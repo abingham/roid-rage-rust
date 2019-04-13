@@ -49,6 +49,8 @@ fn main() {
                 bearing: 2.7,
             },
         ],
+        bullets: vec![],
+        full_time: 0.0,
     };
 
     let mut events = Events::new(EventSettings::new());
