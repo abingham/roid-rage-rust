@@ -43,29 +43,29 @@ impl Field {
         self.height + self.fringe
     }
 
-    pub fn contains(&self, point: &Point2<f32>) -> bool {
-        point.x >= self.left_limit() as f32
-            && point.x <= self.right_limit() as f32
-            && point.y >= self.bottom_limit() as f32
-            && point.y <= self.top_limit() as f32
+    pub fn contains(&self, point: &Point2<f64>) -> bool {
+        point.x >= self.left_limit() as f64
+            && point.x <= self.right_limit() as f64
+            && point.y >= self.bottom_limit() as f64
+            && point.y <= self.top_limit() as f64
     }
 
-    pub fn wrap(&self, point: &Point2<f32>) -> Point2<f32> {
-        let x = if point.x < self.left_limit() as f32 {
-            self.right_limit() as f32
+    pub fn wrap(&self, point: &Point2<f64>) -> Point2<f64> {
+        let x = if point.x < self.left_limit() as f64 {
+            self.right_limit() as f64
         }
-        else if point.x > self.right_limit() as f32 {
-            self.left_limit() as f32
+        else if point.x > self.right_limit() as f64 {
+            self.left_limit() as f64
         }
         else {
             point.x
         };
 
-        let y = if point.y < self.bottom_limit() as f32 {
-            self.top_limit() as f32
+        let y = if point.y < self.bottom_limit() as f64 {
+            self.top_limit() as f64
         }
-        else if point.y > self.top_limit() as f32 {
-            self.bottom_limit() as f32
+        else if point.y > self.top_limit() as f64 {
+            self.bottom_limit() as f64
         }
         else {
             point.y

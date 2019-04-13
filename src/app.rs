@@ -11,10 +11,10 @@ use opengl_graphics::GlGraphics;
 use piston::input::*;
 
 pub struct Roid {
-    pub position: Point2<f32>,
-    pub radius: f32,
-    pub speed: f32,
-    pub bearing: f32,
+    pub position: Point2<f64>,
+    pub radius: f64,
+    pub speed: f64,
+    pub bearing: f64,
 }
 
 pub struct App {
@@ -23,7 +23,7 @@ pub struct App {
     pub roids: Vec<Roid>,
 }
 
-fn move_point(point: &Point2<f32>, distance: f32, bearing: f32) -> Point2<f32> {
+fn move_point(point: &Point2<f64>, distance: f64, bearing: f64) -> Point2<f64> {
     let rot = Rotation2::new(bearing);
     let vec = rot.transform_vector(&Vector2::new(distance, 0.0));
     point + vec
@@ -44,14 +44,14 @@ impl App {
         for roid in &self.roids {
             self.gl.draw(args.viewport(), |c, gl| {
                 let transform = c.transform.trans(
-                    roid.position.coords[0] as f64,
-                    roid.position.coords[1] as f64,
+                    roid.position.coords[0],
+                    roid.position.coords[1],
                 );
 
                 let rect = rectangle::square(
-                    -1.0 * roid.radius as f64,
-                    -1.0 * roid.radius as f64,
-                    2.0 * roid.radius as f64,
+                    -1.0 * roid.radius,
+                    -1.0 * roid.radius,
+                    2.0 * roid.radius,
                 );
                 ellipse(WHITE, rect, transform, gl);
             });
@@ -61,7 +61,7 @@ impl App {
     pub fn update(&mut self, args: &UpdateArgs) {
         // Move all of the roids.
         for roid in &mut self.roids {
-            let point = move_point(&roid.position, roid.speed * args.dt as f32, roid.bearing);
+            let point = move_point(&roid.position, roid.speed * args.dt, roid.bearing);
             let point = self.field.wrap(&point);
             roid.position = point;
         }
