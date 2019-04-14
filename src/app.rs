@@ -6,6 +6,8 @@ extern crate piston;
 extern crate rand;
 
 use crate::field::Field;
+use crate::objects::Circle;
+use crate::util::make_velocity_vector;
 use nalgebra::geometry::Isometry2;
 use nalgebra::{Point2, Vector2};
 use ncollide2d::query;
@@ -14,8 +16,6 @@ use opengl_graphics::GlGraphics;
 use piston::input::*;
 use rand::prelude::*;
 use std::collections::HashSet;
-use crate::objects::Circle;
-use crate::util::make_velocity_vector;
 use std::f64::consts::PI;
 use uuid::Uuid;
 
@@ -54,6 +54,9 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
+        // Find all upcoming collisions
+        let collisions = self.collide(args.dt);
+
         // Move all of the roids.
         for roid in &mut self.roids {
             roid.update(args.dt);
@@ -63,65 +66,65 @@ impl App {
         // move the bullets
         for bullet in &mut self.bullets {
             bullet.update(args.dt);
-            // TODO: Remove bullets which are off the field
-            self.field.contains(&bullet.position);
         }
-        let in_bounds: HashSet<Uuid> = self.bullets.iter().filter_map(|b| {
-            if self.field.contains(&b.position) {
-                Some(b.id())
-            } else {
-                None
-            }
-        }).collect();
-        self.bullets.retain(|b| in_bounds.contains(&b.id()));
 
-        self.collide_objects(args.dt);
+        let f = &self.field;
+        self.roids.retain(|r| !collisions.contains(&r.id()));
+        self.bullets.retain(|b| !collisions.contains(&b.id()));
+        self.bullets.retain(|b| f.contains(&b.position));
+
         self.fire(args.dt);
     }
 
-    fn collide_objects(&mut self, dt: f64) -> ()
-    {
+    fn collide(&mut self, dt: f64) -> HashSet<Uuid> {
         // Find bullet/roid intersections
-        let mut dead_objects: HashSet<Uuid> = HashSet::new();
-        for roid in &self.roids {
-            let roid_ball = Ball::new(roid.radius);
-            let roid_pos = Isometry2::new(
-                Vector2::new(roid.position.coords[0], roid.position.coords[1]),
-                0.0,
-            );
-            for bullet in &self.bullets {
-                let bullet_ball = Ball::new(bullet.radius);
-                let bullet_pos = Isometry2::new(
-                    Vector2::new(bullet.position.coords[0], bullet.position.coords[1]),
+        // let mut dead_objects: HashSet<Uuid> = HashSet::new();
+        // let tois: HashSet<Uuid> = self.roids.iter()
+        self.roids
+            .iter()
+            .map(|roid| {
+                let roid_ball = Ball::new(roid.radius);
+                let roid_pos = Isometry2::new(
+                    Vector2::new(roid.position.coords[0], roid.position.coords[1]),
                     0.0,
                 );
-    
-                let toi = query::time_of_impact(&roid_pos, &roid.velocity, &roid_ball, 
-                                                &bullet_pos, &bullet.velocity, &bullet_ball);
-                match toi {
-                    Some(t) => {
-                        if t <= dt {
-                            dead_objects.insert(roid.id());
-                            dead_objects.insert(bullet.id());
-                            break;
+                let foo: Vec<Uuid> = self
+                    .bullets
+                    .iter()
+                    .filter_map(|bullet| {
+                        let bullet_ball = Ball::new(bullet.radius);
+                        let bullet_pos = Isometry2::new(
+                            Vector2::new(bullet.position.coords[0], bullet.position.coords[1]),
+                            0.0,
+                        );
+                        let toi = query::time_of_impact(
+                            &roid_pos,
+                            &roid.velocity,
+                            &roid_ball,
+                            &bullet_pos,
+                            &bullet.velocity,
+                            &bullet_ball,
+                        );
+                        match toi {
+                            Some(t) => {
+                                if t <= dt {
+                                    Some(vec![roid.id(), bullet.id()])
+                                } else {
+                                    None
+                                }
+                            },
+                            None => None,
                         }
-                    }
-                    None => ()
-                }                
-            }
-        }
-
-        self.roids.retain(|r| {
-            !dead_objects.contains(&r.id())
-        });
-
-        self.bullets.retain(|r| {
-            !dead_objects.contains(&r.id())
-        });
+                    })
+                    .flatten()
+                    .collect();
+                foo
+            })
+            .flatten()
+            .collect()
     }
 
-    fn fire(&mut self, dt: f64) -> ()
-    {
+    fn fire(&mut self, dt: f64) -> () {
         // Generate a bullet if it's the right time.
         self.full_time += dt;
         if self.full_time > 1.0 {
@@ -133,7 +136,7 @@ impl App {
             let b = Circle::new(
                 Point2::new(
                     (self.field.width() / 2) as f64,
-                    (self.field.height() / 2) as f64
+                    (self.field.height() / 2) as f64,
                 ),
                 2.0,
                 make_velocity_vector(200.0, (bearing * 2.0 - 1.0) * PI),
