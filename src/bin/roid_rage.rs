@@ -43,6 +43,7 @@ fn main() {
             ),
         ],
         bullets: vec![],
+        fragments: vec![],
         full_time: 0.0,
     };
 

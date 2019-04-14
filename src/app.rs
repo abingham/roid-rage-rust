@@ -24,6 +24,7 @@ pub struct App {
     pub field: Field,
     pub roids: Vec<Circle>,
     pub bullets: Vec<Circle>,
+    pub fragments: Vec<Circle>,
 
     pub full_time: f64,
 }

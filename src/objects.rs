@@ -36,7 +36,36 @@ impl Circle {
         ellipse(*color, rect, transform, gl);
     }
 
-    pub fn update(&mut self, time_delta: f64) -> () {
+    pub fn update(&mut self, time_delta: f64) -> bool {
         self.position = self.position + self.velocity * time_delta;
+        true
+    }
+}
+
+pub struct Fragment {
+    body: Circle,
+    age: f64,
+    max_age: f64,
+}
+
+impl Fragment {
+    pub fn new(position: Point2<f64>, radius: f64, velocity: Vector2<f64>, max_age: f64) -> Fragment {
+        Fragment {
+            body: Circle::new(position, radius, velocity),
+            age: 0.0,
+            max_age: max_age
+        }
+    }
+
+    pub fn id(&self) -> Uuid { self.body.id }
+
+    pub fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
+        self.body.render(color, c, gl)
+    }
+
+    pub fn update(&mut self, time_delta: f64) -> bool {
+        self.body.update(time_delta);
+        self.age += time_delta;
+        self.age <= self.max_age
     }
 }
