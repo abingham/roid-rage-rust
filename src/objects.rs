@@ -4,13 +4,24 @@ use graphics;
 use nalgebra::{Point2, Vector2};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
+use ncollide2d::shape::{Ball, Shape};
 
+pub trait GameObject {
+    fn position(&self) -> &Point2<f64>;
+    fn set_position(&mut self, pos: Point2<f64>);
+    fn velocity(&self) -> &Vector2<f64>;
+    fn id(&self) -> Uuid;
+    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
+    fn update(&mut self, time_delta: f64) -> bool;
+    fn collision_shape(&self) -> &Shape<f64>;
+}
 
 pub struct Circle {
     position: Point2<f64>,
     radius: f64,
     velocity: Vector2<f64>,
-    id: Uuid
+    id: Uuid,
+    collision_shape: Ball<f64>
 }
 
 impl Circle {
@@ -19,21 +30,20 @@ impl Circle {
             position: position,
             radius: radius,
             velocity: velocity,
-            id: Uuid::new_v4()
+            id: Uuid::new_v4(),
+            collision_shape: Ball::new(radius)
         }
     }
 
-    pub fn position(&self) -> &Point2<f64> { &self.position }
-
-    pub fn set_position(&mut self, pos: Point2<f64>) { self.position = pos; }
-
-    pub fn velocity(&self) -> &Vector2<f64> { &self.velocity }
-
     pub fn radius(&self) -> f64 { self.radius }
+}
 
-    pub fn id(&self) -> Uuid { self.id }
-
-    pub fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
+impl GameObject for Circle {
+    fn position(&self) -> &Point2<f64> { &self.position }
+    fn set_position(&mut self, pos: Point2<f64>) { self.position = pos; }
+    fn velocity(&self) -> &Vector2<f64> { &self.velocity }
+    fn id(&self) -> Uuid { self.id }
+    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
@@ -42,11 +52,14 @@ impl Circle {
 
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
         ellipse(*color, rect, transform, gl);
-    }
 
-    pub fn update(&mut self, time_delta: f64) -> bool {
+    }
+    fn update(&mut self, time_delta: f64) -> bool {
         self.position = self.position + self.velocity * time_delta;
         true
+    }
+    fn collision_shape(&self) -> &Shape<f64> {
+        &self.collision_shape
     }
 }
 

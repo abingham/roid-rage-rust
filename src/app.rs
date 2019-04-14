@@ -6,7 +6,7 @@ extern crate piston;
 extern crate rand;
 
 use crate::field::Field;
-use crate::objects::Circle;
+use crate::objects::{Circle, GameObject};
 use crate::util::make_velocity_vector;
 use nalgebra::geometry::Isometry2;
 use nalgebra::{Point2, Vector2};
@@ -84,7 +84,7 @@ impl App {
         self.roids
             .iter()
             .map(|roid| {
-                let roid_ball = Ball::new(roid.radius());
+                let roid_ball = roid.collision_shape();
                 let roid_pos = Isometry2::new(
                     Vector2::new(roid.position().coords[0], roid.position().coords[1]),
                     0.0,
@@ -93,7 +93,7 @@ impl App {
                     .bullets
                     .iter()
                     .filter_map(|bullet| {
-                        let bullet_ball = Ball::new(bullet.radius());
+                        let bullet_ball = roid.collision_shape();
                         let bullet_pos = Isometry2::new(
                             Vector2::new(bullet.position().coords[0], bullet.position().coords[1]),
                             0.0,
@@ -101,10 +101,10 @@ impl App {
                         let toi = query::time_of_impact(
                             &roid_pos,
                             roid.velocity(),
-                            &roid_ball,
+                            roid_ball,
                             &bullet_pos,
                             bullet.velocity(),
-                            &bullet_ball,
+                            bullet_ball,
                         );
                         match toi {
                             Some(t) => {
