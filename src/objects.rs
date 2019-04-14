@@ -7,9 +7,9 @@ use uuid::Uuid;
 
 
 pub struct Circle {
-    pub position: Point2<f64>,
-    pub radius: f64,
-    pub velocity: Vector2<f64>,
+    position: Point2<f64>,
+    radius: f64,
+    velocity: Vector2<f64>,
     id: Uuid
 }
 
@@ -22,6 +22,14 @@ impl Circle {
             id: Uuid::new_v4()
         }
     }
+
+    pub fn position(&self) -> &Point2<f64> { &self.position }
+
+    pub fn set_position(&mut self, pos: Point2<f64>) { self.position = pos; }
+
+    pub fn velocity(&self) -> &Vector2<f64> { &self.velocity }
+
+    pub fn radius(&self) -> f64 { self.radius }
 
     pub fn id(&self) -> Uuid { self.id }
 

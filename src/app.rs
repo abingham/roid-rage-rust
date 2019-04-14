@@ -61,7 +61,7 @@ impl App {
         // Move all of the roids.
         for roid in &mut self.roids {
             roid.update(args.dt);
-            roid.position = self.field.wrap(&roid.position);
+            roid.set_position(self.field.wrap(&roid.position()));
         }
 
         // move the bullets
@@ -72,7 +72,7 @@ impl App {
         let f = &self.field;
         self.roids.retain(|r| !collisions.contains(&r.id()));
         self.bullets.retain(|b| !collisions.contains(&b.id()));
-        self.bullets.retain(|b| f.contains(&b.position));
+        self.bullets.retain(|b| f.contains(b.position()));
 
         self.fire(args.dt);
     }
@@ -84,26 +84,26 @@ impl App {
         self.roids
             .iter()
             .map(|roid| {
-                let roid_ball = Ball::new(roid.radius);
+                let roid_ball = Ball::new(roid.radius());
                 let roid_pos = Isometry2::new(
-                    Vector2::new(roid.position.coords[0], roid.position.coords[1]),
+                    Vector2::new(roid.position().coords[0], roid.position().coords[1]),
                     0.0,
                 );
                 let foo: Vec<Uuid> = self
                     .bullets
                     .iter()
                     .filter_map(|bullet| {
-                        let bullet_ball = Ball::new(bullet.radius);
+                        let bullet_ball = Ball::new(bullet.radius());
                         let bullet_pos = Isometry2::new(
-                            Vector2::new(bullet.position.coords[0], bullet.position.coords[1]),
+                            Vector2::new(bullet.position().coords[0], bullet.position().coords[1]),
                             0.0,
                         );
                         let toi = query::time_of_impact(
                             &roid_pos,
-                            &roid.velocity,
+                            roid.velocity(),
                             &roid_ball,
                             &bullet_pos,
-                            &bullet.velocity,
+                            bullet.velocity(),
                             &bullet_ball,
                         );
                         match toi {
