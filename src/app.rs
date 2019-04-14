@@ -62,17 +62,24 @@ impl App {
         for roid in &mut self.roids {
             roid.update(args.dt);
             roid.set_position(self.field.wrap(&roid.position()));
+            if collisions.contains(&roid.id()) {
+                roid.kill();
+            }
         }
 
         // move the bullets
         for bullet in &mut self.bullets {
             bullet.update(args.dt);
+            if !self.field.contains(bullet.position()) {
+                bullet.kill();
+            }
+            else if collisions.contains(&bullet.id()) {
+                bullet.kill();
+            }
         }
 
-        let f = &self.field;
-        self.roids.retain(|r| !collisions.contains(&r.id()));
-        self.bullets.retain(|b| !collisions.contains(&b.id()));
-        self.bullets.retain(|b| f.contains(b.position()));
+        self.roids.retain(|r| r.alive());
+        self.bullets.retain(|b| b.alive());
 
         self.fire(args.dt);
     }
@@ -86,16 +93,18 @@ impl App {
             .map(|roid| {
                 let roid_ball = roid.collision_shape();
                 let roid_pos = Isometry2::new(
-                    Vector2::new(roid.position().coords[0], roid.position().coords[1]),
+                    Vector2::new(roid.position().coords[0], 
+                                 roid.position().coords[1]),
                     0.0,
                 );
                 let foo: Vec<Uuid> = self
                     .bullets
                     .iter()
                     .filter_map(|bullet| {
-                        let bullet_ball = roid.collision_shape();
+                        let bullet_ball = bullet.collision_shape();
                         let bullet_pos = Isometry2::new(
-                            Vector2::new(bullet.position().coords[0], bullet.position().coords[1]),
+                            Vector2::new(bullet.position().coords[0], 
+                                         bullet.position().coords[1]),
                             0.0,
                         );
                         let toi = query::time_of_impact(

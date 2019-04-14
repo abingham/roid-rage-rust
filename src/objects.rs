@@ -14,6 +14,8 @@ pub trait GameObject {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
     fn update(&mut self, time_delta: f64) -> bool;
     fn collision_shape(&self) -> &Shape<f64>;
+    fn alive(&self) -> bool;
+    fn kill(&mut self);
 }
 
 pub struct Circle {
@@ -21,7 +23,8 @@ pub struct Circle {
     radius: f64,
     velocity: Vector2<f64>,
     id: Uuid,
-    collision_shape: Ball<f64>
+    collision_shape: Ball<f64>,
+    alive: bool,
 }
 
 impl Circle {
@@ -31,7 +34,8 @@ impl Circle {
             radius: radius,
             velocity: velocity,
             id: Uuid::new_v4(),
-            collision_shape: Ball::new(radius)
+            collision_shape: Ball::new(radius),
+            alive: true
         }
     }
 
@@ -61,6 +65,9 @@ impl GameObject for Circle {
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
     }
+
+    fn alive(&self) -> bool { self.alive }
+    fn kill(&mut self) { self.alive = false }
 }
 
 pub struct Fragment {
