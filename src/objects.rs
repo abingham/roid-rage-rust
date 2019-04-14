@@ -12,7 +12,7 @@ pub trait GameObject {
     fn velocity(&self) -> &Vector2<f64>;
     fn id(&self) -> Uuid;
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
-    fn update(&mut self, time_delta: f64) -> bool;
+    fn update(&mut self, time_delta: f64);
     fn collision_shape(&self) -> &Shape<f64>;
     fn alive(&self) -> bool;
     fn kill(&mut self);
@@ -58,9 +58,8 @@ impl GameObject for Circle {
         ellipse(*color, rect, transform, gl);
 
     }
-    fn update(&mut self, time_delta: f64) -> bool {
+    fn update(&mut self, time_delta: f64) {
         self.position = self.position + self.velocity * time_delta;
-        true
     }
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
@@ -84,16 +83,33 @@ impl Fragment {
             max_age: max_age
         }
     }
+}
 
-    pub fn id(&self) -> Uuid { self.body.id }
+impl GameObject for Fragment {
+    fn id(&self) -> Uuid { self.body.id }
 
-    pub fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
+    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
         self.body.render(color, c, gl)
     }
 
-    pub fn update(&mut self, time_delta: f64) -> bool {
+    fn update(&mut self, time_delta: f64) {
         self.body.update(time_delta);
         self.age += time_delta;
-        self.age <= self.max_age
+        if self.age > self.max_age {
+            self.kill();
+        }
     }
+
+    fn position(&self) -> &Point2<f64> { self.body.position() }
+
+    fn set_position(&mut self, pos: Point2<f64>) { self.body.set_position(pos) }
+
+    fn velocity(&self) -> &Vector2<f64> { self.body.velocity() }
+
+    fn collision_shape(&self) -> &Shape<f64> { self.body.collision_shape() }
+
+    fn alive(&self) -> bool { self.body.alive() }
+
+    fn kill(&mut self) { self.body.kill() }
+
 }
