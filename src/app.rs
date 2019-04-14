@@ -14,8 +14,10 @@ use opengl_graphics::GlGraphics;
 use piston::input::*;
 use rand::prelude::*;
 use std::collections::HashSet;
-use std::f64::consts::PI;
 use crate::objects::Circle;
+use crate::util::make_velocity_vector;
+use std::f64::consts::PI;
+use uuid::Uuid;
 
 pub struct App {
     pub gl: GlGraphics, // OpenGL drawing backend.
@@ -62,56 +64,80 @@ impl App {
         for bullet in &mut self.bullets {
             bullet.update(args.dt);
             // TODO: Remove bullets which are off the field
+            self.field.contains(&bullet.position);
         }
+        let in_bounds: HashSet<Uuid> = self.bullets.iter().filter_map(|b| {
+            if self.field.contains(&b.position) {
+                Some(b.id())
+            } else {
+                None
+            }
+        }).collect();
+        self.bullets.retain(|b| in_bounds.contains(&b.id()));
 
+        self.collide_objects(args.dt);
+        self.fire(args.dt);
+    }
+
+    fn collide_objects(&mut self, dt: f64) -> ()
+    {
         // Find bullet/roid intersections
-        for bullet in &self.bullets {
-            let bullet_ball = Ball::new(bullet.radius);
-            let bullet_trans = Isometry2::new(
-                Vector2::new(bullet.position.coords[0], bullet.position.coords[1]),
+        let mut dead_objects: HashSet<Uuid> = HashSet::new();
+        for roid in &self.roids {
+            let roid_ball = Ball::new(roid.radius);
+            let roid_pos = Isometry2::new(
+                Vector2::new(roid.position.coords[0], roid.position.coords[1]),
                 0.0,
             );
-
-            let mut dead_roids = HashSet::new();
-            for (i, roid) in self.roids.iter().enumerate() {
-                let roid_ball = Ball::new(roid.radius);
-                let roid_trans = Isometry2::new(
-                    Vector2::new(roid.position.coords[0], roid.position.coords[1]),
+            for bullet in &self.bullets {
+                let bullet_ball = Ball::new(bullet.radius);
+                let bullet_pos = Isometry2::new(
+                    Vector2::new(bullet.position.coords[0], bullet.position.coords[1]),
                     0.0,
                 );
-
-                let dist_intersecting =
-                    query::distance(&bullet_trans, &bullet_ball, &roid_trans, &roid_ball);
-
-                if dist_intersecting == 0.0 {
-                    dead_roids.insert(i);
-                }
-            }
-            let mut dead_roids: Vec<&usize> = dead_roids.iter().collect();
-            dead_roids.sort();
-            dead_roids.reverse();
-            for i in dead_roids {
-                self.roids.remove(*i);
+    
+                let toi = query::time_of_impact(&roid_pos, &roid.velocity, &roid_ball, 
+                                                &bullet_pos, &bullet.velocity, &bullet_ball);
+                match toi {
+                    Some(t) => {
+                        if t <= dt {
+                            dead_objects.insert(roid.id());
+                            dead_objects.insert(bullet.id());
+                            break;
+                        }
+                    }
+                    None => ()
+                }                
             }
         }
 
+        self.roids.retain(|r| {
+            !dead_objects.contains(&r.id())
+        });
+
+        self.bullets.retain(|r| {
+            !dead_objects.contains(&r.id())
+        });
+    }
+
+    fn fire(&mut self, dt: f64) -> ()
+    {
         // Generate a bullet if it's the right time.
-        self.full_time += args.dt;
+        self.full_time += dt;
         if self.full_time > 1.0 {
             self.full_time = 0.0;
 
             let mut rng = thread_rng();
             let bearing: f64 = rng.gen();
 
-            let b = Circle {
-                position: Point2::new(
+            let b = Circle::new(
+                Point2::new(
                     (self.field.width() / 2) as f64,
-                    (self.field.height() / 2) as f64,
+                    (self.field.height() / 2) as f64
                 ),
-                radius: 2.0,
-                speed: 200.0,
-                bearing: (bearing * 2.0 - 1.0) * PI,
-            };
+                2.0,
+                make_velocity_vector(200.0, (bearing * 2.0 - 1.0) * PI),
+            );
             self.bullets.push(b);
         }
     }

@@ -13,6 +13,7 @@ use piston::window::WindowSettings;
 use roid_rage::app::App;
 use roid_rage::objects::Circle;
 use roid_rage::field::Field;
+use roid_rage::util::make_velocity_vector;
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -30,18 +31,16 @@ fn main() {
         gl: GlGraphics::new(opengl),
         field: Field::new(800, 600, 100),
         roids: vec![
-            Circle {
-                position: Point2::new(400.0, 300.0),
-                radius: 40.0,
-                speed: 100.0,
-                bearing: 0.0,
-            },
-            Circle {
-                position: Point2::new(400.0, 300.0),
-                radius: 40.0,
-                speed: 100.0,
-                bearing: 2.7,
-            },
+            Circle::new(
+                Point2::new(400.0, 300.0),
+                40.0,
+                make_velocity_vector(100.0, 0.0),
+            ),
+            Circle::new(
+                Point2::new(400.0, 300.0),
+                40.0,
+                make_velocity_vector(100.0, 2.7)
+            ),
         ],
         bullets: vec![],
         full_time: 0.0,

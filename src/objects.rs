@@ -1,18 +1,31 @@
-use opengl_graphics::GlGraphics;
+extern crate uuid;
+
 use graphics;
-use nalgebra::Point2;
-use nalgebra::geometry::Rotation2;
-use nalgebra::Vector2;
+use nalgebra::{Point2, Vector2};
+use opengl_graphics::GlGraphics;
+use uuid::Uuid;
+
 
 pub struct Circle {
     pub position: Point2<f64>,
     pub radius: f64,
-    pub speed: f64,
-    pub bearing: f64,
+    pub velocity: Vector2<f64>,
+    id: Uuid
 }
 
 impl Circle {
-    pub fn render(&self, color: &[f32;4], c: graphics::Context, gl: &mut GlGraphics) -> () {
+    pub fn new(position: Point2<f64>, radius: f64, velocity: Vector2<f64>) -> Circle {
+        Circle {
+            position: position,
+            radius: radius,
+            velocity: velocity,
+            id: Uuid::new_v4()
+        }
+    }
+
+    pub fn id(&self) -> Uuid { self.id }
+
+    pub fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
         use graphics::*;
 
         let transform = c
@@ -24,13 +37,6 @@ impl Circle {
     }
 
     pub fn update(&mut self, time_delta: f64) -> () {
-        self.position = move_point(&self.position, self.speed * time_delta, self.bearing);    
+        self.position = self.position + self.velocity * time_delta;
     }
 }
-
-fn move_point(point: &Point2<f64>, distance: f64, bearing: f64) -> Point2<f64> {
-    let rot = Rotation2::new(bearing);
-    let vec = rot.transform_vector(&Vector2::new(distance, 0.0));
-    point + vec
-}
-
