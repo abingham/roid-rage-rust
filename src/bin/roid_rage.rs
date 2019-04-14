@@ -10,7 +10,8 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
-use roid_rage::app::{App, Roid};
+use roid_rage::app::App;
+use roid_rage::objects::Circle;
 use roid_rage::field::Field;
 
 fn main() {
@@ -24,25 +25,18 @@ fn main() {
         .build()
         .unwrap();
 
-    let roid = Roid {
-        position: Point2::new(400.0, 300.0),
-        radius: 40.0,
-        speed: 100.0,
-        bearing: 0.0,
-    };
-
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
         field: Field::new(800, 600, 100),
         roids: vec![
-            Roid {
+            Circle {
                 position: Point2::new(400.0, 300.0),
                 radius: 40.0,
                 speed: 100.0,
                 bearing: 0.0,
             },
-            Roid {
+            Circle {
                 position: Point2::new(400.0, 300.0),
                 radius: 40.0,
                 speed: 100.0,
