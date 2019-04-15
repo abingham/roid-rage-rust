@@ -6,67 +6,74 @@ use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 use ncollide2d::shape::{Ball, Shape};
 
+pub struct Core {
+    position: Point2<f64>,
+    velocity: Vector2<f64>,
+    id: Uuid,
+    alive: bool,
+}
+
 pub trait GameObject {
-    fn position(&self) -> &Point2<f64>;
-    fn set_position(&mut self, pos: Point2<f64>);
-    fn velocity(&self) -> &Vector2<f64>;
-    fn id(&self) -> Uuid;
+    fn get_core(&self) -> &Core;
+    fn get_mut_core(&mut self) -> &mut Core;
+
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
     fn update(&mut self, time_delta: f64);
     fn collision_shape(&self) -> &Shape<f64>;
-    fn alive(&self) -> bool;
-    fn kill(&mut self);
+
+    fn position(&self) -> &Point2<f64> { &self.get_core().position }
+    fn set_position(&mut self, pos: Point2<f64>) { self.get_mut_core().position = pos; }
+    fn velocity(&self) -> &Vector2<f64> { &self.get_core().velocity }
+    fn id(&self) -> Uuid { self.get_core().id }
+    fn alive(&self) -> bool { self.get_core().alive }
+    fn kill(&mut self) { self.get_mut_core().alive = false; }
 }
 
 pub struct Circle {
-    position: Point2<f64>,
+    core: Core,
     radius: f64,
-    velocity: Vector2<f64>,
-    id: Uuid,
     collision_shape: Ball<f64>,
-    alive: bool,
 }
 
 impl Circle {
     pub fn new(position: Point2<f64>, radius: f64, velocity: Vector2<f64>) -> Circle {
         Circle {
-            position: position,
+            core: Core {
+                position: position,
+                velocity: velocity,
+                id: Uuid::new_v4(),
+                alive: true
+            },
             radius: radius,
-            velocity: velocity,
-            id: Uuid::new_v4(),
             collision_shape: Ball::new(radius),
-            alive: true
         }
     }
 
     pub fn radius(&self) -> f64 { self.radius }
+
 }
 
 impl GameObject for Circle {
-    fn position(&self) -> &Point2<f64> { &self.position }
-    fn set_position(&mut self, pos: Point2<f64>) { self.position = pos; }
-    fn velocity(&self) -> &Vector2<f64> { &self.velocity }
-    fn id(&self) -> Uuid { self.id }
+    fn get_core(&self) -> &Core { &self.core }
+    fn get_mut_core(&mut self) -> &mut Core { &mut self.core }
+
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
             .transform
-            .trans(self.position.coords[0], self.position.coords[1]);
+            .trans(self.core.position.coords[0], self.core.position.coords[1]);
 
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
         ellipse(*color, rect, transform, gl);
 
     }
     fn update(&mut self, time_delta: f64) {
-        self.position = self.position + self.velocity * time_delta;
+        self.core.position = self.core.position + self.core.velocity * time_delta;
     }
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
     }
-
-    fn alive(&self) -> bool { self.alive }
-    fn kill(&mut self) { self.alive = false }
 }
 
 pub struct Fragment {
@@ -86,7 +93,7 @@ impl Fragment {
 }
 
 impl GameObject for Fragment {
-    fn id(&self) -> Uuid { self.body.id }
+    fn get_core(&self) -> &Core { self.body.get_core() }
 
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) -> () {
         self.body.render(color, c, gl)
@@ -100,16 +107,7 @@ impl GameObject for Fragment {
         }
     }
 
-    fn position(&self) -> &Point2<f64> { self.body.position() }
-
     fn set_position(&mut self, pos: Point2<f64>) { self.body.set_position(pos) }
 
-    fn velocity(&self) -> &Vector2<f64> { self.body.velocity() }
-
     fn collision_shape(&self) -> &Shape<f64> { self.body.collision_shape() }
-
-    fn alive(&self) -> bool { self.body.alive() }
-
-    fn kill(&mut self) { self.body.kill() }
-
 }
