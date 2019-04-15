@@ -11,7 +11,6 @@ use crate::util::make_velocity_vector;
 use nalgebra::geometry::Isometry2;
 use nalgebra::{Point2, Vector2};
 use ncollide2d::query;
-use ncollide2d::shape::Ball;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use rand::prelude::*;
