@@ -55,7 +55,14 @@ impl App {
 
     pub fn update(&mut self, args: &UpdateArgs) {
         // Find all upcoming collisions
-        let collisions = self.collide(args.dt);
+        let collisions = self
+            .collide(args.dt)
+            .iter()
+            .fold(HashSet::new(), |mut acc, x| {
+                acc.insert(x.0);
+                acc.insert(x.1);
+                acc
+            });
 
         // Move all of the roids.
         for roid in &mut self.roids {
@@ -71,8 +78,7 @@ impl App {
             bullet.update(args.dt);
             if !self.field.contains(bullet.position()) {
                 bullet.kill();
-            }
-            else if collisions.contains(&bullet.id()) {
+            } else if collisions.contains(&bullet.id()) {
                 bullet.kill();
             }
         }
@@ -83,27 +89,22 @@ impl App {
         self.fire(args.dt);
     }
 
-    fn collide(&mut self, dt: f64) -> HashSet<Uuid> {
-        // Find bullet/roid intersections
-        // let mut dead_objects: HashSet<Uuid> = HashSet::new();
-        // let tois: HashSet<Uuid> = self.roids.iter()
+    fn collide(&mut self, dt: f64) -> HashSet<(Uuid, Uuid)> {
         self.roids
             .iter()
             .map(|roid| {
                 let roid_ball = roid.collision_shape();
                 let roid_pos = Isometry2::new(
-                    Vector2::new(roid.position().coords[0], 
-                                 roid.position().coords[1]),
+                    Vector2::new(roid.position().coords[0], roid.position().coords[1]),
                     0.0,
                 );
-                let foo: Vec<Uuid> = self
+                let colls: Vec<(Uuid, Uuid)> = self
                     .bullets
                     .iter()
                     .filter_map(|bullet| {
                         let bullet_ball = bullet.collision_shape();
                         let bullet_pos = Isometry2::new(
-                            Vector2::new(bullet.position().coords[0], 
-                                         bullet.position().coords[1]),
+                            Vector2::new(bullet.position().coords[0], bullet.position().coords[1]),
                             0.0,
                         );
                         let toi = query::time_of_impact(
@@ -117,17 +118,16 @@ impl App {
                         match toi {
                             Some(t) => {
                                 if t <= dt {
-                                    Some(vec![roid.id(), bullet.id()])
+                                    Some((roid.id(), bullet.id()))
                                 } else {
                                     None
                                 }
-                            },
+                            }
                             None => None,
                         }
                     })
-                    .flatten()
                     .collect();
-                foo
+                colls
             })
             .flatten()
             .collect()
