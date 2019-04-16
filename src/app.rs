@@ -5,16 +5,16 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate rand;
 
+use crate::collide::collide;
 use crate::field::Field;
 use crate::objects::{Circle, GameObject};
 use crate::util::make_velocity_vector;
-use nalgebra::{Point2, Vector2};
+use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use rand::prelude::*;
 use std::collections::HashSet;
 use std::f64::consts::PI;
-use crate::collide::collide;
 
 pub struct App {
     pub gl: GlGraphics, // OpenGL drawing backend.
@@ -53,13 +53,14 @@ impl App {
 
     pub fn update(&mut self, args: &UpdateArgs) {
         // Find all upcoming collisions
-        let collisions = collide(&self.roids, &self.bullets, args.dt)
-            .iter()
-            .fold(HashSet::new(), |mut acc, x| {
+        let collisions = collide(&self.roids, &self.bullets, args.dt).iter().fold(
+            HashSet::new(),
+            |mut acc, x| {
                 acc.insert(x.0);
                 acc.insert(x.1);
                 acc
-            });
+            },
+        );
 
         // Move all of the roids.
         for roid in &mut self.roids {
