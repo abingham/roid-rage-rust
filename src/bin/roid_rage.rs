@@ -9,7 +9,19 @@ use piston::window::WindowSettings;
 use roid_rage::app::App;
 use roid_rage::objects::roid::Roid;
 use roid_rage::field::Field;
-use roid_rage::util::make_velocity_vector;
+use roid_rage::util::{make_velocity_vector, random_bearing};
+use rand::prelude::*;
+
+fn some_roids(width: usize, height: usize) -> Vec<Roid> {
+    let mut rng = thread_rng();
+    (0..20).map(|_| {
+        Roid::new(
+            Point2::new(rng.gen_range(0, width) as f64, 
+                        rng.gen_range(0, height) as f64),
+            40.0,
+            make_velocity_vector(100.0, random_bearing()))
+    }).collect()
+}
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -26,18 +38,7 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         field: Field::new(800, 600, 100),
-        roids: vec![
-            Roid::new(
-                Point2::new(400.0, 300.0),
-                40.0,
-                make_velocity_vector(100.0, 0.0),
-            ),
-            Roid::new(
-                Point2::new(400.0, 300.0),
-                40.0,
-                make_velocity_vector(100.0, 2.7)
-            ),
-        ],
+        roids: some_roids(800, 600),
         bullets: vec![],
         fragments: vec![],
         full_time: 0.0,

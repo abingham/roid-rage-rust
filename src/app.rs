@@ -5,13 +5,11 @@ use crate::objects::fragment::Fragment;
 use crate::objects::roid::Roid;
 use crate::objects::traits::{Identifiable, Mortal, Positioned, Renderable};
 use crate::explode::explode;
-use crate::util::make_velocity_vector;
+use crate::util::{make_velocity_vector, random_bearing};
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
-use rand::prelude::*;
 use std::collections::HashSet;
-use std::f64::consts::PI;
 
 pub struct App {
     pub gl: GlGraphics, // OpenGL drawing backend.
@@ -103,15 +101,12 @@ impl App {
         if self.full_time > 1.0 {
             self.full_time = 0.0;
 
-            let mut rng = thread_rng();
-            let bearing: f64 = rng.gen();
-
             let b = Bullet::new(
                 Point2::new(
                     (self.field.width() / 2) as f64,
                     (self.field.height() / 2) as f64,
                 ),
-                make_velocity_vector(200.0, (bearing * 2.0 - 1.0) * PI),
+                make_velocity_vector(200.0,  random_bearing()),
             );
             self.bullets.push(b);
         }
