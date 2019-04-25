@@ -1,7 +1,3 @@
-extern crate glutin_window;
-extern crate graphics;
-extern crate opengl_graphics;
-extern crate piston;
 extern crate roid_rage;
 
 use glutin_window::GlutinWindow as Window;
@@ -11,7 +7,7 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use roid_rage::app::App;
-use roid_rage::objects::Circle;
+use roid_rage::objects::roid::Roid;
 use roid_rage::field::Field;
 use roid_rage::util::make_velocity_vector;
 
@@ -31,12 +27,12 @@ fn main() {
         gl: GlGraphics::new(opengl),
         field: Field::new(800, 600, 100),
         roids: vec![
-            Circle::new(
+            Roid::new(
                 Point2::new(400.0, 300.0),
                 40.0,
                 make_velocity_vector(100.0, 0.0),
             ),
-            Circle::new(
+            Roid::new(
                 Point2::new(400.0, 300.0),
                 40.0,
                 make_velocity_vector(100.0, 2.7)

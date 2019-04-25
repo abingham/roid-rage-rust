@@ -1,17 +1,21 @@
-use crate::objects::GameObject;
+use crate::objects::traits::{Collidable, Identifiable};
 use nalgebra::geometry::Isometry2;
 use nalgebra::Vector2;
 use ncollide2d::query;
 use std::collections::HashSet;
 use uuid::Uuid;
 
-/// Collide two groups of GameObjects together.
+/// Collide two groups of Collidables together.
 ///
 /// The return value is a set of Uuid pairs, each representing a collision
 /// between an object from the first group and the second group. The first
-/// element of the pair is the ID of the object in `group1` and the secodn i the
-/// ID of the object in `group2`.
-pub fn collide<I: GameObject>(group1: &[I], group2: &[I], dt: f64) -> HashSet<(Uuid, Uuid)> {
+/// element of the pair is the ID of the object in `group1` and the second is
+/// the ID of the object in `group2`.
+pub fn collide<I: Collidable + Identifiable, J: Collidable + Identifiable>(
+    group1: &[I],
+    group2: &[J],
+    dt: f64,
+) -> HashSet<(Uuid, Uuid)> {
     group1
         .iter()
         .map(|roid| {

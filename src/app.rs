@@ -1,13 +1,9 @@
-extern crate glutin_window;
-extern crate graphics;
-extern crate nalgebra;
-extern crate opengl_graphics;
-extern crate piston;
-extern crate rand;
-
 use crate::collide::collide;
 use crate::field::Field;
-use crate::objects::{Circle, GameObject};
+use crate::objects::bullet::Bullet;
+use crate::objects::fragment::Fragment;
+use crate::objects::roid::Roid;
+use crate::objects::traits::{Identifiable, Mortal, Positioned, Renderable};
 use crate::util::make_velocity_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -19,9 +15,9 @@ use std::f64::consts::PI;
 pub struct App {
     pub gl: GlGraphics, // OpenGL drawing backend.
     pub field: Field,
-    pub roids: Vec<Circle>,
-    pub bullets: Vec<Circle>,
-    pub fragments: Vec<Circle>,
+    pub roids: Vec<Roid>,
+    pub bullets: Vec<Bullet>,
+    pub fragments: Vec<Fragment>,
 
     pub full_time: f64,
 }
@@ -96,12 +92,11 @@ impl App {
             let mut rng = thread_rng();
             let bearing: f64 = rng.gen();
 
-            let b = Circle::new(
+            let b = Bullet::new(
                 Point2::new(
                     (self.field.width() / 2) as f64,
                     (self.field.height() / 2) as f64,
                 ),
-                2.0,
                 make_velocity_vector(200.0, (bearing * 2.0 - 1.0) * PI),
             );
             self.bullets.push(b);
