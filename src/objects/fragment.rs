@@ -29,7 +29,7 @@ impl Fragment {
     }
 
     pub fn radius() -> f64 {
-        2.0
+        1.0
     }
 }
 

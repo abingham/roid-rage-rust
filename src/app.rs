@@ -4,6 +4,7 @@ use crate::objects::bullet::Bullet;
 use crate::objects::fragment::Fragment;
 use crate::objects::roid::Roid;
 use crate::objects::traits::{Identifiable, Mortal, Positioned, Renderable};
+use crate::explode::explode;
 use crate::util::make_velocity_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -45,6 +46,12 @@ impl App {
                 bullet.render(&WHITE, c, gl);
             });
         }
+
+        for fragment in &self.fragments {
+            self.gl.draw(args.viewport(), |c, gl| {
+                fragment.render(&WHITE, c, gl);
+            });
+        }
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
@@ -64,6 +71,7 @@ impl App {
             roid.set_position(self.field.wrap(&roid.position()));
             if collisions.contains(&roid.id()) {
                 roid.kill();
+                self.fragments.extend(explode(roid.position()));
             }
         }
 
@@ -77,8 +85,14 @@ impl App {
             }
         }
 
+        // move all of the fragments
+        for fragment in &mut self.fragments {
+            fragment.update(args.dt);
+        }
+
         self.roids.retain(|r| r.alive());
         self.bullets.retain(|b| b.alive());
+        self.fragments.retain(|f| f.alive());
 
         self.fire(args.dt);
     }
