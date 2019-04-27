@@ -19,12 +19,12 @@ pub trait Positioned {
 
 }
 
-pub trait Collidable: Positioned {
-    fn collision_shape(&self) -> &Shape<f64>;
-}
-
 pub trait Identifiable {
     fn id(&self) -> Uuid;
+}
+
+pub trait Collidable: Positioned + Identifiable {
+    fn collision_shape(&self) -> &Shape<f64>;
 }
 
 pub trait Mortal {
