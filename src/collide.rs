@@ -11,9 +11,9 @@ use uuid::Uuid;
 /// between an object from the first group and the second group. The first
 /// element of the pair is the ID of the object in `group1` and the second is
 /// the ID of the object in `group2`.
-pub fn collide<I: GameObject, J: GameObject>(
-    group1: &[I],
-    group2: &[J],
+pub fn collide(
+    group1: &[&GameObject],
+    group2: &[&GameObject],
     dt: f64,
 ) -> HashSet<(Uuid, Uuid)> {
     group1
