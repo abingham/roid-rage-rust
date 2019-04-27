@@ -28,28 +28,25 @@ impl App {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
         const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
-        self.gl.draw(args.viewport(), |_c, gl| {
+        let roids = &self.roids;
+        let bullets = &self.bullets;
+        let fragments = &self.fragments;
+        self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
             clear(BLACK, gl);
-        });
 
-        for roid in &self.roids {
-            self.gl.draw(args.viewport(), |c, gl| {
+            for roid in roids {
                 roid.render(&WHITE, c, gl);
-            });
-        }
+            }
 
-        for bullet in &self.bullets {
-            self.gl.draw(args.viewport(), |c, gl| {
-                bullet.render(&WHITE, c, gl);
-            });
-        }
-
-        for fragment in &self.fragments {
-            self.gl.draw(args.viewport(), |c, gl| {
+            for bullet in bullets {
+                bullet.render(&WHITE, c, gl)
+            }
+            
+            for fragment in fragments {
                 fragment.render(&WHITE, c, gl);
-            });
-        }
+            }
+        });
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
