@@ -3,7 +3,7 @@ use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
-use super::traits::{Collidable, Identifiable, Mortal, Positioned, Renderable};
+use super::game_object::GameObject;
 
 pub struct Roid {
     radius: f64,
@@ -31,7 +31,7 @@ impl Roid {
     }
 }
 
-impl Renderable for Roid {
+impl GameObject for Roid {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
@@ -42,15 +42,11 @@ impl Renderable for Roid {
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
         ellipse(*color, rect, transform, gl);
     }
-}
 
-impl Collidable for Roid {
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
     }
-}
 
-impl Positioned for Roid {
     fn position(&self) -> &Point2<f64> {
         &self.position
     }
@@ -60,15 +56,11 @@ impl Positioned for Roid {
     fn velocity(&self) -> &Vector2<f64> {
         &self.velocity
     }
-}
 
-impl Identifiable for Roid {
     fn id(&self) -> Uuid {
         self.id
     }
-}
 
-impl Mortal for Roid {
     fn alive(&self) -> bool {
         self.alive
     }

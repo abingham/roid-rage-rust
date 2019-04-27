@@ -3,7 +3,7 @@ use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
-use super::traits::{Collidable, Identifiable, Mortal, Positioned, Renderable};
+use super::game_object::GameObject;
 
 pub struct Fragment {
     collision_shape: Ball<f64>,
@@ -33,7 +33,7 @@ impl Fragment {
     }
 }
 
-impl Renderable for Fragment {
+impl GameObject for Fragment {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
@@ -48,15 +48,11 @@ impl Renderable for Fragment {
         );
         ellipse(*color, rect, transform, gl);
     }
-}
 
-impl Collidable for Fragment {
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
     }
-}
 
-impl Positioned for Fragment {
     fn update(&mut self, time_delta: f64) {
         self.set_position(self.position() + self.velocity() * time_delta);
         self.age += time_delta;
@@ -73,15 +69,11 @@ impl Positioned for Fragment {
     fn velocity(&self) -> &Vector2<f64> {
         &self.velocity
     }
-}
 
-impl Identifiable for Fragment {
     fn id(&self) -> Uuid {
         self.id
     }
-}
 
-impl Mortal for Fragment {
     fn alive(&self) -> bool {
         self.alive
     }

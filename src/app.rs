@@ -3,7 +3,7 @@ use crate::field::Field;
 use crate::objects::bullet::Bullet;
 use crate::objects::fragment::Fragment;
 use crate::objects::roid::Roid;
-use crate::objects::traits::{Identifiable, Mortal, Positioned, Renderable};
+use crate::objects::game_object::GameObject;
 use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
 use nalgebra::Point2;

@@ -3,7 +3,7 @@ use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
-use super::traits::{Collidable, Identifiable, Mortal, Positioned, Renderable};
+use super::game_object::GameObject;
 
 pub struct Bullet {
     collision_shape: Ball<f64>,
@@ -29,7 +29,7 @@ impl Bullet {
     }
 }
 
-impl Renderable for Bullet {
+impl GameObject for Bullet {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
@@ -44,33 +44,27 @@ impl Renderable for Bullet {
         );
         ellipse(*color, rect, transform, gl);
     }
-}
 
-impl Collidable for Bullet {
     fn collision_shape(&self) -> &Shape<f64> {
         &self.collision_shape
     }
-}
 
-impl Positioned for Bullet {
     fn position(&self) -> &Point2<f64> {
         &self.position
     }
+
     fn set_position(&mut self, pos: Point2<f64>) {
         self.position = pos;
     }
+
     fn velocity(&self) -> &Vector2<f64> {
         &self.velocity
     }
-}
 
-impl Identifiable for Bullet {
     fn id(&self) -> Uuid {
         self.id
     }
-}
 
-impl Mortal for Bullet {
     fn alive(&self) -> bool {
         self.alive
     }

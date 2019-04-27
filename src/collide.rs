@@ -1,4 +1,4 @@
-use crate::objects::traits::Collidable;
+use crate::objects::game_object::GameObject;
 use nalgebra::geometry::Isometry2;
 use nalgebra::Vector2;
 use ncollide2d::query;
@@ -11,7 +11,7 @@ use uuid::Uuid;
 /// between an object from the first group and the second group. The first
 /// element of the pair is the ID of the object in `group1` and the second is
 /// the ID of the object in `group2`.
-pub fn collide<I: Collidable, J: Collidable>(
+pub fn collide<I: GameObject, J: GameObject>(
     group1: &[I],
     group2: &[J],
     dt: f64,
