@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 use super::categories::Category;
 use super::game_object::GameObject;
+use crate::explode::explode;
 
 pub struct Roid {
     radius: f64,
@@ -67,6 +68,13 @@ impl GameObject for Roid {
     }
     fn kill(&mut self) -> Vec<(Category, Box<GameObject>)> {
         self.alive = false;
-        vec![]
+
+        let mut result: Vec<(Category, Box<GameObject>)> = vec![];
+        
+        for frag in explode(&self.position) {
+            result.push((Category::Other, Box::new(frag)));
+        }
+
+        result
     }
 }
