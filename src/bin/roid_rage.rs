@@ -36,7 +36,6 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App {
-        gl: GlGraphics::new(opengl),
         field: Field::new(800, 600, 100),
         roids: some_roids(800, 600),
         bullets: vec![],
@@ -44,10 +43,11 @@ fn main() {
         full_time: 0.0,
     };
 
+    let mut gl = GlGraphics::new(opengl);
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
-            app.render(&r);
+            app.render(&mut gl, &r);
         }
 
         if let Some(u) = e.update_args() {

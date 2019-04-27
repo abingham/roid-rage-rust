@@ -12,7 +12,6 @@ use piston::input::*;
 use std::collections::HashSet;
 
 pub struct App {
-    pub gl: GlGraphics, // OpenGL drawing backend.
     pub field: Field,
     pub roids: Vec<Roid>,
     pub bullets: Vec<Bullet>,
@@ -22,7 +21,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn render(&mut self, args: &RenderArgs) {
+    pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
         use graphics::*;
 
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
@@ -31,7 +30,7 @@ impl App {
         let roids = &self.roids;
         let bullets = &self.bullets;
         let fragments = &self.fragments;
-        self.gl.draw(args.viewport(), |c, gl| {
+        gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
             clear(BLACK, gl);
 
