@@ -18,6 +18,10 @@ pub trait GameObject {
 
     fn velocity(&self) -> &Vector2<f64>;
 
+    fn speed(&self) -> f64 {
+        (self.velocity()[0].powf(2.0) + self.velocity()[1].powf(2.0)).sqrt()
+    }
+
     fn id(&self) -> Uuid;
 
     fn collision_shape(&self) -> &Shape<f64>;

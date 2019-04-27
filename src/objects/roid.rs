@@ -6,6 +6,9 @@ use uuid::Uuid;
 use super::categories::Category;
 use super::game_object::GameObject;
 use crate::explode::explode;
+use crate::util::{make_velocity_vector, random_bearing};
+
+const MIN_RADIUS: f64 = 10.0;
 
 pub struct Roid {
     radius: f64,
@@ -70,9 +73,21 @@ impl GameObject for Roid {
         self.alive = false;
 
         let mut result: Vec<(Category, Box<GameObject>)> = vec![];
-        
+
         for frag in explode(&self.position) {
             result.push((Category::Other, Box::new(frag)));
+        }
+
+        let new_radius = self.radius / 2.0;
+        if new_radius >= MIN_RADIUS {
+            for _ in 0..2 {
+                let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
+
+                result.push((
+                    Category::Roid,
+                    Box::new(Roid::new(self.position, new_radius, velocity)),
+                ));
+            }
         }
 
         result
