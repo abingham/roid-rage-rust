@@ -1,11 +1,8 @@
 use crate::collide::collide;
 use crate::field::Field;
 use crate::objects::bullet::Bullet;
-use crate::objects::fragment::Fragment;
-use crate::objects::roid::Roid;
 use crate::objects::categories::Category;
 use crate::objects::game_object::GameObject;
-use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -73,22 +70,26 @@ impl App {
             roid.set_position(self.field.wrap(&roid.position()));
         }
 
+        let mut new_objects: Vec<(Category, Box<GameObject>)> = vec![];
+
         // kill collisions
         for (_, obj) in &mut self.objects {
             if collisions.contains(&obj.id()) {
-                obj.kill(); // TODO: Let this return a vector of new objects.
+                new_objects.extend(obj.kill());
             }
         }
 
         // Remove out-of-bounds objects
         for (_, bullet) in &mut self.objects.iter_mut().filter(|(c, _)| c == &Category::Bullet) {
             if !self.field.contains(bullet.position()) {
-                bullet.kill();
+                new_objects.extend(bullet.kill());
             }
         }
 
         // Remove all dead objects
         self.objects.retain(|(_c, o)| o.alive());
+
+        self.objects.extend(new_objects);
 
         self.fire(args.dt);
     }

@@ -3,6 +3,7 @@ use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
+use super::categories::Category;
 use super::game_object::GameObject;
 
 pub struct Bullet {
@@ -68,7 +69,9 @@ impl GameObject for Bullet {
     fn alive(&self) -> bool {
         self.alive
     }
-    fn kill(&mut self) {
+
+    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)> {
         self.alive = false;
+        vec![]
     }
 }

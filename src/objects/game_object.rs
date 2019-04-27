@@ -3,6 +3,7 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::Shape;
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
+use super::categories::Category;
 
 pub trait GameObject {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
@@ -23,5 +24,5 @@ pub trait GameObject {
 
     fn alive(&self) -> bool;
 
-    fn kill(&mut self);
+    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)>;
 }
