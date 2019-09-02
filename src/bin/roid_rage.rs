@@ -12,12 +12,14 @@ use roid_rage::field::Field;
 use roid_rage::objects::categories::Category;
 use roid_rage::objects::game_object::GameObject;
 use roid_rage::objects::roid::Roid;
+use roid_rage::objects::ship::Ship;
+
 use roid_rage::util::{make_velocity_vector, random_bearing};
 
 fn some_roids(width: usize, height: usize) -> Vec<(Category, Box<GameObject>)> {
     let mut rng = thread_rng();
     let mut result: Vec<(Category, Box<GameObject>)> = vec![];
-    for _ in 1..20 {
+    for _ in 1..3 {
         let roid = Roid::new(
             Point2::new(
                 rng.gen_range(0, width) as f64,
@@ -31,6 +33,15 @@ fn some_roids(width: usize, height: usize) -> Vec<(Category, Box<GameObject>)> {
     result
 }
 
+fn the_ship(width: usize, height: usize) -> (Category, Box<GameObject>) {
+    (Category::Ship, 
+     Box::new(
+        Ship::new(
+            Point2::new((width / 2) as f64, (height / 2) as f64),
+            make_velocity_vector(0.0, 0.0),
+            0.0)))
+}
+
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
@@ -42,10 +53,13 @@ fn main() {
         .build()
         .unwrap();
 
+    let mut objects = some_roids(800, 600);
+    objects.push(the_ship(800, 600));
+
     // Create a new game and run it.
     let mut app = App {
         field: Field::new(800, 600, 100),
-        objects: some_roids(800, 600),
+        objects: objects,
         full_time: 0.0,
     };
 

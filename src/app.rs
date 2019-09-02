@@ -3,6 +3,7 @@ use crate::field::Field;
 use crate::objects::bullet::Bullet;
 use crate::objects::categories::Category;
 use crate::objects::game_object::GameObject;
+use crate::objects::ship::Ship;
 use crate::util::{make_velocity_vector, random_bearing};
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -11,7 +12,7 @@ use std::collections::HashSet;
 
 pub struct App {
     pub field: Field,
-    pub objects: Vec<(Category, Box<GameObject>)>,
+    pub objects: Vec<(Category, Box<dyn GameObject>)>,
 
     pub full_time: f64,
 }
@@ -35,29 +36,34 @@ impl App {
 
     pub fn update(&mut self, args: &UpdateArgs) {
         let collisions = {
-            let roids: Vec<&GameObject> = self.objects.iter()
+            let roids: Vec<&GameObject> = self
+                .objects
+                .iter()
                 .filter_map(|(c, o)| match c {
                     Category::Roid => Some(o.as_ref()),
-                    _ => None
+                    _ => None,
                 })
                 .collect();
 
-            let bullets: Vec<&GameObject> = self.objects.iter()
+            let bullets: Vec<&GameObject> = self
+                .objects
+                .iter()
                 .filter_map(|(c, o)| match c {
                     Category::Bullet => Some(o.as_ref()),
-                    _ => None
+                    _ => None,
                 })
                 .collect();
 
+            // TODO: Collide roids and ships
+
             // Find all upcoming collisions
-            collide(&roids, &bullets, args.dt).iter().fold(
-                HashSet::new(),
-                |mut acc, x| {
+            collide(&roids, &bullets, args.dt)
+                .iter()
+                .fold(HashSet::new(), |mut acc, x| {
                     acc.insert(x.0);
                     acc.insert(x.1);
                     acc
-                },
-            )
+                })
         };
 
         // Move all objects
@@ -66,7 +72,11 @@ impl App {
         }
 
         // Wrap all roids
-        for (_, roid) in self.objects.iter_mut().filter(|(c, _)| c == &Category::Roid) {
+        for (_, roid) in self
+            .objects
+            .iter_mut()
+            .filter(|(c, _)| c == &Category::Roid)
+        {
             roid.set_position(self.field.wrap(&roid.position()));
         }
 
@@ -80,7 +90,11 @@ impl App {
         }
 
         // Remove out-of-bounds objects
-        for (_, bullet) in &mut self.objects.iter_mut().filter(|(c, _)| c == &Category::Bullet) {
+        for (_, bullet) in &mut self
+            .objects
+            .iter_mut()
+            .filter(|(c, _)| c == &Category::Bullet)
+        {
             if !self.field.contains(bullet.position()) {
                 new_objects.extend(bullet.kill());
             }
@@ -100,14 +114,25 @@ impl App {
         if self.full_time > 1.0 {
             self.full_time = 0.0;
 
-            let b = Bullet::new(
-                Point2::new(
-                    (self.field.width() / 2) as f64,
-                    (self.field.height() / 2) as f64,
-                ),
-                make_velocity_vector(200.0,  random_bearing()),
-            );
-            self.objects.push((Category::Bullet, Box::new(b)));
+            let bullets: Vec<Box<dyn GameObject>> = self
+                .objects
+                .iter()
+                .filter_map(|(c, o)| match c {
+                    Category::Ship => Some(o.as_ref()),
+                    _ => None,
+                })
+                .map(|s| {
+                    let b: Box<GameObject> = Box::new(Bullet::new(
+                        s.position().clone(),
+                        make_velocity_vector(200.0, /* ship.heading */ 0.0),
+                    ));
+                    b
+                 })
+                .collect();
+
+            for b in bullets {
+                self.objects.push((Category::Bullet, b));
+            }
         }
     }
 }
