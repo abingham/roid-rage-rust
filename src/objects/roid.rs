@@ -48,7 +48,7 @@ impl GameObject for Roid {
         ellipse(*color, rect, transform, gl);
     }
 
-    fn collision_shape(&self) -> &Shape<f64> {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
         &self.collision_shape
     }
 
@@ -69,10 +69,10 @@ impl GameObject for Roid {
     fn alive(&self) -> bool {
         self.alive
     }
-    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)> {
+    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
         self.alive = false;
 
-        let mut result: Vec<(Category, Box<GameObject>)> = vec![];
+        let mut result: Vec<(Category, Box<dyn GameObject>)> = vec![];
 
         for frag in explode(&self.position) {
             result.push((Category::Other, Box::new(frag)));

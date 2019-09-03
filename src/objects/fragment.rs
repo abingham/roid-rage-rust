@@ -50,7 +50,7 @@ impl GameObject for Fragment {
         ellipse(*color, rect, transform, gl);
     }
 
-    fn collision_shape(&self) -> &Shape<f64> {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
         &self.collision_shape
     }
 
@@ -78,7 +78,7 @@ impl GameObject for Fragment {
     fn alive(&self) -> bool {
         self.alive
     }
-    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)> {
+    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
         self.alive = false;
         vec![]
     }

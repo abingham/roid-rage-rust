@@ -75,7 +75,7 @@ impl GameObject for Ship {
         self.heading += 0.01;
     }
 
-    fn collision_shape(&self) -> &Shape<f64> {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
         &self.collision_shape
     }
 
@@ -99,7 +99,7 @@ impl GameObject for Ship {
         self.alive
     }
 
-    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)> {
+    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
         self.alive = false;
         vec![]
     }

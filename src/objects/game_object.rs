@@ -24,9 +24,9 @@ pub trait GameObject {
 
     fn id(&self) -> Uuid;
 
-    fn collision_shape(&self) -> &Shape<f64>;
+    fn collision_shape(&self) -> &dyn Shape<f64>;
 
     fn alive(&self) -> bool;
 
-    fn kill(&mut self) -> Vec<(Category, Box<GameObject>)>;
+    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)>;
 }

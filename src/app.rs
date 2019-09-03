@@ -3,9 +3,7 @@ use crate::field::Field;
 use crate::objects::bullet::Bullet;
 use crate::objects::categories::Category;
 use crate::objects::game_object::GameObject;
-use crate::objects::ship::Ship;
-use crate::util::{make_velocity_vector, random_bearing};
-use nalgebra::Point2;
+use crate::util::{make_velocity_vector};
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashSet;
@@ -36,7 +34,7 @@ impl App {
 
     pub fn update(&mut self, args: &UpdateArgs) {
         let collisions = {
-            let roids: Vec<&GameObject> = self
+            let roids: Vec<&dyn GameObject> = self
                 .objects
                 .iter()
                 .filter_map(|(c, o)| match c {
@@ -45,7 +43,7 @@ impl App {
                 })
                 .collect();
 
-            let bullets: Vec<&GameObject> = self
+            let bullets: Vec<&dyn GameObject> = self
                 .objects
                 .iter()
                 .filter_map(|(c, o)| match c {
@@ -80,7 +78,7 @@ impl App {
             roid.set_position(self.field.wrap(&roid.position()));
         }
 
-        let mut new_objects: Vec<(Category, Box<GameObject>)> = vec![];
+        let mut new_objects: Vec<(Category, Box<dyn GameObject>)> = vec![];
 
         // kill collisions
         for (_, obj) in &mut self.objects {
@@ -122,7 +120,7 @@ impl App {
                     _ => None,
                 })
                 .map(|s| {
-                    let b: Box<GameObject> = Box::new(Bullet::new(
+                    let b: Box<dyn GameObject> = Box::new(Bullet::new(
                         s.position().clone(),
                         make_velocity_vector(200.0, /* ship.heading */ 0.0),
                     ));

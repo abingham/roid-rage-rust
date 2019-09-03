@@ -12,8 +12,8 @@ use uuid::Uuid;
 /// element of the pair is the ID of the object in `group1` and the second is
 /// the ID of the object in `group2`.
 pub fn collide(
-    group1: &[&GameObject],
-    group2: &[&GameObject],
+    group1: &[&dyn GameObject],
+    group2: &[&dyn GameObject],
     dt: f64,
 ) -> HashSet<(Uuid, Uuid)> {
     group1

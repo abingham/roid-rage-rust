@@ -16,9 +16,9 @@ use roid_rage::objects::ship::Ship;
 
 use roid_rage::util::{make_velocity_vector, random_bearing};
 
-fn some_roids(width: usize, height: usize) -> Vec<(Category, Box<GameObject>)> {
+fn some_roids(width: usize, height: usize) -> Vec<(Category, Box<dyn GameObject>)> {
     let mut rng = thread_rng();
-    let mut result: Vec<(Category, Box<GameObject>)> = vec![];
+    let mut result: Vec<(Category, Box<dyn GameObject>)> = vec![];
     for _ in 1..3 {
         let roid = Roid::new(
             Point2::new(
@@ -33,7 +33,7 @@ fn some_roids(width: usize, height: usize) -> Vec<(Category, Box<GameObject>)> {
     result
 }
 
-fn the_ship(width: usize, height: usize) -> (Category, Box<GameObject>) {
+fn the_ship(width: usize, height: usize) -> (Category, Box<dyn GameObject>) {
     (Category::Ship, 
      Box::new(
         Ship::new(
