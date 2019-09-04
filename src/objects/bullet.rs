@@ -1,18 +1,20 @@
 use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
-use uuid::Uuid;
 
-use super::categories::Category;
-use super::game_object::GameObject;
 use crate::collide::Collidable;
+use crate::field::Field;
+use crate::traits::{Moving, Renderable, Updateable};
+use crate::util::project;
+use std::hash::{Hash, Hasher};
+
+// TODO: Remove Uuid library from package if no longer used.
 
 pub struct Bullet {
     collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: Uuid,
-    alive: bool,
+    id: uuid::Uuid
 }
 
 impl Bullet {
@@ -20,22 +22,35 @@ impl Bullet {
         Bullet {
             position: position,
             velocity: velocity,
-            id: Uuid::new_v4(),
-            alive: true,
             collision_shape: Ball::new(Bullet::radius()), // TODO: Can this be totally static?
+            id: uuid::Uuid::new_v4()
         }
     }
 
     pub fn radius() -> f64 {
         2.0
     }
+
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
 }
 
-impl Collidable for Bullet {
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
+impl PartialEq for Bullet {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
     }
+}
 
+impl Eq for Bullet {}
+
+impl Hash for Bullet {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl Moving for Bullet {
     fn position(&self) -> &Point2<f64> {
         &self.position
     }
@@ -45,7 +60,19 @@ impl Collidable for Bullet {
     }
 }
 
-impl GameObject for Bullet {
+impl Updateable for Bullet {
+    fn update(&mut self, field: &Field, time_delta: f64) {
+        self.position = project(self, time_delta);
+    }
+}
+
+impl Collidable for Bullet {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
+        &self.collision_shape
+    }
+}
+
+impl Renderable for Bullet {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
@@ -59,34 +86,5 @@ impl GameObject for Bullet {
             2.0 * Bullet::radius(),
         );
         ellipse(*color, rect, transform, gl);
-    }
-
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
-    }
-
-    fn position(&self) -> &Point2<f64> {
-        &self.position
-    }
-
-    fn set_position(&mut self, pos: Point2<f64>) {
-        self.position = pos;
-    }
-
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
-    }
-
-    fn id(&self) -> Uuid {
-        self.id
-    }
-
-    fn alive(&self) -> bool {
-        self.alive
-    }
-
-    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
-        self.alive = false;
-        vec![]
     }
 }

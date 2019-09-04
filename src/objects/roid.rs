@@ -1,23 +1,25 @@
 use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
-use uuid::Uuid;
 
-use super::categories::Category;
-use super::game_object::GameObject;
 use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
 use crate::collide::Collidable;
+use crate::traits::{Renderable, Updateable, Moving};
+use crate::util::project;
+use crate::field::Field;
+use std::hash::{Hash, Hasher};
+use uuid;
 
 const MIN_RADIUS: f64 = 10.0;
 
+#[derive(Debug)]
 pub struct Roid {
     radius: f64,
     collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: Uuid,
-    alive: bool,
+    id: uuid::Uuid
 }
 
 impl Roid {
@@ -25,23 +27,36 @@ impl Roid {
         Roid {
             position: position,
             velocity: velocity,
-            id: Uuid::new_v4(),
-            alive: true,
             radius: radius,
             collision_shape: Ball::new(radius),
+            id: uuid::Uuid::new_v4()
         }
     }
 
     pub fn radius(&self) -> f64 {
         self.radius
     }
+
+    pub fn id(&self) -> uuid::Uuid {
+        self.id
+    }
 }
 
-impl Collidable for Roid {
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
+impl PartialEq for Roid {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
     }
+}
 
+impl Eq for Roid {}
+
+impl Hash for Roid {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+impl Moving for Roid {
     fn position(&self) -> &Point2<f64> {
         &self.position
     }
@@ -51,7 +66,19 @@ impl Collidable for Roid {
     }
 }
 
-impl GameObject for Roid {
+impl Updateable for Roid {
+    fn update(&mut self, field: &Field, time_delta: f64) {
+        self.position = field.wrap(&project(self, time_delta));
+    }
+}
+
+impl Collidable for Roid {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
+        &self.collision_shape
+    }
+}
+
+impl Renderable for Roid {
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
@@ -62,49 +89,26 @@ impl GameObject for Roid {
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
         ellipse(*color, rect, transform, gl);
     }
-
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
-    }
-
-    fn position(&self) -> &Point2<f64> {
-        &self.position
-    }
-    fn set_position(&mut self, pos: Point2<f64>) {
-        self.position = pos;
-    }
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
-    }
-
-    fn id(&self) -> Uuid {
-        self.id
-    }
-
-    fn alive(&self) -> bool {
-        self.alive
-    }
-    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
-        self.alive = false;
-
-        let mut result: Vec<(Category, Box<dyn GameObject>)> = vec![];
-
-        for frag in explode(&self.position) {
-            result.push((Category::Other, Box::new(frag)));
-        }
-
-        let new_radius = self.radius / 2.0;
-        if new_radius >= MIN_RADIUS {
-            for _ in 0..2 {
-                let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
-
-                result.push((
-                    Category::Roid,
-                    Box::new(Roid::new(self.position, new_radius, velocity)),
-                ));
-            }
-        }
-
-        result
-    }
 }
+
+
+    // fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
+    //     self.alive = false;
+
+    //     let mut result: Vec<(Category, Box<dyn GameObject>)> = vec![];
+
+    //     for frag in explode(&self.position) {
+    //         result.push((Category::Other, Box::new(frag)));
+    //     }
+
+    //     let new_radius = self.radius / 2.0;
+    //     if new_radius >= MIN_RADIUS {
+    //         for _ in 0..2 {
+    //             let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
+
+    //             result.push((
+    //                 Category::Roid,
+    //                 Box::new(Roid::new(self.position, new_radius, velocity)),
+    //             ));
+    //         }
+    //     }

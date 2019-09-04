@@ -1,17 +1,18 @@
 use crate::collide::collide;
-use crate::field::Field;
 use crate::objects::bullet::Bullet;
-use crate::objects::categories::Category;
-use crate::objects::game_object::GameObject;
-use crate::util::{make_velocity_vector};
+use crate::traits::Moving;
+use crate::util::make_velocity_vector;
+use crate::object_set::ObjectSet;
+use crate::field::Field;
+use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashSet;
+use uuid::Uuid;
 
 pub struct App {
     pub field: Field,
-    pub objects: Vec<(Category, Box<dyn GameObject>)>,
-
+    pub objects: ObjectSet,
     pub full_time: f64,
 }
 
@@ -26,84 +27,51 @@ impl App {
             // Clear the screen.
             clear(BLACK, gl);
 
-            for (_c, obj) in &self.objects {
-                obj.render(&WHITE, c, gl);
+            for roid in self.objects.renderables() {
+                roid.render(&WHITE, c, gl);
             }
         });
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        // let collisions = {
-        //     let roids: Vec<&dyn GameObject> = self
-        //         .objects
-        //         .iter()
-        //         .filter_map(|(c, o)| match c {
-        //             Category::Roid => Some(o.as_ref()),
-        //             _ => None,
-        //         })
-        //         .collect();
+        let (roid_hits, bullet_hits) = {
+            let hits = collide(&self.objects.roids, &self.objects.bullets, args.dt);
+            let roid_hits: HashSet<Uuid> = hits.iter().fold(HashSet::new(), |mut acc, x| {
+                acc.insert(x.0.id());
+                acc
+            });
+            let bullet_hits: HashSet<Uuid> = hits.iter().fold(HashSet::new(), |mut acc, x| {
+                acc.insert(x.1.id());
+                acc
+            });
 
-        //     let bullets: Vec<&dyn GameObject> = self
-        //         .objects
-        //         .iter()
-        //         .filter_map(|(c, o)| match c {
-        //             Category::Bullet => Some(o.as_ref()),
-        //             _ => None,
-        //         })
-        //         .collect();
+            (roid_hits, bullet_hits)
+        };
 
-        //     // TODO: Collide roids and ships
+        let field = self.field;
 
-        //     // Find all upcoming collisions
-        //     // collide(roids, bullets, args.dt)
-        //     //     .iter()
-        //     //     .fold(HashSet::new(), |mut acc, x| {
-        //     //         acc.insert(x.0);
-        //     //         acc.insert(x.1);
-        //     //         acc
-        //     //     })
-        // };
+        // Update all objects
+        for roid in self.objects.updateables() {
+            roid.update(&field, args.dt);
+        }
 
-        // // Move all objects
-        // for (_c, obj) in &mut self.objects {
-        //     obj.update(args.dt);
-        // }
+        // Explode roids
+        // self.state.roids
+        //     .iter()
+        //     .filter(|r| roid_hits.contains(r.id()))
+        //     .map(|r| r);
 
-        // // Wrap all roids
-        // for (_, roid) in self
-        //     .objects
-        //     .iter_mut()
-        //     .filter(|(c, _)| c == &Category::Roid)
-        // {
-        //     roid.set_position(self.field.wrap(&roid.position()));
-        // }
+        // kill collisions
+        self.objects.roids.retain(|r| !roid_hits.contains(&r.id()));
+        self.objects.bullets.retain(|b| !bullet_hits.contains(&b.id()));
 
-        // let mut new_objects: Vec<(Category, Box<dyn GameObject>)> = vec![];
+        // Remove out-of-bounds objects
+        self.objects.bullets.retain(|b| {
+            let p = b.position();
+            field.contains(p)
+        });
 
-        // // kill collisions
-        // for (_, obj) in &mut self.objects {
-        //     if collisions.contains(&obj.id()) {
-        //         new_objects.extend(obj.kill());
-        //     }
-        // }
-
-        // // Remove out-of-bounds objects
-        // for (_, bullet) in &mut self
-        //     .objects
-        //     .iter_mut()
-        //     .filter(|(c, _)| c == &Category::Bullet)
-        // {
-        //     if !self.field.contains(bullet.position()) {
-        //         new_objects.extend(bullet.kill());
-        //     }
-        // }
-
-        // // Remove all dead objects
-        // self.objects.retain(|(_c, o)| o.alive());
-
-        // self.objects.extend(new_objects);
-
-        // self.fire(args.dt);
+        self.fire(args.dt);
     }
 
     fn fire(&mut self, dt: f64) -> () {
@@ -112,25 +80,14 @@ impl App {
         if self.full_time > 1.0 {
             self.full_time = 0.0;
 
-            let bullets: Vec<Box<dyn GameObject>> = self
-                .objects
-                .iter()
-                .filter_map(|(c, o)| match c {
-                    Category::Ship => Some(o.as_ref()),
-                    _ => None,
-                })
-                .map(|s| {
-                    let b: Box<dyn GameObject> = Box::new(Bullet::new(
-                        s.position().clone(),
-                        make_velocity_vector(200.0, /* ship.heading */ 0.0),
-                    ));
-                    b
-                 })
-                .collect();
-
-            for b in bullets {
-                self.objects.push((Category::Bullet, b));
-            }
+            let bullet = Bullet::new(
+                Point2::new(
+                    (self.field.width() / 2) as f64,
+                    (self.field.height() / 2) as f64,
+                ),
+                make_velocity_vector(200.0, 0.0),
+            );
+            self.objects.bullets.push(bullet);
         }
     }
 }

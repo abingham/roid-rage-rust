@@ -1,5 +1,6 @@
 use nalgebra::Point2;
 
+#[derive(Clone, Copy)]
 pub struct Field {
     width: usize,
     height: usize,

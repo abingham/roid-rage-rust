@@ -3,8 +3,6 @@ use ncollide2d::shape::{Polyline, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
-use super::categories::Category;
-use super::game_object::GameObject;
 
 pub struct Ship {
     collision_shape: Polyline<f64>,
@@ -48,59 +46,59 @@ impl Ship {
     }
 }
 
-impl GameObject for Ship {
-    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
-        use graphics::*;
+// impl GameObject for Ship {
+//     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
+//         use graphics::*;
 
 
-        let transform = c
-            .transform
-            .trans(self.position.coords[0], self.position.coords[1])
-            .rot_rad(self.heading); 
+//         let transform = c
+//             .transform
+//             .trans(self.position.coords[0], self.position.coords[1])
+//             .rot_rad(self.heading); 
 
-        // TODO: How to create a triangle?
-        let body = rectangle::rectangle_by_corners(
-            -1.0 * Ship::width() / 2.0, 
-            -1.0 * Ship::length() / 2.0,
-            Ship::width() / 2.0,
-            Ship::length() / 2.0);
+//         // TODO: How to create a triangle?
+//         let body = rectangle::rectangle_by_corners(
+//             -1.0 * Ship::width() / 2.0, 
+//             -1.0 * Ship::length() / 2.0,
+//             Ship::width() / 2.0,
+//             Ship::length() / 2.0);
 
-        rectangle(*color, body, transform, gl);
-    }
+//         rectangle(*color, body, transform, gl);
+//     }
     
-    fn update(&mut self, time_delta: f64) {
-        // TODO: How to use default implementation and augment it? Here we're duplicating code.
-        self.set_position(self.position() + self.velocity() * time_delta);
+//     fn update(&mut self, time_delta: f64) {
+//         // TODO: How to use default implementation and augment it? Here we're duplicating code.
+//         self.set_position(self.position() + self.velocity() * time_delta);
 
-        self.heading += 0.01;
-    }
+//         self.heading += 0.01;
+//     }
 
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
-    }
+//     fn collision_shape(&self) -> &dyn Shape<f64> {
+//         &self.collision_shape
+//     }
 
-    fn position(&self) -> &Point2<f64> {
-        &self.position
-    }
+//     fn position(&self) -> &Point2<f64> {
+//         &self.position
+//     }
 
-    fn set_position(&mut self, pos: Point2<f64>) {
-        self.position = pos;
-    }
+//     fn set_position(&mut self, pos: Point2<f64>) {
+//         self.position = pos;
+//     }
 
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
-    }
+//     fn velocity(&self) -> &Vector2<f64> {
+//         &self.velocity
+//     }
 
-    fn id(&self) -> Uuid {
-        self.id
-    }
+//     fn id(&self) -> Uuid {
+//         self.id
+//     }
 
-    fn alive(&self) -> bool {
-        self.alive
-    }
+//     fn alive(&self) -> bool {
+//         self.alive
+//     }
 
-    fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
-        self.alive = false;
-        vec![]
-    }
-}
+//     fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
+//         self.alive = false;
+//         vec![]
+//     }
+// }
