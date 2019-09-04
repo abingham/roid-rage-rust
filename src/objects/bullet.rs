@@ -5,6 +5,7 @@ use uuid::Uuid;
 
 use super::categories::Category;
 use super::game_object::GameObject;
+use crate::collide::Collidable;
 
 pub struct Bullet {
     collision_shape: Ball<f64>,
@@ -27,6 +28,20 @@ impl Bullet {
 
     pub fn radius() -> f64 {
         2.0
+    }
+}
+
+impl Collidable for Bullet {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
+        &self.collision_shape
+    }
+
+    fn position(&self) -> &Point2<f64> {
+        &self.position
+    }
+
+    fn velocity(&self) -> &Vector2<f64> {
+        &self.velocity
     }
 }
 

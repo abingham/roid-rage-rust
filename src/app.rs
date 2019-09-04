@@ -33,77 +33,77 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        let collisions = {
-            let roids: Vec<&dyn GameObject> = self
-                .objects
-                .iter()
-                .filter_map(|(c, o)| match c {
-                    Category::Roid => Some(o.as_ref()),
-                    _ => None,
-                })
-                .collect();
+        // let collisions = {
+        //     let roids: Vec<&dyn GameObject> = self
+        //         .objects
+        //         .iter()
+        //         .filter_map(|(c, o)| match c {
+        //             Category::Roid => Some(o.as_ref()),
+        //             _ => None,
+        //         })
+        //         .collect();
 
-            let bullets: Vec<&dyn GameObject> = self
-                .objects
-                .iter()
-                .filter_map(|(c, o)| match c {
-                    Category::Bullet => Some(o.as_ref()),
-                    _ => None,
-                })
-                .collect();
+        //     let bullets: Vec<&dyn GameObject> = self
+        //         .objects
+        //         .iter()
+        //         .filter_map(|(c, o)| match c {
+        //             Category::Bullet => Some(o.as_ref()),
+        //             _ => None,
+        //         })
+        //         .collect();
 
-            // TODO: Collide roids and ships
+        //     // TODO: Collide roids and ships
 
-            // Find all upcoming collisions
-            collide(&roids, &bullets, args.dt)
-                .iter()
-                .fold(HashSet::new(), |mut acc, x| {
-                    acc.insert(x.0);
-                    acc.insert(x.1);
-                    acc
-                })
-        };
+        //     // Find all upcoming collisions
+        //     // collide(roids, bullets, args.dt)
+        //     //     .iter()
+        //     //     .fold(HashSet::new(), |mut acc, x| {
+        //     //         acc.insert(x.0);
+        //     //         acc.insert(x.1);
+        //     //         acc
+        //     //     })
+        // };
 
-        // Move all objects
-        for (_c, obj) in &mut self.objects {
-            obj.update(args.dt);
-        }
+        // // Move all objects
+        // for (_c, obj) in &mut self.objects {
+        //     obj.update(args.dt);
+        // }
 
-        // Wrap all roids
-        for (_, roid) in self
-            .objects
-            .iter_mut()
-            .filter(|(c, _)| c == &Category::Roid)
-        {
-            roid.set_position(self.field.wrap(&roid.position()));
-        }
+        // // Wrap all roids
+        // for (_, roid) in self
+        //     .objects
+        //     .iter_mut()
+        //     .filter(|(c, _)| c == &Category::Roid)
+        // {
+        //     roid.set_position(self.field.wrap(&roid.position()));
+        // }
 
-        let mut new_objects: Vec<(Category, Box<dyn GameObject>)> = vec![];
+        // let mut new_objects: Vec<(Category, Box<dyn GameObject>)> = vec![];
 
-        // kill collisions
-        for (_, obj) in &mut self.objects {
-            if collisions.contains(&obj.id()) {
-                new_objects.extend(obj.kill());
-            }
-        }
+        // // kill collisions
+        // for (_, obj) in &mut self.objects {
+        //     if collisions.contains(&obj.id()) {
+        //         new_objects.extend(obj.kill());
+        //     }
+        // }
 
-        // Remove out-of-bounds objects
-        for (_, bullet) in &mut self
-            .objects
-            .iter_mut()
-            .filter(|(c, _)| c == &Category::Bullet)
-        {
-            if !self.field.contains(bullet.position()) {
-                new_objects.extend(bullet.kill());
-            }
-        }
+        // // Remove out-of-bounds objects
+        // for (_, bullet) in &mut self
+        //     .objects
+        //     .iter_mut()
+        //     .filter(|(c, _)| c == &Category::Bullet)
+        // {
+        //     if !self.field.contains(bullet.position()) {
+        //         new_objects.extend(bullet.kill());
+        //     }
+        // }
 
-        // Remove all dead objects
-        self.objects.retain(|(_c, o)| o.alive());
+        // // Remove all dead objects
+        // self.objects.retain(|(_c, o)| o.alive());
 
-        self.objects.extend(new_objects);
+        // self.objects.extend(new_objects);
 
-        self.fire(args.dt);
+        // self.fire(args.dt);
     }
 
     fn fire(&mut self, dt: f64) -> () {

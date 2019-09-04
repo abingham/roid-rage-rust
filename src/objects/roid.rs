@@ -7,6 +7,7 @@ use super::categories::Category;
 use super::game_object::GameObject;
 use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
+use crate::collide::Collidable;
 
 const MIN_RADIUS: f64 = 10.0;
 
@@ -33,6 +34,20 @@ impl Roid {
 
     pub fn radius(&self) -> f64 {
         self.radius
+    }
+}
+
+impl Collidable for Roid {
+    fn collision_shape(&self) -> &dyn Shape<f64> {
+        &self.collision_shape
+    }
+
+    fn position(&self) -> &Point2<f64> {
+        &self.position
+    }
+
+    fn velocity(&self) -> &Vector2<f64> {
+        &self.velocity
     }
 }
 
