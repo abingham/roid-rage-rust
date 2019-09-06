@@ -16,6 +16,18 @@ impl ObjectSet {
         }
     }
 
+    pub fn from_objects(roids: Vec<Roid>, bullets: Vec<Bullet>) -> ObjectSet {
+        ObjectSet {
+            roids: roids,
+            bullets: bullets
+        }
+    }
+
+    pub fn extend(&mut self, other: ObjectSet) {
+        self.roids.extend(other.roids);
+        self.bullets.extend(other.bullets);
+    }
+
     /// All renderable objects
     pub fn renderables(&self) -> Vec<&dyn Renderable> {
         let result: Vec<&dyn Renderable> = self

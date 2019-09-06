@@ -2,6 +2,7 @@ use graphics;
 use nalgebra::{Point2, Vector2};
 use opengl_graphics::GlGraphics;
 use uuid;
+use crate::object_set::ObjectSet;
 
 use crate::field::Field;
 
@@ -25,5 +26,5 @@ pub trait Renderable {
 }
 
 pub trait Splode {
-    // fn splode(&mut self) -> Vec<(Category, Box<dyn GameObject>)>;
+    fn splode(&self) -> ObjectSet;
 }

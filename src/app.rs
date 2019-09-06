@@ -1,14 +1,13 @@
 use crate::collide::collide;
-use crate::objects::bullet::Bullet;
-use crate::traits::Moving;
-use crate::util::make_velocity_vector;
-use crate::object_set::ObjectSet;
 use crate::field::Field;
+use crate::object_set::ObjectSet;
+use crate::objects::bullet::Bullet;
+use crate::traits::{Moving, Splode};
+use crate::util::make_velocity_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashSet;
-use uuid::Uuid;
 
 pub struct App {
     pub field: Field,
@@ -34,19 +33,13 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        let (roid_hits, bullet_hits) = {
-            let hits = collide(&self.objects.roids, &self.objects.bullets, args.dt);
-            let roid_hits: HashSet<Uuid> = hits.iter().fold(HashSet::new(), |mut acc, x| {
+        let hits = collide(&self.objects.roids, &self.objects.bullets, args.dt)
+            .iter()
+            .fold(HashSet::new(), |mut acc, x| {
                 acc.insert(x.0.id());
-                acc
-            });
-            let bullet_hits: HashSet<Uuid> = hits.iter().fold(HashSet::new(), |mut acc, x| {
                 acc.insert(x.1.id());
                 acc
             });
-
-            (roid_hits, bullet_hits)
-        };
 
         let field = self.field;
 
@@ -56,19 +49,33 @@ impl App {
         }
 
         // Explode roids
-        // self.state.roids
-        //     .iter()
-        //     .filter(|r| roid_hits.contains(r.id()))
-        //     .map(|r| r);
+        let updates: Vec<ObjectSet> = self
+            .objects
+            .roids
+            .iter()
+            .filter_map(|r| {
+                if hits.contains(&r.id()) {
+                    Some(r.splode())
+                } else {
+                    None
+                }
+            })
+            .collect();
 
         // kill collisions
-        self.objects.roids.retain(|r| !roid_hits.contains(&r.id()));
-        self.objects.bullets.retain(|b| !bullet_hits.contains(&b.id()));
+        self.objects.roids.retain(|r| !hits.contains(&r.id()));
+        self.objects.bullets.retain(|b| !hits.contains(&b.id()));
 
         // Remove out-of-bounds objects
         self.objects.bullets.retain(|b| {
             let p = b.position();
             field.contains(p)
+        });
+
+        // Insert new objects (splosion results, etc.)
+        updates.into_iter().fold(&mut self.objects, |acc, x| {
+            acc.extend(x);
+            acc
         });
 
         self.fire(args.dt);

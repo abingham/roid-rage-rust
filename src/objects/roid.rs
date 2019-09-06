@@ -2,12 +2,13 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 
-use crate::explode::explode;
+// use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
 use crate::collide::Collidable;
-use crate::traits::{Renderable, Updateable, Moving};
+use crate::traits::{Renderable, Updateable, Moving, Splode};
 use crate::util::project;
 use crate::field::Field;
+use crate::object_set::ObjectSet;
 use std::hash::{Hash, Hasher};
 use uuid;
 
@@ -91,24 +92,21 @@ impl Renderable for Roid {
     }
 }
 
+impl Splode for Roid {
+    fn splode(&self) -> ObjectSet {
+        let new_radius = self.radius / 2.0;
+        let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
+        let roids = (0..num_sub_roids).map(|_| {
+                let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
+                Roid::new(self.position, new_radius, velocity)
+            })
+            .collect();
 
-    // fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
-    //     self.alive = false;
+        // TODO: Fragments
+        //     for frag in explode(&self.position) {
+        //         result.push((Category::Other, Box::new(frag)));
+        //     }
 
-    //     let mut result: Vec<(Category, Box<dyn GameObject>)> = vec![];
-
-    //     for frag in explode(&self.position) {
-    //         result.push((Category::Other, Box::new(frag)));
-    //     }
-
-    //     let new_radius = self.radius / 2.0;
-    //     if new_radius >= MIN_RADIUS {
-    //         for _ in 0..2 {
-    //             let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
-
-    //             result.push((
-    //                 Category::Roid,
-    //                 Box::new(Roid::new(self.position, new_radius, velocity)),
-    //             ));
-    //         }
-    //     }
+        ObjectSet::from_objects(roids, vec![])
+    }
+}
