@@ -22,7 +22,7 @@ impl Fragment {
             velocity: velocity,
             id: Uuid::new_v4(),
             alive: true,
-            collision_shape: Ball::new(Fragment::radius()), // TODO: Can this be totally static?
+            collision_shape: Ball::new(Fragment::radius()),
             age: 0.0,
             max_age: max_age,
         }

@@ -8,8 +8,6 @@ use crate::traits::{Moving, Renderable, Updateable};
 use crate::util::project;
 use std::hash::{Hash, Hasher};
 
-// TODO: Remove Uuid library from package if no longer used.
-
 pub struct Bullet {
     collision_shape: Ball<f64>,
     position: Point2<f64>,
@@ -22,7 +20,7 @@ impl Bullet {
         Bullet {
             position: position,
             velocity: velocity,
-            collision_shape: Ball::new(Bullet::radius()), // TODO: Can this be totally static?
+            collision_shape: Ball::new(Bullet::radius()),
             id: uuid::Uuid::new_v4()
         }
     }

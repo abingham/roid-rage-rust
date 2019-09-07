@@ -18,20 +18,17 @@ use roid_rage::util::{make_velocity_vector, random_bearing};
 
 fn some_roids(width: usize, height: usize) -> Vec<Roid> {
     let mut rng = thread_rng();
-    let mut result: Vec<Roid> = vec![];
-    // TODO: Can we map over range 1-3?
-    for _ in 1..10 {
-        let roid = Roid::new(
+    (1..10).map(|_| {
+        Roid::new(
             Point2::new(
                 rng.gen_range(0, width) as f64,
                 rng.gen_range(0, height) as f64,
             ),
             40.0,
             make_velocity_vector(100.0, random_bearing()),
-        );
-        result.push(roid);
-    }
-    result
+        )
+    })
+    .collect()
 }
 
 // fn the_ship(width: usize, height: usize) -> (Category, Box<dyn GameObject>) {
