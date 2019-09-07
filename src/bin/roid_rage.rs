@@ -55,11 +55,11 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         field: Field::new(800, 600, 100),
-        objects: ObjectSet::new(),
+        objects: ObjectSet::from_objects(
+            some_roids(800, 600), 
+            vec![]),
         full_time: 0.0,
     };
-
-    app.objects.roids.extend(some_roids(800, 600));
 
     let mut gl = GlGraphics::new(opengl);
     let mut events = Events::new(EventSettings::new());

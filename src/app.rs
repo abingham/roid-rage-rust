@@ -33,14 +33,7 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
-        let hits = collide(&self.objects.roids, &self.objects.bullets, args.dt)
-            .iter()
-            .fold(HashSet::new(), |mut acc, x| {
-                acc.insert(x.0.id());
-                acc.insert(x.1.id());
-                acc
-            });
-
+        let hits = self.objects.collisions(args.dt);
         let field = self.field;
 
         // Update all objects
@@ -62,7 +55,7 @@ impl App {
             .collect();
 
         // Kill out-of-bounds objects
-        for bullet in &mut self.objects.bullets {
+        for bullet in &mut self.objects.iter_mut() {
             if !field.contains(bullet.position()) {
                 bullet.kill();
             }
@@ -93,7 +86,12 @@ impl App {
                 ),
                 make_velocity_vector(200.0, 0.0),
             );
-            self.objects.bullets.push(bullet);
+
+            let bullets = ObjectSet::from_objects(
+                vec![],
+                vec![bullet]
+            );
+            self.objects.extend(bullets);
         }
     }
 }

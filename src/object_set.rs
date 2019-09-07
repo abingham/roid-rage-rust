@@ -1,11 +1,13 @@
 use crate::objects::roid::Roid;
 use crate::objects::bullet::Bullet;
 use crate::game_object::GameObject;
+use crate::collide::{collide, Collidable};
+use std::collections::HashSet;
 
 /// The state of the game: the field of play and the objects on it.
 pub struct ObjectSet {
-    pub roids: Vec<Roid>,
-    pub bullets: Vec<Bullet>
+    roids: Vec<Roid>,
+    bullets: Vec<Bullet>
 }
 
 impl ObjectSet {
@@ -31,6 +33,16 @@ impl ObjectSet {
     pub fn extend(&mut self, other: ObjectSet) {
         self.roids.extend(other.roids);
         self.bullets.extend(other.bullets);
+    }
+
+    pub fn collisions(&self, time_delta: f64) -> HashSet<uuid::Uuid> {
+        collide(&self.roids, &self.bullets, time_delta)
+            .iter()
+            .fold(HashSet::new(), |mut acc, x| {
+                acc.insert(x.0.id());
+                acc.insert(x.1.id());
+                acc
+            })
     }
 
     /// All GameObjects
