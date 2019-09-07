@@ -2,7 +2,7 @@ use nalgebra::{Point2, Vector2};
 use rand::prelude::*;
 use std::f64;
 use std::f64::consts::PI;
-use crate::traits::Moving;
+use crate::game_object::GameObject;
 
 pub fn random_bearing() -> f64 {
     let mut rng = thread_rng();
@@ -14,6 +14,6 @@ pub fn make_velocity_vector(speed: f64, bearing: f64) -> Vector2<f64> {
 }
 
 /// Project the position of a moving object forward in time.
-pub fn project(m: &dyn Moving, time_delta: f64) -> Point2<f64> {
+pub fn project(m: &dyn GameObject, time_delta: f64) -> Point2<f64> {
     m.position() + m.velocity() * time_delta
 }

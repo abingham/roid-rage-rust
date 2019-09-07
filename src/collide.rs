@@ -1,13 +1,13 @@
-use nalgebra::Vector2;
+use nalgebra::{Point2, Vector2};
 use nalgebra::geometry::Isometry2;
 use ncollide2d::query;
 use ncollide2d::shape::Shape;
 
-use crate::traits::Moving;
-
 /// Things that can be collided together.
-pub trait Collidable: Moving {
+pub trait Collidable {
     fn collision_shape(&self) -> &dyn Shape<f64>;
+    fn position(&self) -> &Point2<f64>;
+    fn velocity(&self) -> &Vector2<f64>;
 }
 
 /// Collide two groups of Collidables together.

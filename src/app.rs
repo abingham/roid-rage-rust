@@ -2,7 +2,7 @@ use crate::collide::collide;
 use crate::field::Field;
 use crate::object_set::ObjectSet;
 use crate::objects::bullet::Bullet;
-use crate::traits::{Moving, Splode};
+use crate::game_object::GameObject;
 use crate::util::make_velocity_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -26,7 +26,7 @@ impl App {
             // Clear the screen.
             clear(BLACK, gl);
 
-            for roid in self.objects.renderables() {
+            for roid in self.objects.iter() {
                 roid.render(&WHITE, c, gl);
             }
         });
@@ -44,35 +44,34 @@ impl App {
         let field = self.field;
 
         // Update all objects
-        for roid in self.objects.updateables() {
+        for roid in self.objects.iter_mut() {
             roid.update(&field, args.dt);
         }
 
-        // Explode roids
+        // Explode collisions 
         let updates: Vec<ObjectSet> = self
             .objects
-            .roids
-            .iter()
+            .iter_mut()
             .filter_map(|r| {
                 if hits.contains(&r.id()) {
-                    Some(r.splode())
+                    Some(r.kill())
                 } else {
                     None
                 }
             })
             .collect();
 
+        // Kill out-of-bounds objects
+        for bullet in &mut self.objects.bullets {
+            if !field.contains(bullet.position()) {
+                bullet.kill();
+            }
+        }
+
         // kill collisions
-        self.objects.roids.retain(|r| !hits.contains(&r.id()));
-        self.objects.bullets.retain(|b| !hits.contains(&b.id()));
+        self.objects.remove_dead();
 
-        // Remove out-of-bounds objects
-        self.objects.bullets.retain(|b| {
-            let p = b.position();
-            field.contains(p)
-        });
-
-        // Insert new objects (splosion results, etc.)
+        // Insert new objects
         updates.into_iter().fold(&mut self.objects, |acc, x| {
             acc.extend(x);
             acc

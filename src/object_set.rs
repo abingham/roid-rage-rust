@@ -1,6 +1,6 @@
 use crate::objects::roid::Roid;
 use crate::objects::bullet::Bullet;
-use crate::traits::{Renderable, Updateable};
+use crate::game_object::GameObject;
 
 /// The state of the game: the field of play and the objects on it.
 pub struct ObjectSet {
@@ -23,33 +23,31 @@ impl ObjectSet {
         }
     }
 
+    pub fn remove_dead(&mut self) {
+        self.roids.retain(|r| r.alive());
+        self.bullets.retain(|b| b.alive());
+    }
+
     pub fn extend(&mut self, other: ObjectSet) {
         self.roids.extend(other.roids);
         self.bullets.extend(other.bullets);
     }
 
-    /// All renderable objects
-    pub fn renderables(&self) -> Vec<&dyn Renderable> {
-        let result: Vec<&dyn Renderable> = self
+    /// All GameObjects
+    pub fn iter<'a>(&'a self) ->impl Iterator<Item = &'a dyn GameObject> {
+        self
             .roids
             .iter()
-            .map(|r| r as &dyn Renderable)
-            .chain(self.bullets.iter().map(|b| b as &dyn Renderable))
-            .collect();
-
-        result
+            .map(|r| r as &dyn GameObject)
+            .chain(self.bullets.iter().map(|b| b as &dyn GameObject))
     }
 
-    /// All updateable objects
-    pub fn updateables(&mut self) -> Vec<&mut dyn Updateable> {
-        let result: Vec<&mut dyn Updateable> = self
+    pub fn iter_mut<'a>(&'a mut self) ->impl Iterator<Item = &'a mut dyn GameObject> {
+        self
             .roids
             .iter_mut()
-            .map(|r| r as &mut dyn Updateable)
-            .chain(self.bullets.iter_mut().map(|b| b as &mut dyn Updateable))
-            .collect();
-
-        result
+            .map(|r| r as &mut dyn GameObject)
+            .chain(self.bullets.iter_mut().map(|b| b as &mut dyn GameObject))
     }
 }
 
