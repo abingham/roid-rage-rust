@@ -57,6 +57,7 @@ fn main() {
         field: Field::new(800, 600, 100),
         objects: ObjectSet::from_objects(
             some_roids(800, 600), 
+            vec![],
             vec![]),
         full_time: 0.0,
     };

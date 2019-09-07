@@ -3,10 +3,12 @@ use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
-// use super::game_object::GameObject;
+use crate::game_object::GameObject;
+use crate::field::Field;
+use crate::util::project;
+use crate::object_set::ObjectSet;
 
 pub struct Fragment {
-    collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
     id: Uuid,
@@ -22,7 +24,6 @@ impl Fragment {
             velocity: velocity,
             id: Uuid::new_v4(),
             alive: true,
-            collision_shape: Ball::new(Fragment::radius()),
             age: 0.0,
             max_age: max_age,
         }
@@ -33,52 +34,48 @@ impl Fragment {
     }
 }
 
-// impl GameObject for Fragment {
-//     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
-//         use graphics::*;
+impl GameObject for Fragment {
+    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
+        use graphics::*;
 
-//         let transform = c
-//             .transform
-//             .trans(self.position.coords[0], self.position.coords[1]);
+        let transform = c
+            .transform
+            .trans(self.position.coords[0], self.position.coords[1]);
 
-//         let rect = rectangle::square(
-//             -1.0 * Fragment::radius(),
-//             -1.0 * Fragment::radius(),
-//             2.0 * Fragment::radius(),
-//         );
-//         ellipse(*color, rect, transform, gl);
-//     }
+        let rect = rectangle::square(
+            -1.0 * Fragment::radius(),
+            -1.0 * Fragment::radius(),
+            2.0 * Fragment::radius(),
+        );
+        ellipse(*color, rect, transform, gl);
+    }
 
-//     fn collision_shape(&self) -> &dyn Shape<f64> {
-//         &self.collision_shape
-//     }
+    fn update(&mut self, field: &Field, time_delta: f64) {
+        self.position = field.wrap(&project(self, time_delta));
 
-//     fn update(&mut self, time_delta: f64) {
-//         self.set_position(self.position() + self.velocity() * time_delta);
-//         self.age += time_delta;
-//         if self.age > self.max_age {
-//             self.kill();
-//         }
-//     }
-//     fn position(&self) -> &Point2<f64> {
-//         &self.position
-//     }
-//     fn set_position(&mut self, pos: Point2<f64>) {
-//         self.position = pos;
-//     }
-//     fn velocity(&self) -> &Vector2<f64> {
-//         &self.velocity
-//     }
+        self.age += time_delta;
+        if self.age > self.max_age {
+            self.kill();
+        }
+    }
+    fn position(&self) -> &Point2<f64> {
+        &self.position
+    }
 
-//     fn id(&self) -> Uuid {
-//         self.id
-//     }
+    fn velocity(&self) -> &Vector2<f64> {
+        &self.velocity
+    }
 
-//     fn alive(&self) -> bool {
-//         self.alive
-//     }
-//     fn kill(&mut self) -> Vec<(Category, Box<dyn GameObject>)> {
-//         self.alive = false;
-//         vec![]
-//     }
-// }
+    fn id(&self) -> Uuid {
+        self.id
+    }
+
+    fn alive(&self) -> bool {
+        self.alive
+    }
+
+    fn kill(&mut self) -> ObjectSet {
+        self.alive = false;
+        ObjectSet::new()
+    }
+}

@@ -2,7 +2,7 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 
-// use crate::explode::explode;
+use crate::explode::explode;
 use crate::util::{make_velocity_vector, random_bearing};
 use crate::collide::Collidable;
 use crate::game_object::GameObject;
@@ -54,12 +54,7 @@ impl GameObject for Roid {
             })
             .collect();
 
-        // TODO: Fragments
-        //     for frag in explode(&self.position) {
-        //         result.push((Category::Other, Box::new(frag)));
-        //     }
-
-        ObjectSet::from_objects(roids, vec![])
+        ObjectSet::from_objects(roids, vec![], explode(&self.position))
     }
 
     fn position(&self) -> &Point2<f64> {

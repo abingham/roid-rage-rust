@@ -89,7 +89,8 @@ impl App {
 
             let bullets = ObjectSet::from_objects(
                 vec![],
-                vec![bullet]
+                vec![bullet],
+                vec![]
             );
             self.objects.extend(bullets);
         }
