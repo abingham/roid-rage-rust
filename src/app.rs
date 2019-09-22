@@ -79,6 +79,10 @@ impl App {
         if self.full_time > 1.0 {
             self.full_time = 0.0;
 
+            // Look through roids for closest
+            // Calculate vector from ship position to roid on which bullet would strike it
+            // Fire such a bullet.
+
             let bullet = Bullet::new(
                 Point2::new(
                     (self.field.width() / 2) as f64,

@@ -13,10 +13,6 @@ pub trait GameObject {
 
     fn velocity(&self) -> &Vector2<f64>;
 
-    fn speed(&self) -> f64 {
-        (self.velocity()[0].powf(2.0) + self.velocity()[1].powf(2.0)).sqrt()
-    }
-
     fn update(&mut self, field: &Field, time_delta: f64);
 
     fn render(&self, 

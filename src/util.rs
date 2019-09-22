@@ -17,3 +17,13 @@ pub fn make_velocity_vector(speed: f64, bearing: f64) -> Vector2<f64> {
 pub fn project(m: &dyn GameObject, time_delta: f64) -> Point2<f64> {
     m.position() + m.velocity() * time_delta
 }
+
+/// Calculate the speed represented by a velocity vector.
+pub fn speed(velocity: &Vector2<f64>) -> f64 {
+    (velocity[0].powf(2.0) + velocity[1].powf(2.0)).sqrt()
+}
+
+pub fn bearing(velocity: &Vector2<f64>) -> f64 {
+    let x = velocity[1] / velocity[0];
+    x.atan()
+}
