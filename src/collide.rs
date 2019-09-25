@@ -2,8 +2,8 @@ use nalgebra::{Point2, Vector2};
 use nalgebra::geometry::Isometry2;
 use ncollide2d::query;
 use ncollide2d::shape::Shape;
-
-use crate::util;
+use std::iter::Iterator;
+use std::cmp::Ordering;
 
 /// Things that can be collided together.
 pub trait Collidable {
@@ -64,89 +64,68 @@ where
         .collect()
 }
 
+/// Find real roots for a quadratic of the form:
+/// 
+///     ax^2 + bx + c
+/// 
+/// :param a: The "a" in the quadratic
+/// :param b: The "b" in the quadratic
+/// :param c: The "c" in the quadratic
+/// :return: A list of real roots, sized 0, 1, or 2
+fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<Vec<f64>> {
+    // disc = math.pow(b, 2) - 4 * a * c
+    let disc = b.powf(2.0) - 4.0 * a * c;
+
+    if disc < 0.0 {
+        None
+    }
+    else if disc == 0.0 {
+        Some(vec![(-1.0 * b) / (2.0 * a)])
+    }
+    else {
+        let sqrt_disc = disc.sqrt(); 
+        Some(vec![
+            (-1.0 * b + sqrt_disc) / (2.0 * a),
+            (-1.0 * b - sqrt_disc) / (2.0 * a)
+        ])
+    }
+}
+
+
 pub fn collision_point(position: &Point2<f64>, speed: f64, target: &dyn Collidable) -> Option<Point2<f64>> {
     let dx = target.position().x - position.x;
     let dy = target.position().y - position.y;
-    let target_speed = crate::util::speed(target.velocity())
-    let a = speed.powf(2.0) - target_speed(target.velocity()).powf(2.0);
-    let b = -2 * (target_speed * math.cos())
-//     b = -2 * (target_speed * math.cos(target_dir) * dx +
-//               target_speed * math.sin(target_dir) * dy)
-//     c = -1 * (pow(dx, 2) + pow(dy, 2))
+    let target_speed = crate::util::speed(target.velocity());
+    let target_dir = crate::util::bearing(target.velocity());
+    let a = speed.powf(2.0) - target_speed.powf(2.0);
+    let b = -2.0 * (target_speed * f64::cos(target_dir) * dx +
+                    target_speed * f64::sin(target_dir) * dy);
+    let c = -1.0 * dx.powf(2.0) + dy.powf(2.0);
 
-//     roots = [r for r in solve_quadratic(a, b, c) if r >= 0]
-//     if not roots:
-//         return None
-
-//     # This is how far in the future the collision will occur
-//     dt = min(roots) if roots else None
-
-//     coll_x = dt * target_speed * math.cos(target_dir) + target_pos.x
-//     coll_y = dt * target_speed * math.sin(target_dir) + target_pos.y
-//     return geom.Point(coll_x, coll_y)
-
-    None
+    solve_quadratic(a, b, c) 
+        .and_then(|mut roots| {
+            roots.retain(|r| *r >= 0.0);
+            roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less));
+            roots.pop()
+        })
+        .map(|dt| {
+            let coll_x = dt * target_speed * f64::cos(target_dir) + target.position().x;
+            let coll_y = dt * target_speed * f64::sin(target_dir) + target.position().y;
+            Point2::new(coll_x, coll_y)
+        })
 }
-// def calculate_collision_point(
-//         position,
-//         speed,  # speed of projectile
-//         target_pos,
-//         target_speed,  # speed of target
-//         target_dir):
-//     '''Calculate point of collision given target position + velocity
-//     and projectile speed + firing position.
 
-//     :return: Point of collision, or None if no collision possible
-//     '''
-
-//     # Solve for delta-t, the time at which the target and the
-//     # projectile will be equally distant from `position`. This
-//     # involves solving a quadratic equation, hence the a, b, and c.
-//     dx = target_pos.x - position.x
-//     dy = target_pos.y - position.y
-//     a = pow(speed, 2) - pow(target_speed, 2)
-//     b = -2 * (target_speed * math.cos(target_dir) * dx +
-//               target_speed * math.sin(target_dir) * dy)
-//     c = -1 * (pow(dx, 2) + pow(dy, 2))
-
-//     roots = [r for r in solve_quadratic(a, b, c) if r >= 0]
-//     if not roots:
-//         return None
-
-//     # This is how far in the future the collision will occur
-//     dt = min(roots) if roots else None
-
-//     coll_x = dt * target_speed * math.cos(target_dir) + target_pos.x
-//     coll_y = dt * target_speed * math.sin(target_dir) + target_pos.y
-//     return geom.Point(coll_x, coll_y)
-
-
-// def calculate_collision_vector(position,
-//                                speed,
-//                                target_pos,
-//                                target_speed,
-//                                target_dir):
-//     '''Calculate vector from `position` to target that will result in
-//     a collision given the other parameters.
-
-//     :param position: The firing position.
-//     :param speed: The speed of the projectile.
-//     :param target_pos: Initial position of target to hit.
-//     :param target_speed: Speed of target to hit.
-//     :param target_dir: Direction (of movement) of target
-
-//     :return: A tuple (collision-position, collision-vector) if one
-//         exists, or (None, None) if not.
-//     '''
-
-//     coll_pos = calculate_collision_point(
-//         position=position,
-//         speed=speed,
-//         target_pos=target_pos,
-//         target_speed=target_speed,
-//         target_dir=target_dir)
-
-//     if coll_pos is None:
-//         return (None, None)
-
-//     return (coll_pos, coll_pos - position)
+/// Calculate vector from `position` to target that will result in
+/// a collision given the other parameters.
+///
+/// :param position: The firing position.
+/// :param speed: The speed of the projectile.
+/// :param target_pos: Initial position of target to hit.
+/// :param target_speed: Speed of target to hit.
+/// :param target_dir: Direction (of movement) of target
+///
+/// :return: A tuple (collision-position, collision-vector) if one
+pub fn collision_vector(position: &Point2<f64>, speed: f64, target: &dyn Collidable) -> Option<(Point2<f64>, Vector2<f64>)>
+{
+    collision_point(position, speed, target).map(|p| (p, p - position))
+}

@@ -9,7 +9,7 @@ use crate::game_object::GameObject;
 use crate::util::project;
 use crate::field::Field;
 use crate::object_set::ObjectSet;
-use std::hash::{Hash, Hasher};
+use crate::util::speed;
 use uuid;
 
 const MIN_RADIUS: f64 = 10.0;
@@ -49,7 +49,7 @@ impl GameObject for Roid {
                 let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
         let roids = (0..num_sub_roids).map(|_| {
-                let velocity = make_velocity_vector(self.speed() * 2.0, random_bearing());
+                let velocity = make_velocity_vector(speed((self as &mut dyn GameObject).velocity()) * 2.0, random_bearing());
                 Roid::new(self.position, new_radius, velocity)
             })
             .collect();
