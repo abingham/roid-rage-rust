@@ -3,7 +3,7 @@ use crate::util::{make_velocity_vector, random_bearing};
 use nalgebra::Point2;
 use rand::prelude::*;
 
-pub fn explode(pos: &Point2<f64>) -> Vec<Fragment> {
+pub fn make_explosion(pos: &Point2<f64>) -> Vec<Fragment> {
     let mut rng = thread_rng();
 
     (0..rng.gen_range(1, 10))
