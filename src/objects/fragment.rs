@@ -1,5 +1,4 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 use uuid::Uuid;
 
@@ -12,19 +11,17 @@ pub struct Fragment {
     position: Point2<f64>,
     velocity: Vector2<f64>,
     id: Uuid,
-    alive: bool,
     age: f64,
     max_age: f64,
 }
 
 impl Fragment {
-    pub fn new(position: Point2<f64>, velocity: Vector2<f64>, max_age: f64) -> Fragment {
+    pub fn new(position: Point2<f64>, velocity: Vector2<f64>, age: f64, max_age: f64) -> Fragment {
         Fragment {
             position: position,
             velocity: velocity,
             id: Uuid::new_v4(),
-            alive: true,
-            age: 0.0,
+            age: age,
             max_age: max_age,
         }
     }
@@ -50,12 +47,15 @@ impl GameObject for Fragment {
         ellipse(*color, rect, transform, gl);
     }
 
-    fn update(&mut self, field: &Field, time_delta: f64) {
-        self.position = field.wrap(&project(self, time_delta));
+    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
+        let new_age = self.age + time_delta;
 
-        self.age += time_delta;
-        if self.age > self.max_age {
-            self.kill();
+        if new_age > self.max_age {
+            ObjectSet::new()
+        }
+        else {
+            let new_position = field.wrap(&project(self, time_delta));
+            ObjectSet::from_objects(vec![], vec![], vec![Fragment::new(new_position, self.velocity, new_age, self.max_age)])
         }
     }
     fn position(&self) -> &Point2<f64> {
@@ -68,14 +68,5 @@ impl GameObject for Fragment {
 
     fn id(&self) -> Uuid {
         self.id
-    }
-
-    fn alive(&self) -> bool {
-        self.alive
-    }
-
-    fn kill(&mut self) -> ObjectSet {
-        self.alive = false;
-        ObjectSet::new()
     }
 }

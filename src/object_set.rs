@@ -32,11 +32,11 @@ impl ObjectSet {
         }
     }
 
-    pub fn remove_dead(&mut self) {
-        self.roids.retain(|r| r.alive());
-        self.bullets.retain(|b| b.alive());
-        self.fragments.retain(|b| b.alive());
-    }
+    // pub fn remove_dead(&mut self) {
+    //     self.roids.retain(|r| r.alive());
+    //     self.bullets.retain(|b| b.alive());
+    //     self.fragments.retain(|b| b.alive());
+    // }
 
     pub fn extend(&mut self, other: ObjectSet) {
         self.roids.extend(other.roids);

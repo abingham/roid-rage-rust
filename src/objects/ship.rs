@@ -1,6 +1,5 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Polyline, Shape};
-use opengl_graphics::GlGraphics;
+use ncollide2d::shape::{Polyline};
 use uuid::Uuid;
 
 

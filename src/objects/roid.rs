@@ -20,8 +20,7 @@ pub struct Roid {
     collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: uuid::Uuid,
-    alive: bool
+    id: uuid::Uuid
 }
 
 impl Roid {
@@ -32,7 +31,6 @@ impl Roid {
             radius: radius,
             collision_shape: Ball::new(radius),
             id: uuid::Uuid::new_v4(),
-            alive: true
         }
     }
 
@@ -43,13 +41,12 @@ impl Roid {
 
 impl GameObject for Roid {
     fn id(&self) -> uuid::Uuid { self.id }
-    fn alive(&self) -> bool { self.alive }
-    fn kill(&mut self) -> ObjectSet { 
-        self.alive = false; 
-                let new_radius = self.radius / 2.0;
+
+    fn explode(&self) -> ObjectSet { 
+        let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
         let roids = (0..num_sub_roids).map(|_| {
-                let velocity = make_velocity_vector(speed((self as &mut dyn GameObject).velocity()) * 2.0, random_bearing());
+                let velocity = make_velocity_vector(speed(&self.velocity) * 2.0, random_bearing());
                 Roid::new(self.position, new_radius, velocity)
             })
             .collect();
@@ -65,8 +62,13 @@ impl GameObject for Roid {
         &self.velocity
     }
 
-    fn update(&mut self, field: &Field, time_delta: f64) {
-        self.position = field.wrap(&project(self, time_delta));
+    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
+        let new_position = field.wrap(&project(self, time_delta));
+        ObjectSet::from_objects(
+            vec![Roid::new(new_position, self.radius, 
+                           self.velocity.clone())], 
+            vec![], 
+            vec![])
     }
 
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {

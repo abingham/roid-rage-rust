@@ -13,7 +13,7 @@ pub trait GameObject {
 
     fn velocity(&self) -> &Vector2<f64>;
 
-    fn update(&mut self, field: &Field, time_delta: f64);
+    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet;
 
     fn render(&self, 
               color: &[f32; 4], 
@@ -22,20 +22,20 @@ pub trait GameObject {
 
     fn id(&self) -> uuid::Uuid;
 
-    fn alive(&self) -> bool;
-
-    fn kill(&mut self) -> ObjectSet;
+    fn explode(&self) -> ObjectSet {
+        ObjectSet::new()
+    }
 }
 
-impl PartialEq for GameObject {
+impl PartialEq for dyn GameObject {
     fn eq(&self, other: &Self) -> bool {
         self.id() == other.id()
     }
 }
 
-impl Eq for GameObject {}
+impl Eq for dyn GameObject {}
 
-impl Hash for GameObject {
+impl Hash for dyn GameObject {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.id().hash(state);
     }

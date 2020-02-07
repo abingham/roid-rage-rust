@@ -1,13 +1,10 @@
-use crate::collide::collide;
 use crate::field::Field;
 use crate::object_set::ObjectSet;
 use crate::objects::bullet::Bullet;
-use crate::game_object::GameObject;
 use crate::util::make_velocity_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
-use std::collections::HashSet;
 
 pub struct App {
     pub field: Field,
@@ -33,42 +30,25 @@ impl App {
     }
 
     pub fn update(&mut self, args: &UpdateArgs) {
+        // See what got hit
         let hits = self.objects.collisions(args.dt);
-        let field = self.field;
 
-        // Update all objects
-        for roid in self.objects.iter_mut() {
-            roid.update(&field, args.dt);
-        }
-
-        // Explode collisions 
-        let updates: Vec<ObjectSet> = self
-            .objects
-            .iter_mut()
-            .filter_map(|r| {
-                if hits.contains(&r.id()) {
-                    Some(r.kill())
-                } else {
-                    None
+        // Update or explode everything.
+        self.objects = self.objects.iter()
+            .filter_map(|o| {
+                // If an object was hit, its debris goes into the new object set
+                if hits.contains(&o.id()) {
+                    Some(o.explode())
+                }
+                // otherwise, the object's update goes into the new object set
+                else {
+                    Some(o.update(&self.field, args.dt))
                 }
             })
-            .collect();
-
-        // Kill out-of-bounds objects
-        for bullet in &mut self.objects.iter_mut() {
-            if !field.contains(bullet.position()) {
-                bullet.kill();
-            }
-        }
-
-        // kill collisions
-        self.objects.remove_dead();
-
-        // Insert new objects
-        updates.into_iter().fold(&mut self.objects, |acc, x| {
-            acc.extend(x);
-            acc
-        });
+            .fold(ObjectSet::new(), |mut acc, s| {
+                acc.extend(s);
+                acc
+            });
 
         self.fire(args.dt);
     }

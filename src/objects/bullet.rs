@@ -7,14 +7,12 @@ use crate::field::Field;
 use crate::game_object::GameObject;
 use crate::util::project;
 use crate::object_set::ObjectSet;
-use std::hash::{Hash, Hasher};
 
 pub struct Bullet {
     collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: uuid::Uuid,
-    alive: bool
+    id: uuid::Uuid
 }
 
 impl Bullet {
@@ -23,8 +21,7 @@ impl Bullet {
             position: position,
             velocity: velocity,
             collision_shape: Ball::new(Bullet::radius()),
-            id: uuid::Uuid::new_v4(),
-            alive: true
+            id: uuid::Uuid::new_v4()
         }
     }
 
@@ -35,13 +32,8 @@ impl Bullet {
 
 impl GameObject for Bullet {
     fn id(&self) -> uuid::Uuid { self.id }
-    fn alive(&self) -> bool { self.alive }
-    fn kill(&mut self) -> ObjectSet { 
-        self.alive = false; 
-        ObjectSet::new()
-    }
 
-   fn position(&self) -> &Point2<f64> {
+    fn position(&self) -> &Point2<f64> {
         &self.position
     }
 
@@ -49,8 +41,17 @@ impl GameObject for Bullet {
         &self.velocity
     }
 
-    fn update(&mut self, field: &Field, time_delta: f64) {
-        self.position = project(self, time_delta);
+    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
+        let new_position = project(self, time_delta);
+        if !field.contains(&new_position) {
+            ObjectSet::new()
+        }
+        else {
+            ObjectSet::from_objects(
+                vec![], 
+                vec![Bullet::new(new_position, self.velocity.clone())], 
+                vec![])
+        }
     }
 
    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
