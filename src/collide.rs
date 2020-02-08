@@ -66,7 +66,7 @@ where
 
 /// Find real roots for a quadratic of the form:
 /// 
-///     ax^2 + bx + c
+/// ax^2 + bx + c
 /// 
 /// :param a: The "a" in the quadratic
 /// :param b: The "b" in the quadratic

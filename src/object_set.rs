@@ -72,6 +72,12 @@ impl ObjectSet {
             .chain(self.bullets.iter_mut().map(|b| b as &mut dyn GameObject))
             .chain(self.fragments.iter_mut().map(|f| f as &mut dyn GameObject))
     }
+
+    pub fn roids<'a>(&'a self) ->impl Iterator<Item = &'a Roid> {
+        self.roids.iter()
+    }
+
+
 }
 
 

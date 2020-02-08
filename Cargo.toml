@@ -13,3 +13,6 @@ nalgebra = "0.18.0"
 rand = "0.6.5"
 ncollide2d = "0.19.1"
 uuid = { version = "0.7", features = ["v4"] }
+
+[dev-dependencies]
+itertools-num = "0.1.3"
