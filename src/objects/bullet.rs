@@ -5,7 +5,6 @@ use opengl_graphics::GlGraphics;
 use crate::collide::Collidable;
 use crate::field::Field;
 use crate::game_object::GameObject;
-use crate::util::project;
 use crate::object_set::ObjectSet;
 
 pub struct Bullet {
@@ -42,7 +41,7 @@ impl GameObject for Bullet {
     }
 
     fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
-        let new_position = project(self, time_delta);
+        let new_position = self.position + self.velocity * time_delta;
         if !field.contains(&new_position) {
             ObjectSet::new()
         }

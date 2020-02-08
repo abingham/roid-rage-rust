@@ -4,7 +4,6 @@ use uuid::Uuid;
 
 use crate::game_object::GameObject;
 use crate::field::Field;
-use crate::util::project;
 use crate::object_set::ObjectSet;
 
 pub struct Fragment {
@@ -54,7 +53,7 @@ impl GameObject for Fragment {
             ObjectSet::new()
         }
         else {
-            let new_position = field.wrap(&project(self, time_delta));
+            let new_position = field.wrap(&(self.position + self.velocity * time_delta));
             ObjectSet::from_objects(vec![], vec![], vec![Fragment::new(new_position, self.velocity, new_age, self.max_age)])
         }
     }

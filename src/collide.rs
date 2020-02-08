@@ -4,6 +4,7 @@ use ncollide2d::query;
 use ncollide2d::shape::Shape;
 use std::iter::Iterator;
 use std::cmp::Ordering;
+use crate::util::Velocity;
 
 /// Things that can be collided together.
 pub trait Collidable {
@@ -95,8 +96,8 @@ fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<Vec<f64>> {
 pub fn collision_point(position: &Point2<f64>, speed: f64, target: &dyn Collidable) -> Option<Point2<f64>> {
     let dx = target.position().x - position.x;
     let dy = target.position().y - position.y;
-    let target_speed = crate::util::speed(target.velocity());
-    let target_dir = crate::util::bearing(target.velocity());
+    let target_speed = target.velocity().speed();
+    let target_dir = target.velocity().bearing();
     let a = speed.powf(2.0) - target_speed.powf(2.0);
     let b = -2.0 * (target_speed * f64::cos(target_dir) * dx +
                     target_speed * f64::sin(target_dir) * dy);

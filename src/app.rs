@@ -1,7 +1,7 @@
 use crate::field::Field;
 use crate::object_set::ObjectSet;
 use crate::objects::bullet::Bullet;
-use crate::util::{bearing, make_velocity_vector};
+use crate::util::{make_velocity_vector, Velocity};
 use crate::collide::collision_vector;
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
@@ -80,7 +80,7 @@ impl App {
                             (self.field.width() / 2) as f64,
                             (self.field.height() / 2) as f64,
                         ),
-                        make_velocity_vector(200.0, bearing(&v)));
+                        make_velocity_vector(200.0, v.bearing()));
                 
                     let bullets = ObjectSet::from_objects(
                         vec![],

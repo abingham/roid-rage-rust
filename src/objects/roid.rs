@@ -6,11 +6,10 @@ use crate::explosion::make_explosion;
 use crate::util::{make_velocity_vector, random_bearing};
 use crate::collide::Collidable;
 use crate::game_object::GameObject;
-use crate::util::project;
 use crate::field::Field;
 use crate::object_set::ObjectSet;
-use crate::util::speed;
 use uuid;
+use crate::util::Velocity;
 
 const MIN_RADIUS: f64 = 10.0;
 
@@ -46,7 +45,7 @@ impl GameObject for Roid {
         let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
         let roids = (0..num_sub_roids).map(|_| {
-                let velocity = make_velocity_vector(speed(&self.velocity) * 2.0, random_bearing());
+                let velocity = make_velocity_vector(self.velocity.speed() * 2.0, random_bearing());
                 Roid::new(self.position, new_radius, velocity)
             })
             .collect();
@@ -63,7 +62,7 @@ impl GameObject for Roid {
     }
 
     fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
-        let new_position = field.wrap(&project(self, time_delta));
+        let new_position = field.wrap(&(self.position + self.velocity * time_delta));
         ObjectSet::from_objects(
             vec![Roid::new(new_position, self.radius, 
                            self.velocity.clone())], 
