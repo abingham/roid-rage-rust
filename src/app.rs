@@ -1,10 +1,9 @@
-use crate::collide::collision_vector;
 use crate::field::Field;
+use crate::targeting::target;
 use crate::object_set::ObjectSet;
 use crate::objects::bullet::Bullet;
-use crate::velocity::{make_velocity_vector, Velocity};
-use core::cmp::Ordering;
-use nalgebra::{Point2, Vector2};
+use crate::velocity::make_velocity_vector;
+use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 
@@ -64,32 +63,23 @@ impl App {
             (self.field.width() / 2) as f64,
             (self.field.height() / 2) as f64,
         );
+
         // Generate a bullet if it's the right time.
         self.full_time += dt;
         if self.full_time > FIRING_FREQUENCY {
-            let mut hits: Vec<(Point2<f64>, Vector2<f64>)> = self
-                .objects
-                .roids()
-                .filter_map(|roid| collision_vector(&firing_position, Bullet::speed(), roid))
-                .filter(|(p, _v)| self.field.contains(p))
-                .collect();
-
-            hits.sort_by(|(p1, _v1), (p2, _v2)| {
-                let d1 = (firing_position - p1).magnitude();
-                let d2 = (firing_position - p2).magnitude();
-                match d1.partial_cmp(&d2) {
-                    Some(ordering) => ordering,
-                    None => Ordering::Equal,
-                }
-            });
-            let closest_hit = hits.iter().nth(0);
-
-            match closest_hit {
-                Some((_p, v)) => {
+            match target(
+                &firing_position,
+                Bullet::speed(),
+                &self.field,
+                &self.objects,
+            ) {
+                Some(bearing) => {
                     self.full_time = 0.0;
 
-                    let bullet =
-                        Bullet::new(firing_position, make_velocity_vector(Bullet::speed(), v.bearing()));
+                    let bullet = Bullet::new(
+                        firing_position,
+                        make_velocity_vector(Bullet::speed(), bearing),
+                    );
 
                     let bullets = ObjectSet::from_objects(vec![], vec![bullet], vec![]);
                     self.objects.extend(bullets);
