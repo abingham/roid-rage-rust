@@ -27,6 +27,10 @@ impl Bullet {
     pub fn radius() -> f64 {
         2.0
     }
+
+    pub fn speed() -> f64 {
+        400.0
+    }
 }
 
 impl GameObject for Bullet {
