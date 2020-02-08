@@ -1,6 +1,7 @@
 extern crate roid_rage;
 
 use glutin_window::GlutinWindow as Window;
+use nalgebra::Point2;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
@@ -8,38 +9,34 @@ use piston::window::WindowSettings;
 use rand::prelude::*;
 use roid_rage::app::App;
 use roid_rage::field::Field;
-use roid_rage::objects::roid::Roid;
-// use roid_rage::objects::ship::Ship;
-// use roid_rage::objects::bullet::Bullet;
 use roid_rage::object_set::ObjectSet;
-use nalgebra::Point2;
-
-use roid_rage::util::{make_velocity_vector, random_bearing};
+use roid_rage::objects::roid::Roid;
+use roid_rage::velocity::{make_velocity_vector, random_bearing};
 
 fn some_roids(width: usize, height: usize) -> Vec<Roid> {
     let mut rng = thread_rng();
-    (1..10).map(|_| {
-        Roid::new(
-            Point2::new(
-                rng.gen_range(0, width) as f64,
-                rng.gen_range(0, height) as f64,
-            ),
-            40.0,
-            make_velocity_vector(100.0, random_bearing()),
-        )
-    })
-    .collect()
+    (1..10)
+        .map(|_| {
+            Roid::new(
+                Point2::new(
+                    rng.gen_range(0, width) as f64,
+                    rng.gen_range(0, height) as f64,
+                ),
+                40.0,
+                make_velocity_vector(100.0, random_bearing()),
+            )
+        })
+        .collect()
 }
 
 // fn the_ship(width: usize, height: usize) -> (Category, Box<dyn GameObject>) {
-//     (Category::Ship, 
+//     (Category::Ship,
 //      Box::new(
 //         Ship::new(
 //             Point2::new((width / 2) as f64, (height / 2) as f64),
 //             make_velocity_vector(0.0, 0.0),
 //             0.0)))
 // }
-
 
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
@@ -55,10 +52,7 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         field: Field::new(800, 600, 100),
-        objects: ObjectSet::from_objects(
-            some_roids(800, 600), 
-            vec![],
-            vec![]),
+        objects: ObjectSet::from_objects(some_roids(800, 600), vec![], vec![]),
         full_time: 0.0,
     };
 

@@ -1,8 +1,8 @@
+use crate::collide::collision_vector;
 use crate::field::Field;
 use crate::object_set::ObjectSet;
 use crate::objects::bullet::Bullet;
-use crate::util::{make_velocity_vector, Velocity};
-use crate::collide::collision_vector;
+use crate::velocity::{make_velocity_vector, Velocity};
 use nalgebra::Point2;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
@@ -35,7 +35,9 @@ impl App {
         let hits = self.objects.collisions(args.dt);
 
         // Update or explode everything.
-        self.objects = self.objects.iter()
+        self.objects = self
+            .objects
+            .iter()
             .filter_map(|o| {
                 // If an object was hit, its debris goes into the new object set
                 if hits.contains(&o.id()) {
@@ -58,17 +60,20 @@ impl App {
         // Generate a bullet if it's the right time.
         self.full_time += dt;
         if self.full_time > 1.0 {
-            let hit = self.objects.roids()
+            let hit = self
+                .objects
+                .roids()
                 .filter_map(|roid| {
                     collision_vector(
-                        &Point2::new((self.field.width() / 2) as f64, 
-                                     (self.field.height() / 2) as f64),
-                        200.0, 
-                        roid)
-                    })
-                .filter(|(p, _v)| {
-                    self.field.contains(p)
+                        &Point2::new(
+                            (self.field.width() / 2) as f64,
+                            (self.field.height() / 2) as f64,
+                        ),
+                        200.0,
+                        roid,
+                    )
                 })
+                .filter(|(p, _v)| self.field.contains(p))
                 .nth(0);
 
             match hit {
@@ -80,15 +85,12 @@ impl App {
                             (self.field.width() / 2) as f64,
                             (self.field.height() / 2) as f64,
                         ),
-                        make_velocity_vector(200.0, v.bearing()));
-                
-                    let bullets = ObjectSet::from_objects(
-                        vec![],
-                        vec![bullet],
-                        vec![]
+                        make_velocity_vector(200.0, v.bearing()),
                     );
+
+                    let bullets = ObjectSet::from_objects(vec![], vec![bullet], vec![]);
                     self.objects.extend(bullets);
-                },
+                }
                 None => {}
             }
         }

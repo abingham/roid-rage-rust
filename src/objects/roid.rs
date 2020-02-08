@@ -2,14 +2,13 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, Shape};
 use opengl_graphics::GlGraphics;
 
-use crate::explosion::make_explosion;
-use crate::util::{make_velocity_vector, random_bearing};
 use crate::collide::Collidable;
-use crate::game_object::GameObject;
+use crate::explosion::make_explosion;
 use crate::field::Field;
+use crate::game_object::GameObject;
 use crate::object_set::ObjectSet;
+use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use uuid;
-use crate::util::Velocity;
 
 const MIN_RADIUS: f64 = 10.0;
 
@@ -19,7 +18,7 @@ pub struct Roid {
     collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: uuid::Uuid
+    id: uuid::Uuid,
 }
 
 impl Roid {
@@ -39,12 +38,15 @@ impl Roid {
 }
 
 impl GameObject for Roid {
-    fn id(&self) -> uuid::Uuid { self.id }
+    fn id(&self) -> uuid::Uuid {
+        self.id
+    }
 
-    fn explode(&self) -> ObjectSet { 
+    fn explode(&self) -> ObjectSet {
         let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
-        let roids = (0..num_sub_roids).map(|_| {
+        let roids = (0..num_sub_roids)
+            .map(|_| {
                 let velocity = make_velocity_vector(self.velocity.speed() * 2.0, random_bearing());
                 Roid::new(self.position, new_radius, velocity)
             })
@@ -64,10 +66,10 @@ impl GameObject for Roid {
     fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
         let new_position = field.wrap(&(self.position + self.velocity * time_delta));
         ObjectSet::from_objects(
-            vec![Roid::new(new_position, self.radius, 
-                           self.velocity.clone())], 
-            vec![], 
-            vec![])
+            vec![Roid::new(new_position, self.radius, self.velocity.clone())],
+            vec![],
+            vec![],
+        )
     }
 
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {

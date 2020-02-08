@@ -1,10 +1,10 @@
-use nalgebra::{Point2, Vector2};
+use crate::velocity::Velocity;
 use nalgebra::geometry::Isometry2;
+use nalgebra::{Point2, Vector2};
 use ncollide2d::query;
 use ncollide2d::shape::Shape;
-use std::iter::Iterator;
 use std::cmp::Ordering;
-use crate::util::Velocity;
+use std::iter::Iterator;
 
 /// Things that can be collided together.
 pub trait Collidable {
@@ -18,14 +18,10 @@ pub trait Collidable {
 /// The return value is a sequence of Collidable pairs, each representing a collision between an object from the first
 /// group and the second group. The first element of the pair is the object in `group1` and the second is the object in
 /// `group2`.
-pub fn collide<'a, T1, T2>(
-    group1: &'a [T1],
-    group2: &'a [T2],
-    dt: f64,
-) -> Vec<(&'a T1, &'a T2)>
+pub fn collide<'a, T1, T2>(group1: &'a [T1], group2: &'a [T2], dt: f64) -> Vec<(&'a T1, &'a T2)>
 where
     T1: Collidable,
-    T2: Collidable
+    T2: Collidable,
 {
     group1
         .iter()
@@ -44,9 +40,11 @@ where
                         shape1,
                         &Isometry2::new(
                             Vector2::new(obj2.position().coords[0], obj2.position().coords[1]),
-                            0.0),
+                            0.0,
+                        ),
                         obj2.velocity(),
-                        obj2.collision_shape());
+                        obj2.collision_shape(),
+                    );
                     match toi {
                         Some(t) => {
                             if t <= dt {
@@ -66,9 +64,9 @@ where
 }
 
 /// Find real roots for a quadratic of the form:
-/// 
+///
 /// ax^2 + bx + c
-/// 
+///
 /// :param a: The "a" in the quadratic
 /// :param b: The "b" in the quadratic
 /// :param c: The "c" in the quadratic
@@ -79,31 +77,32 @@ fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<Vec<f64>> {
 
     if disc < 0.0 {
         None
-    }
-    else if disc == 0.0 {
+    } else if disc == 0.0 {
         Some(vec![(-1.0 * b) / (2.0 * a)])
-    }
-    else {
-        let sqrt_disc = disc.sqrt(); 
+    } else {
+        let sqrt_disc = disc.sqrt();
         Some(vec![
             (-1.0 * b + sqrt_disc) / (2.0 * a),
-            (-1.0 * b - sqrt_disc) / (2.0 * a)
+            (-1.0 * b - sqrt_disc) / (2.0 * a),
         ])
     }
 }
 
-
-pub fn collision_point(position: &Point2<f64>, speed: f64, target: &dyn Collidable) -> Option<Point2<f64>> {
+pub fn collision_point(
+    position: &Point2<f64>,
+    speed: f64,
+    target: &dyn Collidable,
+) -> Option<Point2<f64>> {
     let dx = target.position().x - position.x;
     let dy = target.position().y - position.y;
     let target_speed = target.velocity().speed();
     let target_dir = target.velocity().bearing();
     let a = speed.powf(2.0) - target_speed.powf(2.0);
-    let b = -2.0 * (target_speed * f64::cos(target_dir) * dx +
-                    target_speed * f64::sin(target_dir) * dy);
+    let b = -2.0
+        * (target_speed * f64::cos(target_dir) * dx + target_speed * f64::sin(target_dir) * dy);
     let c = -1.0 * dx.powf(2.0) + dy.powf(2.0);
 
-    solve_quadratic(a, b, c) 
+    solve_quadratic(a, b, c)
         .and_then(|mut roots| {
             roots.retain(|r| *r >= 0.0);
             roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less));
@@ -126,7 +125,10 @@ pub fn collision_point(position: &Point2<f64>, speed: f64, target: &dyn Collidab
 /// :param target_dir: Direction (of movement) of target
 ///
 /// :return: A tuple (collision-position, collision-vector) if one
-pub fn collision_vector(position: &Point2<f64>, speed: f64, target: &dyn Collidable) -> Option<(Point2<f64>, Vector2<f64>)>
-{
+pub fn collision_vector(
+    position: &Point2<f64>,
+    speed: f64,
+    target: &dyn Collidable,
+) -> Option<(Point2<f64>, Vector2<f64>)> {
     collision_point(position, speed, target).map(|p| (p, p - position))
 }

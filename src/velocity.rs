@@ -12,11 +12,6 @@ pub fn make_velocity_vector(speed: f64, bearing: f64) -> Vector2<f64> {
     Vector2::new(bearing.cos() * speed, bearing.sin() * speed)
 }
 
-/// Project the position of a moving object forward in time.
-// pub fn project(m: &dyn GameObject, time_delta: f64) -> Point2<f64> {
-//     m.position() + m.velocity() * time_delta
-// }
-
 /// Calculate the speed represented by a velocity vector.
 pub trait Velocity {
     fn speed(&self) -> f64;
