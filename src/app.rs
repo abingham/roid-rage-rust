@@ -13,7 +13,7 @@ pub struct App {
     pub full_time: f64,
 }
 
-const FIRING_FREQUENCY: f64 = 1.0;
+const FIRING_FREQUENCY: f64 = 0.5;
 
 impl App {
     pub fn render(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
