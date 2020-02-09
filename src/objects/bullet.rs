@@ -29,7 +29,7 @@ impl Bullet {
     }
 
     pub fn speed() -> f64 {
-        400.0
+        600.0
     }
 }
 

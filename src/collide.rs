@@ -71,24 +71,55 @@ where
 /// :param b: The "b" in the quadratic
 /// :param c: The "c" in the quadratic
 /// :return: A list of real roots, sized 0, 1, or 2
-fn solve_quadratic(a: f64, b: f64, c: f64) -> Option<Vec<f64>> {
-    // disc = math.pow(b, 2) - 4 * a * c
+fn solve_quadratic(a: f64, b: f64, c: f64) -> Vec<f64> {
     let disc = b.powf(2.0) - 4.0 * a * c;
 
     if disc < 0.0 {
-        None
+        vec![]
     } else if disc == 0.0 {
-        Some(vec![(-1.0 * b) / (2.0 * a)])
+        vec![(-1.0 * b) / (2.0 * a)]
     } else {
         let sqrt_disc = disc.sqrt();
-        Some(vec![
+        vec![
             (-1.0 * b + sqrt_disc) / (2.0 * a),
             (-1.0 * b - sqrt_disc) / (2.0 * a),
-        ])
+        ]
     }
 }
 
 pub fn collision_point(
+    position: &Point2<f64>,
+    speed: f64,
+    target: &dyn Collidable
+) -> Option<Point2<f64>> {
+    let delta_x = position[0] - target.position()[0];
+    let delta_y = position[1] - target.position()[1];
+
+    let target_speed = target.velocity().speed();
+    let target_bearing = target.velocity().bearing();
+    let a = target_speed.powf(2.0) * f64::cos(target_bearing).powf(2.0) + target_speed.powf(2.0) * f64::sin(target_bearing).powf(2.0) - speed.powf(2.0);
+    let b = -1.0 * (2.0 * delta_x * target_speed * f64::cos(target_bearing) + 2.0 * delta_y * target_speed * f64::sin(target_bearing));
+    let c = delta_x.powf(2.0) + delta_y.powf(2.0);
+
+    println!("target_speed {} target_bearing {} a {} b {} c {}", target_speed, target_bearing, a, b, c);
+
+    solve_quadratic(a, b, c)
+        .iter()
+        .filter(|r| {
+            **r >= 0.0
+        })
+        .min_by(|a, b| {
+            a.partial_cmp(b).unwrap_or(Ordering::Less)
+        })
+        .map(|dt| {
+            println!("dt: {}", dt);
+            let coll_x = dt * target_speed * f64::cos(target_bearing) + target.position().x;
+            let coll_y = dt * target_speed * f64::sin(target_bearing) + target.position().y;
+            Point2::new(coll_x, coll_y)
+        })
+}
+
+pub fn _collision_point(
     position: &Point2<f64>,
     speed: f64,
     target: &dyn Collidable,
@@ -103,10 +134,12 @@ pub fn collision_point(
     let c = -1.0 * dx.powf(2.0) + dy.powf(2.0);
 
     solve_quadratic(a, b, c)
-        .and_then(|mut roots| {
-            roots.retain(|r| *r >= 0.0);
-            roots.sort_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less));
-            roots.pop()
+        .iter()
+        .filter(|r| {
+            **r >= 0.0
+        })
+        .min_by(|a, b| {
+            a.partial_cmp(b).unwrap_or(Ordering::Less)
         })
         .map(|dt| {
             let coll_x = dt * target_speed * f64::cos(target_dir) + target.position().x;
