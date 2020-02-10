@@ -1,4 +1,3 @@
-use crate::explosion::make_explosion;
 use crate::field::Field;
 use crate::game_object::GameObject;
 use crate::objects::bullet::Bullet;
@@ -90,9 +89,6 @@ impl App {
                     if let Some(obj) = self.game_objects.get(&handle) {
                         additions.extend(obj.explode());
                     }
-                }
-                if let Some(obj) = self.game_objects.get(&collider1) {
-                    additions.extend(make_explosion(obj.position()));
                 }
             }
         }

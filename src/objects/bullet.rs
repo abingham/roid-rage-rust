@@ -2,6 +2,7 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::pipeline::CollisionGroups;
 use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
+use crate::explosion::make_explosion;
 
 use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP};
 use crate::field::Field;
@@ -61,6 +62,10 @@ impl GameObject for Bullet {
             2.0 * Bullet::radius(),
         );
         ellipse(*color, rect, transform, gl);
+    }
+
+    fn explode(&self) -> Vec<Box<dyn GameObject>> {
+        make_explosion(&self.position)
     }
 
     // TODO: Re-add collidable trait
