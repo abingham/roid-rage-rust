@@ -6,11 +6,11 @@ use std::hash::{Hash, Hasher};
 use ncollide2d::shape::ShapeHandle;
 use ncollide2d::pipeline::CollisionGroups;
 
-use crate::object_set::ObjectSet;
-
 use crate::field::Field;
 
 // Collision groups
+// TODO: Is this this best way to model these groups? How about an enum to make sure implementors only
+// use valid values?
 pub const MASSIVE_GROUP: usize = 1;
 pub const WEAPON_GROUP: usize = 2;
 pub const SHIP_GROUP: usize = 3;
@@ -29,8 +29,8 @@ pub trait GameObject {
 
     fn id(&self) -> uuid::Uuid;
 
-    fn explode(&self) -> ObjectSet {
-        ObjectSet::new()
+    fn explode(&self) -> Vec<Box<dyn GameObject>> {
+        vec![]
     }
 
     fn collision_shape(&self) -> ShapeHandle<f64>; 

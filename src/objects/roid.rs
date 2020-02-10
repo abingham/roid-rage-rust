@@ -6,6 +6,7 @@ use crate::field::Field;
 use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP, SHIP_GROUP};
 use uuid;
 use ncollide2d::pipeline::CollisionGroups;
+use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 
 
 const MIN_RADIUS: f64 = 10.0;
@@ -37,18 +38,17 @@ impl GameObject for Roid {
         self.id
     }
 
-    // fn explode(&self) -> ObjectSet {
-    //     let new_radius = self.radius / 2.0;
-    //     let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
-    //     let roids = (0..num_sub_roids)
-    //         .map(|_| {
-    //             let velocity = make_velocity_vector(self.velocity.speed() * 2.0, random_bearing());
-    //             Roid::new(self.position, new_radius, velocity)
-    //         })
-    //         .collect();
-
-    //     ObjectSet::from_objects(roids, vec![], make_explosion(&self.position))
-    // }
+    fn explode(&self) -> Vec<Box<dyn GameObject>> {
+        println!("yep");
+        let new_radius = self.radius / 2.0;
+        let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
+         (0..num_sub_roids)
+            .map(|_| {
+                let velocity = make_velocity_vector(self.velocity.speed() * 1.5, random_bearing());
+                Box::new(Roid::new(self.position, new_radius, velocity)) as Box<dyn GameObject>
+            })
+            .collect()
+    }
 
     fn position(&self) -> &Point2<f64> {
         &self.position

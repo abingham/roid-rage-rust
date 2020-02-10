@@ -1,6 +1,7 @@
 use crate::field::Field;
 use crate::game_object::GameObject;
 use crate::objects::bullet::Bullet;
+use crate::velocity::make_velocity_vector;
 use nalgebra as na;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use ncollide2d::pipeline::{ContactEvent, GeometricQueryType};
@@ -8,7 +9,6 @@ use ncollide2d::world::CollisionWorld;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashMap;
-use crate::velocity::make_velocity_vector;
 
 pub struct App {
     field: Field,
@@ -72,6 +72,7 @@ impl App {
     fn cleanup(&mut self) -> () {
         // Anything that should be removed goes on this vector.
         let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
+        let mut additions: Vec<Box<dyn GameObject>> = vec![];
 
         // Look for things that are off the field
         for (handle, game_object) in &self.game_objects {
@@ -83,8 +84,12 @@ impl App {
         // Then look for collisions
         for event in self.collision_world.contact_events() {
             if let &ContactEvent::Started(collider1, collider2) = event {
-                removals.push(collider1);
-                removals.push(collider2);
+                for handle in vec![collider1, collider2] {
+                    removals.push(handle);
+                    if let Some(obj) = self.game_objects.get(&handle) {
+                        additions.extend(obj.explode());
+                    }
+                }
             }
         }
 
@@ -94,6 +99,10 @@ impl App {
         self.collision_world.remove(&removals);
         for removal in removals {
             self.game_objects.remove(&removal);
+        }
+
+        for addition in additions {
+            self.insert(addition);
         }
     }
 
@@ -131,5 +140,5 @@ impl App {
 
             // TODO: Use targeting, of course.
         }
-   }
+    }
 }
