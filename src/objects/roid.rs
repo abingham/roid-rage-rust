@@ -39,7 +39,6 @@ impl GameObject for Roid {
     }
 
     fn explode(&self) -> Vec<Box<dyn GameObject>> {
-        println!("yep");
         let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
          (0..num_sub_roids)

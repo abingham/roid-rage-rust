@@ -14,6 +14,7 @@ use crate::field::Field;
 pub const MASSIVE_GROUP: usize = 1;
 pub const WEAPON_GROUP: usize = 2;
 pub const SHIP_GROUP: usize = 3;
+pub const HARMLESS_GROUP: usize = 4;
 
 pub trait GameObject {
     fn position(&self) -> &Point2<f64>;
