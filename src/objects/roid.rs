@@ -1,5 +1,5 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Ball, Shape};
+use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 
 use crate::collide::Collidable;
@@ -15,7 +15,6 @@ const MIN_RADIUS: f64 = 10.0;
 #[derive(Debug)]
 pub struct Roid {
     radius: f64,
-    collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
     id: uuid::Uuid,
@@ -27,7 +26,6 @@ impl Roid {
             position: position,
             velocity: velocity,
             radius: radius,
-            collision_shape: Ball::new(radius),
             id: uuid::Uuid::new_v4(),
         }
     }
@@ -82,18 +80,9 @@ impl GameObject for Roid {
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
         ellipse(*color, rect, transform, gl);
     }
-}
 
-impl Collidable for Roid {
-    fn collision_shape(&self) -> &dyn Shape<f64> {
-        &self.collision_shape
-    }
-
-    fn position(&self) -> &Point2<f64> {
-        &self.position
-    }
-
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
+    fn collision_shape(&self) -> ShapeHandle<f64> {
+        ShapeHandle::new(Ball::new(self.radius))
     }
 }
+

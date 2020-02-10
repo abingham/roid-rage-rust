@@ -2,13 +2,13 @@ use crate::velocity::Velocity;
 use nalgebra::geometry::Isometry2;
 use nalgebra::{Point2, Vector2};
 use ncollide2d::query;
-use ncollide2d::shape::Shape;
+use ncollide2d::shape::ShapeHandle;
 use std::cmp::Ordering;
 use std::iter::Iterator;
 
 /// Things that can be collided together.
 pub trait Collidable {
-    fn collision_shape(&self) -> &dyn Shape<f64>;
+    fn collision_shape(&self) -> ShapeHandle<f64>;
     fn position(&self) -> &Point2<f64>;
     fn velocity(&self) -> &Vector2<f64>;
 }

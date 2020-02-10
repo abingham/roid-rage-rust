@@ -3,6 +3,7 @@ use nalgebra::{Point2, Vector2};
 use opengl_graphics::GlGraphics;
 use uuid;
 use std::hash::{Hash, Hasher};
+use ncollide2d::shape::ShapeHandle;
 
 use crate::object_set::ObjectSet;
 
@@ -25,6 +26,8 @@ pub trait GameObject {
     fn explode(&self) -> ObjectSet {
         ObjectSet::new()
     }
+
+    fn collision_shape(&self) -> ShapeHandle<f64>;
 }
 
 impl PartialEq for dyn GameObject {
