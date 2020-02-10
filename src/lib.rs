@@ -1,6 +1,5 @@
 pub mod app;
 pub mod collide;
-pub mod explosion;
 pub mod field;
 pub mod targeting;
 pub mod game_object;

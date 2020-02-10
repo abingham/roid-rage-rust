@@ -2,10 +2,12 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::pipeline::CollisionGroups;
 use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
-use crate::explosion::make_explosion;
+use rand::prelude::*;
 
 use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP};
 use crate::field::Field;
+use crate::objects::fragment::Fragment;
+use crate::velocity::{make_velocity_vector, random_bearing};
 
 pub struct Bullet {
     position: Point2<f64>,
@@ -42,7 +44,7 @@ impl GameObject for Bullet {
         &self.velocity
     }
 
-    fn update(&mut self, field: &Field, time_delta: f64) -> () {
+    fn update(&mut self, _field: &Field, time_delta: f64) -> () {
         let new_position = self.position + self.velocity * time_delta;
         self.position = new_position;
    }
@@ -63,7 +65,20 @@ impl GameObject for Bullet {
     }
 
     fn explode(&self) -> Vec<Box<dyn GameObject>> {
-        make_explosion(&self.position)
+        let mut rng = thread_rng();
+
+        (0..rng.gen_range(1, 10))
+            .map(|_| {
+                let speed = rng.gen::<f64>() * 400.0 + 200.0;
+                let max_age = rng.gen::<f64>() * 0.5;
+                Box::new(Fragment::new(
+                    self.position,
+                    make_velocity_vector(speed, random_bearing()),
+                    0.0,
+                    max_age,
+                )) as Box<dyn GameObject>
+            })
+            .collect()
     }
 
     // TODO: Re-add collidable trait

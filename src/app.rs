@@ -96,7 +96,7 @@ impl App {
             }
         }
 
-        // Remove those things
+        // Remove the things that should be removed
         removals.sort();
         removals.dedup();
         self.collision_world.remove(&removals);
@@ -104,6 +104,7 @@ impl App {
             self.game_objects.remove(&removal);
         }
 
+        // Add the things that should be added
         for addition in additions {
             self.insert(addition);
         }
