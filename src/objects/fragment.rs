@@ -64,6 +64,10 @@ impl GameObject for Fragment {
         self.id
     }
 
+    fn alive(&self) -> bool {
+        self.age <= self.max_age
+    }
+
     // TODO: Re-add collidable trait
     fn collision_shape(&self) -> ShapeHandle<f64> {
         ShapeHandle::new(Ball::new(Fragment::radius()))

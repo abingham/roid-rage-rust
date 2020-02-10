@@ -1,10 +1,10 @@
 use graphics;
 use nalgebra::{Point2, Vector2};
-use opengl_graphics::GlGraphics;
-use uuid;
-use std::hash::{Hash, Hasher};
-use ncollide2d::shape::ShapeHandle;
 use ncollide2d::pipeline::CollisionGroups;
+use ncollide2d::shape::ShapeHandle;
+use opengl_graphics::GlGraphics;
+use std::hash::{Hash, Hasher};
+use uuid;
 
 use crate::field::Field;
 
@@ -23,18 +23,19 @@ pub trait GameObject {
 
     fn update(&mut self, field: &Field, time_delta: f64) -> ();
 
-    fn render(&self, 
-              color: &[f32; 4], 
-              c: graphics::Context, 
-              gl: &mut GlGraphics);
+    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
 
     fn id(&self) -> uuid::Uuid;
+
+    fn alive(&self) -> bool {
+        true
+    }
 
     fn explode(&self) -> Vec<Box<dyn GameObject>> {
         vec![]
     }
 
-    fn collision_shape(&self) -> ShapeHandle<f64>; 
+    fn collision_shape(&self) -> ShapeHandle<f64>;
 
     fn collision_groups(&self) -> CollisionGroups;
 }
@@ -52,4 +53,3 @@ impl Hash for dyn GameObject {
         self.id().hash(state);
     }
 }
-

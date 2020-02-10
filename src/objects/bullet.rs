@@ -8,10 +8,9 @@ use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP};
 use crate::field::Field;
 
 pub struct Bullet {
-    // collision_shape: Ball<f64>,
     position: Point2<f64>,
     velocity: Vector2<f64>,
-    id: uuid::Uuid
+    id: uuid::Uuid,
 }
 
 impl Bullet {
@@ -19,8 +18,7 @@ impl Bullet {
         Bullet {
             position: position,
             velocity: velocity,
-            // collision_shape: Ball::new(Bullet::radius()),
-            id: uuid::Uuid::new_v4()
+            id: uuid::Uuid::new_v4(),
         }
     }
 

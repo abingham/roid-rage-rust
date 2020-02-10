@@ -79,6 +79,9 @@ impl App {
             if !self.field.contains(game_object.position()) {
                 removals.push(*handle);
             }
+            else if !game_object.alive() {
+                removals.push(*handle);
+            }
         }
 
         // Then look for collisions
