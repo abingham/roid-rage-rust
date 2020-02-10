@@ -4,10 +4,16 @@ use opengl_graphics::GlGraphics;
 use uuid;
 use std::hash::{Hash, Hasher};
 use ncollide2d::shape::ShapeHandle;
+use ncollide2d::pipeline::CollisionGroups;
 
 use crate::object_set::ObjectSet;
 
 use crate::field::Field;
+
+// Collision groups
+pub const MASSIVE_GROUP: usize = 1;
+pub const WEAPON_GROUP: usize = 2;
+pub const SHIP_GROUP: usize = 3;
 
 pub trait GameObject {
     fn position(&self) -> &Point2<f64>;
@@ -27,7 +33,9 @@ pub trait GameObject {
         ObjectSet::new()
     }
 
-    fn collision_shape(&self) -> ShapeHandle<f64>;
+    fn collision_shape(&self) -> ShapeHandle<f64>; 
+
+    fn collision_groups(&self) -> CollisionGroups;
 }
 
 impl PartialEq for dyn GameObject {

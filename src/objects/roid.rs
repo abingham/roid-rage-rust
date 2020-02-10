@@ -5,10 +5,12 @@ use opengl_graphics::GlGraphics;
 // use crate::collide::Collidable;
 // use crate::explosion::make_explosion;
 use crate::field::Field;
-use crate::game_object::GameObject;
+use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP, SHIP_GROUP};
 use crate::object_set::ObjectSet;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use uuid;
+use ncollide2d::pipeline::CollisionGroups;
+
 
 const MIN_RADIUS: f64 = 10.0;
 
@@ -77,8 +79,16 @@ impl GameObject for Roid {
         ellipse(*color, rect, transform, gl);
     }
 
+    // TODO: Re-add collidable trait
     fn collision_shape(&self) -> ShapeHandle<f64> {
         ShapeHandle::new(Ball::new(self.radius))
+    }
+
+    fn collision_groups(&self) -> CollisionGroups {
+        let mut group = CollisionGroups::new();
+        group.set_membership(&[MASSIVE_GROUP]);
+        group.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
+        group
     }
 }
 
