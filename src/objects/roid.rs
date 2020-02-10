@@ -1,13 +1,9 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Ball, Shape, ShapeHandle};
+use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 
-// use crate::collide::Collidable;
-// use crate::explosion::make_explosion;
 use crate::field::Field;
 use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP, SHIP_GROUP};
-use crate::object_set::ObjectSet;
-use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use uuid;
 use ncollide2d::pipeline::CollisionGroups;
 

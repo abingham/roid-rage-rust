@@ -7,23 +7,25 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use rand::prelude::*;
+use roid_rage::app::App;
 use roid_rage::field::Field;
+use roid_rage::game_object::GameObject;
 use roid_rage::objects::roid::Roid;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
-use roid_rage::app::App;
 
-fn some_roids(width: usize, height: usize) -> Vec<Roid> {
+fn some_roids(width: usize, height: usize) -> Vec<Box<dyn GameObject>> {
     let mut rng = thread_rng();
     (1..10)
         .map(|_| {
-            Roid::new(
+            let roid = Roid::new(
                 Point2::new(
                     rng.gen_range(0, width) as f64,
                     rng.gen_range(0, height) as f64,
                 ),
                 40.0,
                 make_velocity_vector(100.0, random_bearing()),
-            )
+            );
+            Box::new(roid) as Box<dyn GameObject>
         })
         .collect()
 }
@@ -40,7 +42,6 @@ fn some_roids(width: usize, height: usize) -> Vec<Roid> {
 fn main() {
     // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
-
 
     // Create an Glutin window.
     let mut window: Window = WindowSettings::new("Roid Rage!", [800, 600])
