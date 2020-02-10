@@ -7,23 +7,20 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use rand::prelude::*;
-use roid_rage::app::App;
 use roid_rage::field::Field;
-use roid_rage::object_set::ObjectSet;
 use roid_rage::game_object::GameObject;
 use roid_rage::objects::roid::Roid;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
-use ncollide2d::shape::{Ball, ShapeHandle};
-use ncollide2d::world::{CollisionObjectHandle, CollisionGroups, CollisionWorld};
-use ncollide2d::world::GeometricQueryType;
+use ncollide2d::world::{CollisionWorld};
+use ncollide2d::pipeline::CollisionGroups;
+use ncollide2d::pipeline::GeometricQueryType;
+use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use nalgebra as na;
 use graphics::*;
-use std::collections::HashMap;
-use uuid::Uuid;
 
 fn some_roids(width: usize, height: usize) -> Vec<Roid> {
     let mut rng = thread_rng();
-    (1..2)
+    (1..10)
         .map(|_| {
             Roid::new(
                 Point2::new(
@@ -62,17 +59,20 @@ fn main() {
     ball_group.set_membership(&[1]);
 
     let contacts_query  = GeometricQueryType::Contacts(0.0, 0.0);
-    let proximity_query = GeometricQueryType::Proximity(0.0);
 
-    let mut world = CollisionWorld::new(0.02);
+    let mut world: CollisionWorld::<f64, Option<uuid::Uuid>> = CollisionWorld::new(0.02f64);
 
-    let mut roids: HashMap<Uuid, (Roid, CollisionObjectHandle)>;
-    for roid in some_roids(800, 600) {
-        let ball = roid.collision_shape();
-        let ball_pos = na::Isometry2::new(na::Vector2::new(roid.position()[0], roid.position()[1]), na::zero());
-        let ball_handle = world.add(ball_pos, ball, ball_group, contacts_query, Some(roid.id()));
-        roids.insert(roid.id(), (roid, ball_handle));
-    }
+    let mut roids: Vec<(Roid, CollisionObjectSlabHandle)> = some_roids(800, 600)
+        .into_iter()
+        .map(|roid| {
+            let ball = roid.collision_shape();
+            let ball_pos = na::Isometry2::new(na::Vector2::new(roid.position()[0], roid.position()[1]), na::zero());
+            let (handle, _obj) = world.add(ball_pos, ball, ball_group, contacts_query, None);
+            (roid, handle)
+        })
+        .collect();
+
+    let field = Field::new(800, 600, 100);
 
     let mut gl = GlGraphics::new(opengl);
     let mut events = Events::new(EventSettings::new());
@@ -85,25 +85,34 @@ fn main() {
             gl.draw(args.viewport(), |c, gl| {
                 clear(BLACK, gl);
                 
-                for roid in roids {
+                for (roid, _) in &roids {
                     roid.render(&WHITE, c, gl);
                 }
             })
         }
 
         if let Some(args) = e.update_args() {
-            for roid in ball_groups {
-
+            for (roid, handle) in &mut roids {
+                roid.update(&field, args.dt);
+                if let Some(object) = world.get_mut(*handle) {
+                    let pos = na::Isometry2::new(na::Vector2::new(roid.position()[0], roid.position()[1]), na::zero());
+                    object.set_position(pos);
+                }
             }
-            let ball_pos;
-    {
-        // Integrate the velocities.
-        let ball_object   = world.collision_object(ball_handle).unwrap();
-        let ball_velocity = ball_object.data.velocity.as_ref().unwrap();
+            world.update();
+            // Update positions of objects, and update collision world.
+            // for roid in ball_group {
 
-        // Integrate the positions.
-        ball_pos = ball_object.position.append_translation(&(timestep * ball_velocity.get()));
-    }
+            // }
+            // let ball_pos;
+            // {
+            //     // Integrate the velocities.
+            //     let ball_object   = world.collision_object(ball_handle).unwrap();
+            //     let ball_velocity = ball_object.data.velocity.as_ref().unwrap();
+
+            //     // Integrate the positions.
+            //     ball_pos = ball_object.position.append_translation(&(timestep * ball_velocity.get()));
+            // }
         }
 
     //     if let Some(r) = e.render_args() {
@@ -113,5 +122,5 @@ fn main() {
     //     if let Some(u) = e.update_args() {
     //         app.update(&u);
     //     }
-    // }
+    }
 }

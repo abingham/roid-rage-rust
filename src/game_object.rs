@@ -14,7 +14,7 @@ pub trait GameObject {
 
     fn velocity(&self) -> &Vector2<f64>;
 
-    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet;
+    fn update(&mut self, field: &Field, time_delta: f64) -> ();
 
     fn render(&self, 
               color: &[f32; 4], 

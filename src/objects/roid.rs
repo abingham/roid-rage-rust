@@ -1,9 +1,9 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Ball, ShapeHandle};
+use ncollide2d::shape::{Ball, Shape, ShapeHandle};
 use opengl_graphics::GlGraphics;
 
-use crate::collide::Collidable;
-use crate::explosion::make_explosion;
+// use crate::collide::Collidable;
+// use crate::explosion::make_explosion;
 use crate::field::Field;
 use crate::game_object::GameObject;
 use crate::object_set::ObjectSet;
@@ -12,7 +12,6 @@ use uuid;
 
 const MIN_RADIUS: f64 = 10.0;
 
-#[derive(Debug)]
 pub struct Roid {
     radius: f64,
     position: Point2<f64>,
@@ -40,18 +39,18 @@ impl GameObject for Roid {
         self.id
     }
 
-    fn explode(&self) -> ObjectSet {
-        let new_radius = self.radius / 2.0;
-        let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
-        let roids = (0..num_sub_roids)
-            .map(|_| {
-                let velocity = make_velocity_vector(self.velocity.speed() * 2.0, random_bearing());
-                Roid::new(self.position, new_radius, velocity)
-            })
-            .collect();
+    // fn explode(&self) -> ObjectSet {
+    //     let new_radius = self.radius / 2.0;
+    //     let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
+    //     let roids = (0..num_sub_roids)
+    //         .map(|_| {
+    //             let velocity = make_velocity_vector(self.velocity.speed() * 2.0, random_bearing());
+    //             Roid::new(self.position, new_radius, velocity)
+    //         })
+    //         .collect();
 
-        ObjectSet::from_objects(roids, vec![], make_explosion(&self.position))
-    }
+    //     ObjectSet::from_objects(roids, vec![], make_explosion(&self.position))
+    // }
 
     fn position(&self) -> &Point2<f64> {
         &self.position
@@ -61,14 +60,11 @@ impl GameObject for Roid {
         &self.velocity
     }
 
-    fn update(&self, field: &Field, time_delta: f64) -> ObjectSet {
+    fn update(&mut self, field: &Field, time_delta: f64) -> () {
         let new_position = field.wrap(&(self.position + self.velocity * time_delta));
-        ObjectSet::from_objects(
-            vec![Roid::new(new_position, self.radius, self.velocity.clone())],
-            vec![],
-            vec![],
-        )
-    }
+        self.position = new_position;
+        // self.collision_shape
+   }
 
     fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
