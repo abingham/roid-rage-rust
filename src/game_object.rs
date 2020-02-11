@@ -15,6 +15,7 @@ pub const WEAPON_GROUP: usize = 2;
 pub const SHIP_GROUP: usize = 3;
 pub const HARMLESS_GROUP: usize = 4;
 
+#[derive(Eq, PartialEq)]
 pub enum Kind {
     Weapon,
     Ship,
