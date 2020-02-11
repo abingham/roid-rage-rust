@@ -1,3 +1,5 @@
+#[macro_use] extern crate approx;
+
 pub mod app;
 pub mod collide;
 pub mod field;

@@ -85,28 +85,28 @@ pub fn collision_vector(
         .map(|p| (p, p - position))
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-//     mod quadratic {
-//         use super::*;
+    mod quadratic {
+        use super::*;
 
-//         #[test]
-//         fn test_canned() {
-//             let cases: Vec<((f64, f64, f64), Vec<f64>)> = vec![
-//                 ((1.0, 9.0, 14.0), vec![-2.0, -7.0]),
-//                 ((1.0, -9.0, 14.0), vec![7.0, 2.0]),
-//                 ((1.0, 2.0, -15.0), vec![3.0, -5.0]),
-//                 ((1.0, -2.0, -15.0), vec![5.0, -3.0]),
-//                 ((2.0, 15.0, 27.0), vec![-3.0, -9.0 / 2.0]),
-//                 ((2.0, -15.0, 27.0), vec![9.0 / 2.0, 3.0]),
-//                 ((2.0, 3.0, -27.0), vec![3.0, -9.0 / 2.0]),
-//             ];
+        #[test]
+        fn test_canned() {
+            let cases: Vec<((f64, f64, f64), Vec<f64>)> = vec![
+                ((1.0, 9.0, 14.0), vec![-2.0, -7.0]),
+                ((1.0, -9.0, 14.0), vec![7.0, 2.0]),
+                ((1.0, 2.0, -15.0), vec![3.0, -5.0]),
+                ((1.0, -2.0, -15.0), vec![5.0, -3.0]),
+                ((2.0, 15.0, 27.0), vec![-3.0, -9.0 / 2.0]),
+                ((2.0, -15.0, 27.0), vec![9.0 / 2.0, 3.0]),
+                ((2.0, 3.0, -27.0), vec![3.0, -9.0 / 2.0]),
+            ];
 
-//             for ((a, b, c), expected) in cases {
-//                 assert_eq!(solve_quadratic(a, b, c), expected);
-//             }
-//         }
-//     }
-// }
+            for ((a, b, c), expected) in cases {
+                assert_eq!(solve_quadratic(a, b, c), expected);
+            }
+        }
+    }
+}

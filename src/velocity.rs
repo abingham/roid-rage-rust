@@ -33,30 +33,18 @@ mod tests {
     use super::*;
     use itertools_num::linspace;
 
-    const EPSILON: f64 = 0.00001;
-
-    macro_rules! assert_f64_eq {
-        ( $( $x:expr, $y:expr ),* ) => {
-            {
-                $(
-                assert!(($x - $y).abs() <= EPSILON);
-                )*
-            }
-        };
-    }
-
     #[test]
     fn test_create_velocity_flat() {
         let vel = make_velocity_vector(10.0, 0.0);
-        assert_f64_eq!(vel[0], 10.0);
-        assert_f64_eq!(vel[1], 0.0);
+        relative_eq!(vel[0], 10.0);
+        relative_eq!(vel[1], 0.0);
     }
 
     #[test]
     fn test_create_velocity_up() {
         let vel = make_velocity_vector(10.0, PI / 2.0);
-        assert_f64_eq!(vel[0], 0.0);
-        assert_f64_eq!(vel[1], 10.0);
+        relative_eq!(vel[0], 0.0);
+        relative_eq!(vel[1], 10.0);
     }
 
     #[test]
@@ -66,7 +54,7 @@ mod tests {
         for s in speeds {
             for b in &bearings {
                 let vel = make_velocity_vector(s, *b);
-                assert_f64_eq!(vel.speed(), s);
+                relative_eq!(vel.speed(), s);
             }
         }
     }
@@ -78,7 +66,7 @@ mod tests {
         for s in speeds {
             for b in &bearings {
                 let vel = make_velocity_vector(s, *b);
-                assert_f64_eq!(vel.bearing(), *b);
+                relative_eq!(vel.bearing(), *b);
             }
         }
     }
