@@ -15,7 +15,7 @@ use roid_rage::velocity::{make_velocity_vector, random_bearing};
 
 fn some_roids(width: usize, height: usize) -> Vec<Box<dyn GameObject>> {
     let mut rng = thread_rng();
-    (1..20)
+    (1..10)
         .map(|_| {
             let roid = Roid::new(
                 Point2::new(

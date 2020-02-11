@@ -6,6 +6,7 @@ use crate::field::Field;
 use crate::game_object::{GameObject, Kind};
 use uuid;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
+use rand::prelude::*;
 
 
 const MIN_RADIUS: f64 = 10.0;
@@ -15,15 +16,19 @@ pub struct Roid {
     position: Point2<f64>,
     velocity: Vector2<f64>,
     id: uuid::Uuid,
+    color: [f32; 4],
 }
 
 impl Roid {
     pub fn new(position: Point2<f64>, radius: f64, velocity: Vector2<f64>) -> Roid {
+        let mut rng = thread_rng();
+        let color: f32 = rng.gen::<f32>() * 0.5 + 0.5;
         Roid {
             position: position,
             velocity: velocity,
             radius: radius,
             id: uuid::Uuid::new_v4(),
+            color: [color, color, color, 1.0],
         }
     }
 
@@ -59,10 +64,9 @@ impl GameObject for Roid {
     fn update(&mut self, field: &Field, time_delta: f64) -> () {
         let new_position = field.wrap(&(self.position + self.velocity * time_delta));
         self.position = new_position;
-        // self.collision_shape
    }
 
-    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
@@ -70,7 +74,7 @@ impl GameObject for Roid {
             .trans(self.position.coords[0], self.position.coords[1]);
 
         let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
-        ellipse(*color, rect, transform, gl);
+        ellipse(self.color, rect, transform, gl);
     }
 
     // TODO: Re-add collidable trait

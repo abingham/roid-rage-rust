@@ -48,7 +48,7 @@ impl GameObject for Bullet {
         self.position = new_position;
    }
 
-   fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
+   fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
@@ -60,7 +60,7 @@ impl GameObject for Bullet {
             -1.0 * Bullet::radius(),
             2.0 * Bullet::radius(),
         );
-        ellipse(*color, rect, transform, gl);
+        ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
     }
 
     fn explode(&self) -> Vec<Box<dyn GameObject>> {

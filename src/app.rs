@@ -86,13 +86,12 @@ impl App {
         use graphics::*;
 
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-        const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
         gl.draw(args.viewport(), |c, gl| {
             clear(BLACK, gl);
 
             for (_, roid) in &self.game_objects {
-                roid.render(&WHITE, c, gl);
+                roid.render(c, gl);
             }
         });
     }

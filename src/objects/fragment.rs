@@ -31,7 +31,7 @@ impl Fragment {
 }
 
 impl GameObject for Fragment {
-    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics) {
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
@@ -43,7 +43,7 @@ impl GameObject for Fragment {
             -1.0 * Fragment::radius(),
             2.0 * Fragment::radius(),
         );
-        ellipse(*color, rect, transform, gl);
+        ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
     }
 
     fn update(&mut self, _field: &Field, time_delta: f64) -> () {

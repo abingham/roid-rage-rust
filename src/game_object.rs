@@ -29,7 +29,7 @@ pub trait GameObject {
 
     fn update(&mut self, field: &Field, time_delta: f64) -> ();
 
-    fn render(&self, color: &[f32; 4], c: graphics::Context, gl: &mut GlGraphics);
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics);
 
     fn id(&self) -> uuid::Uuid;
 
@@ -41,9 +41,9 @@ pub trait GameObject {
         vec![]
     }
 
-    fn collision_shape(&self) -> ShapeHandle<f64>;
-
     fn kind(&self) -> Kind;
+
+    fn collision_shape(&self) -> ShapeHandle<f64>;
 }
 
 impl PartialEq for dyn GameObject {
