@@ -1,10 +1,9 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::pipeline::CollisionGroups;
 use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 use rand::prelude::*;
 
-use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP};
+use crate::game_object::{GameObject, Kind};
 use crate::field::Field;
 use crate::objects::fragment::Fragment;
 use crate::velocity::{make_velocity_vector, random_bearing};
@@ -86,10 +85,7 @@ impl GameObject for Bullet {
         ShapeHandle::new(Ball::new(Bullet::radius()))
     }
 
-    fn collision_groups(&self) -> CollisionGroups {
-        let mut group = CollisionGroups::new();
-        group.set_membership(&[WEAPON_GROUP]);
-        group.set_whitelist(&[MASSIVE_GROUP]);
-        group
+    fn kind(&self) -> Kind {
+        Kind::Weapon
     }
 }

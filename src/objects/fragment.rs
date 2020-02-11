@@ -3,9 +3,8 @@ use opengl_graphics::GlGraphics;
 use ncollide2d::shape::{Ball, ShapeHandle};
 use uuid::Uuid;
 
-use crate::game_object::{GameObject, HARMLESS_GROUP};
+use crate::game_object::{GameObject, Kind};
 use crate::field::Field;
-use ncollide2d::pipeline::CollisionGroups;
 
 pub struct Fragment {
     position: Point2<f64>,
@@ -73,10 +72,7 @@ impl GameObject for Fragment {
         ShapeHandle::new(Ball::new(Fragment::radius()))
     }
 
-    fn collision_groups(&self) -> CollisionGroups {
-        let mut group = CollisionGroups::new();
-        group.set_membership(&[HARMLESS_GROUP]);
-        group.set_whitelist(&[]);
-        group
+    fn kind(&self) -> Kind {
+        Kind::Debris
     }
 }

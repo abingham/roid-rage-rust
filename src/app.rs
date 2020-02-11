@@ -1,5 +1,5 @@
 use crate::field::Field;
-use crate::game_object::GameObject;
+use crate::game_object::{GameObject, Kind};
 use crate::objects::bullet::Bullet;
 use crate::velocity::make_velocity_vector;
 use nalgebra as na;
@@ -9,6 +9,7 @@ use ncollide2d::world::CollisionWorld;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashMap;
+use ncollide2d::pipeline::CollisionGroups;
 
 pub struct App {
     field: Field,
@@ -18,6 +19,9 @@ pub struct App {
 }
 
 const FIRING_FREQUENCY: f64 = 0.5;
+const ROID_GROUP: usize = 1;
+const SHIP_GROUP: usize = 2;
+const WEAPON_GROUP: usize = 3;
 
 impl App {
     pub fn new<I>(field: Field, game_objects: I) -> App
@@ -46,12 +50,36 @@ impl App {
         let (handle, _obj) = self.collision_world.add(
             pos,
             game_object.collision_shape(),
-            game_object.collision_groups(),
+            App::collision_groups(game_object.kind()),
             GeometricQueryType::Contacts(0.0, 0.0),
             None,
         );
 
         self.game_objects.insert(handle, game_object);
+    }
+
+    /// This determines an object's collision groups based on its "kind".
+    fn collision_groups(kind: Kind) -> CollisionGroups {
+        let mut group = CollisionGroups::new();
+
+        match kind {
+            Kind::Roid => {
+                group.set_membership(&[ROID_GROUP]);
+                group.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
+            },
+            Kind::Weapon => {
+                group.set_membership(&[WEAPON_GROUP]);
+                group.set_whitelist(&[ROID_GROUP]);
+            },
+            Kind::Ship => {
+                group.set_membership(&[SHIP_GROUP]);
+                group.set_whitelist(&[ROID_GROUP]);
+            },
+            Kind::Debris => {
+            }
+        }
+
+        group
     }
 
     pub fn render(&self, gl: &mut GlGraphics, args: &RenderArgs) {

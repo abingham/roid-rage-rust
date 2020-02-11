@@ -3,9 +3,8 @@ use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 
 use crate::field::Field;
-use crate::game_object::{GameObject, MASSIVE_GROUP, WEAPON_GROUP, SHIP_GROUP};
+use crate::game_object::{GameObject, Kind};
 use uuid;
-use ncollide2d::pipeline::CollisionGroups;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 
 
@@ -79,11 +78,8 @@ impl GameObject for Roid {
         ShapeHandle::new(Ball::new(self.radius))
     }
 
-    fn collision_groups(&self) -> CollisionGroups {
-        let mut group = CollisionGroups::new();
-        group.set_membership(&[MASSIVE_GROUP]);
-        group.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
-        group
+    fn kind(&self) -> Kind {
+        Kind::Roid
     }
 }
 

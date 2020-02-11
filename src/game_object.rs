@@ -1,6 +1,5 @@
 use graphics;
 use nalgebra::{Point2, Vector2};
-use ncollide2d::pipeline::CollisionGroups;
 use ncollide2d::shape::ShapeHandle;
 use opengl_graphics::GlGraphics;
 use std::hash::{Hash, Hasher};
@@ -15,6 +14,13 @@ pub const MASSIVE_GROUP: usize = 1;
 pub const WEAPON_GROUP: usize = 2;
 pub const SHIP_GROUP: usize = 3;
 pub const HARMLESS_GROUP: usize = 4;
+
+pub enum Kind {
+    Weapon,
+    Ship,
+    Roid,
+    Debris
+}
 
 pub trait GameObject {
     fn position(&self) -> &Point2<f64>;
@@ -37,7 +43,7 @@ pub trait GameObject {
 
     fn collision_shape(&self) -> ShapeHandle<f64>;
 
-    fn collision_groups(&self) -> CollisionGroups;
+    fn kind(&self) -> Kind;
 }
 
 impl PartialEq for dyn GameObject {
