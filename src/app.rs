@@ -1,15 +1,16 @@
 use crate::field::Field;
 use crate::game_object::{GameObject, Kind};
 use crate::objects::bullet::Bullet;
+use crate::targeting::target;
 use crate::velocity::make_velocity_vector;
 use nalgebra as na;
+use ncollide2d::pipeline::CollisionGroups;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use ncollide2d::pipeline::{ContactEvent, GeometricQueryType};
 use ncollide2d::world::CollisionWorld;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use std::collections::HashMap;
-use ncollide2d::pipeline::CollisionGroups;
 
 pub struct App {
     field: Field,
@@ -66,17 +67,16 @@ impl App {
             Kind::Roid => {
                 group.set_membership(&[ROID_GROUP]);
                 group.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
-            },
+            }
             Kind::Weapon => {
                 group.set_membership(&[WEAPON_GROUP]);
                 group.set_whitelist(&[ROID_GROUP]);
-            },
+            }
             Kind::Ship => {
                 group.set_membership(&[SHIP_GROUP]);
                 group.set_whitelist(&[ROID_GROUP]);
-            },
-            Kind::Debris => {
             }
+            Kind::Debris => {}
         }
 
         group
@@ -106,8 +106,7 @@ impl App {
         for (handle, game_object) in &self.game_objects {
             if !self.field.contains(game_object.position()) {
                 removals.push(*handle);
-            }
-            else if !game_object.alive() {
+            } else if !game_object.alive() {
                 removals.push(*handle);
             }
         }
@@ -166,11 +165,13 @@ impl App {
 
         self.full_time += dt;
         if self.full_time > FIRING_FREQUENCY {
-            self.full_time = 0.0;
-            let bullet = Bullet::new(firing_position, make_velocity_vector(60.0, 0.0));
-            self.insert(Box::new(bullet));
-
-            // TODO: Use targeting, of course.
+            let target_bearing = target( &firing_position, Bullet::speed(), &self.field,
+                                         self.game_objects.values().map(|b| b.as_ref())); 
+            if let Some(bearing) = target_bearing {
+                self.full_time = 0.0;
+                let bullet = Bullet::new(firing_position, make_velocity_vector(Bullet::speed(), bearing));
+                self.insert(Box::new(bullet));
+            }
         }
     }
 }
