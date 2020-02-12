@@ -47,13 +47,13 @@ impl Model {
     // This is the core rule for updating the field. We bake this into the model because we treat it as the basic
     // "physics" of the game.
     pub fn project(&mut self, time_delta: f64) -> () {
+        self.cleanup();
 
         // Move all of the game objects
         for game_object in self.game_objects.values_mut() {
             game_object.project(&self.field, time_delta);
         }
 
-        self.cleanup();
 
         // Adjust collision objects for the game objects
         for (handle, game_object) in self.game_objects.iter_mut() {
