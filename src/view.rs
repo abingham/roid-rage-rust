@@ -6,14 +6,13 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use crate::controller::Controller;
 
 // TODO: Do we need a view trait? Or is this enough for now?
-pub struct View<'c> {
-    // TODO: This feels wrong. What's the right way to get a mutable reference to a thing like this?
-    controller: &'c mut dyn Controller,
+pub struct View {
+    controller: Box<dyn Controller>,
     size: [u32; 2],
 }
 
-impl<'c> View<'c> {
-    pub fn new(controller: &'c mut dyn Controller, size: [u32; 2]) -> View {
+impl View {
+    pub fn new(controller: Box<dyn Controller>, size: [u32; 2]) -> View {
         View {
             controller: controller,
             size: size,

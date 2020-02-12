@@ -43,8 +43,8 @@ fn main() {
         model.insert(roid);
     }
 
-    let mut controller = BasicController::new(model);
+    let controller = BasicController::new(model);
 
-    let mut view = View::new(&mut controller, [800, 600]);
+    let mut view = View::new(Box::new(controller), [800, 600]);
     view.run();
 }
