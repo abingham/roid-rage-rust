@@ -3,8 +3,8 @@ use opengl_graphics::GlGraphics;
 use ncollide2d::shape::{Ball, ShapeHandle};
 use uuid::Uuid;
 
-use crate::game_object::{GameObject, Kind};
-use crate::field::Field;
+use crate::model::field::Field;
+use crate::model::game_object::{GameObject, Kind};
 
 pub struct Fragment {
     position: Point2<f64>,
@@ -46,17 +46,13 @@ impl GameObject for Fragment {
         ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
     }
 
-    fn update(&mut self, _field: &Field, time_delta: f64) -> () {
+    fn project(&mut self, _field: &Field, time_delta: f64) -> () {
         self.age += time_delta;
-        self.position = self.position + self.velocity * time_delta;
+        self.position += self.velocity * time_delta;
     }
 
     fn position(&self) -> &Point2<f64> {
         &self.position
-    }
-
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
     }
 
     fn id(&self) -> Uuid {

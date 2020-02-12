@@ -3,9 +3,9 @@ use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 use rand::prelude::*;
 
-use crate::game_object::{GameObject, Kind};
-use crate::field::Field;
-use crate::objects::fragment::Fragment;
+use crate::model::field::Field;
+use crate::model::game_object::{GameObject, Kind};
+use crate::model::objects::fragment::Fragment;
 use crate::velocity::{make_velocity_vector, random_bearing};
 
 pub struct Bullet {
@@ -39,11 +39,7 @@ impl GameObject for Bullet {
         &self.position
     }
 
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
-    }
-
-    fn update(&mut self, _field: &Field, time_delta: f64) -> () {
+    fn project(&mut self, _field: &Field, time_delta: f64) -> () {
         let new_position = self.position + self.velocity * time_delta;
         self.position = new_position;
    }

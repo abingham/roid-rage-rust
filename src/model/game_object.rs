@@ -5,15 +5,7 @@ use opengl_graphics::GlGraphics;
 use std::hash::{Hash, Hasher};
 use uuid;
 
-use crate::field::Field;
-
-// Collision groups
-// TODO: Is this this best way to model these groups? How about an enum to make sure implementors only
-// use valid values?
-pub const MASSIVE_GROUP: usize = 1;
-pub const WEAPON_GROUP: usize = 2;
-pub const SHIP_GROUP: usize = 3;
-pub const HARMLESS_GROUP: usize = 4;
+use super::field::Field;
 
 #[derive(Eq, PartialEq)]
 pub enum Kind {
@@ -26,10 +18,9 @@ pub enum Kind {
 pub trait GameObject {
     fn position(&self) -> &Point2<f64>;
 
-    fn velocity(&self) -> &Vector2<f64>;
+    fn project(&mut self, field: &Field, time_delta: f64) -> ();
 
-    fn update(&mut self, field: &Field, time_delta: f64) -> ();
-
+    // TODO: This should be in a view
     fn render(&self, c: graphics::Context, gl: &mut GlGraphics);
 
     fn id(&self) -> uuid::Uuid;

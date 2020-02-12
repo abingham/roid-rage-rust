@@ -1,9 +1,9 @@
 use crate::collide::collision_vector;
-use crate::field::Field;
+use crate::model::field::Field;
 use crate::velocity::Velocity;
 use nalgebra::{Point2, Vector2};
 use std::cmp::Ordering;
-use crate::game_object::{GameObject, Kind};
+use crate::model::game_object::{GameObject, Kind};
 
 /// Return the bearing of the shot to make, if any.
 pub fn target<'a, I>(
@@ -14,15 +14,18 @@ pub fn target<'a, I>(
 ) -> Option<f64>
 where I: Iterator<Item = &'a dyn GameObject>
 {
-    // Find all possible collisions
-    let hits: Vec<(Point2<f64>, Vector2<f64>)> = objects
-        .filter(|obj| obj.kind() == Kind::Roid)
-        .filter_map(|roid| collision_vector(firing_position, bullet_speed, *roid.position(), roid.velocity()))
-        .filter(|(p, _v)| field.contains(p))
-        .collect() ;
+    // TODO: Tricky! Need to build velocity model for all roids.
 
-    // Return the bearing to the furthest collision, if any
-    closest(firing_position, &hits).map(|(_p, v)| v.bearing())
+    // // Find all possible collisions
+    // let hits: Vec<(Point2<f64>, Vector2<f64>)> = objects
+    //     .filter(|obj| obj.kind() == Kind::Roid)
+    //     .filter_map(|roid| collision_vector(firing_position, bullet_speed, *roid.position(), roid.velocity()))
+    //     .filter(|(p, _v)| field.contains(p))
+    //     .collect() ;
+
+    // // Return the bearing to the furthest collision, if any
+    // closest(firing_position, &hits).map(|(_p, v)| v.bearing())
+    None
 }
 
 /// Find the furthest away possible hit in a group.

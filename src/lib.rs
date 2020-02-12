@@ -1,9 +1,7 @@
 #[macro_use] extern crate approx;
 
-pub mod app;
 pub mod collide;
-pub mod field;
+pub mod controller;
 pub mod targeting;
-pub mod game_object;
-pub mod objects;
+pub mod model;
 pub mod velocity;

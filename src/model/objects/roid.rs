@@ -2,8 +2,8 @@ use nalgebra::{Point2, Vector2};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use opengl_graphics::GlGraphics;
 
-use crate::field::Field;
-use crate::game_object::{GameObject, Kind};
+use crate::model::field::Field;
+use crate::model::game_object::{GameObject, Kind};
 use uuid;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use rand::prelude::*;
@@ -57,14 +57,12 @@ impl GameObject for Roid {
         &self.position
     }
 
-    fn velocity(&self) -> &Vector2<f64> {
-        &self.velocity
+    fn project(&mut self, field: &Field, time_delta: f64) -> () {
+        self.position += self.velocity * time_delta;
+        if !field.contains(&self.position) {
+            self.position = field.wrap(&self.position);
+        }
     }
-
-    fn update(&mut self, field: &Field, time_delta: f64) -> () {
-        let new_position = field.wrap(&(self.position + self.velocity * time_delta));
-        self.position = new_position;
-   }
 
     fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
@@ -77,7 +75,6 @@ impl GameObject for Roid {
         ellipse(self.color, rect, transform, gl);
     }
 
-    // TODO: Re-add collidable trait
     fn collision_shape(&self) -> ShapeHandle<f64> {
         ShapeHandle::new(Ball::new(self.radius))
     }

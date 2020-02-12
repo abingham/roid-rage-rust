@@ -7,10 +7,11 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use rand::prelude::*;
-use roid_rage::app::App;
-use roid_rage::field::Field;
-use roid_rage::game_object::GameObject;
-use roid_rage::objects::roid::Roid;
+use roid_rage::controller::{BasicController, Controller};
+use roid_rage::model::field::Field;
+use roid_rage::model::game_object::GameObject;
+use roid_rage::model::model::Model;
+use roid_rage::model::objects::roid::Roid;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
 
 fn some_roids(width: usize, height: usize) -> Vec<Box<dyn GameObject>> {
@@ -50,20 +51,26 @@ fn main() {
         .build()
         .unwrap();
 
-    let field = Field::new(800, 600, 100);
+    let mut model = Model::new(
+        Field::new(800, 600, 100)
+    );
 
-    let mut app = App::new(field, some_roids(800, 600));
+    for roid in some_roids(800, 600) {
+        model.insert(roid);
+    }
+
+    let mut controller = BasicController::new(model);
 
     let mut gl = GlGraphics::new(opengl);
     let mut events = Events::new(EventSettings::new());
 
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
-            app.render(&mut gl, &args);
+            controller.model().render(&mut gl, &args);
         }
 
         if let Some(args) = e.update_args() {
-            app.update(args.dt);
+            controller.update(args.dt);
         }
     }
 }
