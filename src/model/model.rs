@@ -47,13 +47,13 @@ impl Model {
     // This is the core rule for updating the field. We bake this into the model because we treat it as the basic
     // "physics" of the game.
     pub fn project(&mut self, time_delta: f64) -> () {
-        self.cleanup();
 
         // Move all of the game objects
         for game_object in self.game_objects.values_mut() {
             game_object.project(&self.field, time_delta);
         }
 
+        self.cleanup();
 
         // Adjust collision objects for the game objects
         for (handle, game_object) in self.game_objects.iter_mut() {
@@ -84,6 +84,8 @@ impl Model {
         }
 
         // Then look for collisions
+        //
+        // TODO: In some cases a bullet intersects more than one roid. We should only explode one roid in this case.
         for event in self.collision_world.contact_events() {
             if let &ContactEvent::Started(collider1, collider2) = event {
                 for handle in vec![collider1, collider2] {
@@ -128,6 +130,7 @@ impl Model {
             }
             Kind::Debris => {
                 group.set_membership(&[DEBRIS_GROUP]);
+                group.set_blacklist(&[ROID_GROUP, DEBRIS_GROUP, WEAPON_GROUP]);
             }
         }
 
