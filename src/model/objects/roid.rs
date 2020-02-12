@@ -4,10 +4,9 @@ use opengl_graphics::GlGraphics;
 
 use crate::model::field::Field;
 use crate::model::game_object::{GameObject, Kind};
-use uuid;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use rand::prelude::*;
-
+use uuid;
 
 const MIN_RADIUS: f64 = 10.0;
 
@@ -45,7 +44,7 @@ impl GameObject for Roid {
     fn explode(&self) -> Vec<Box<dyn GameObject>> {
         let new_radius = self.radius / 2.0;
         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
-         (0..num_sub_roids)
+        (0..num_sub_roids)
             .map(|_| {
                 let velocity = make_velocity_vector(self.velocity.speed() * 1.5, random_bearing());
                 Box::new(Roid::new(self.position, new_radius, velocity)) as Box<dyn GameObject>
@@ -83,4 +82,3 @@ impl GameObject for Roid {
         Kind::Roid
     }
 }
-

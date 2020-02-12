@@ -11,7 +11,6 @@ use super::field::Field;
 pub struct Model {
     field: Field,
     game_objects: HashMap<CollisionObjectSlabHandle, Box<dyn GameObject>>,
-    full_time: f64,
     collision_world: CollisionWorld<f64, Option<()>>,
 }
 
@@ -21,9 +20,12 @@ impl Model {
         Model {
             field: field,
             game_objects: HashMap::<CollisionObjectSlabHandle, Box<dyn GameObject>>::new(),
-            full_time: 0.0,
             collision_world: CollisionWorld::new(0.02f64),
         }
+    }
+
+    pub fn field(&self) -> &Field {
+        &self.field
     }
 
     pub fn insert(&mut self, game_object: Box<dyn GameObject>) -> () {
@@ -45,6 +47,7 @@ impl Model {
     // This is the core rule for updating the field. We bake this into the model because we treat it as the basic
     // "physics" of the game.
     pub fn project(&mut self, time_delta: f64) -> () {
+
         // Move all of the game objects
         for game_object in self.game_objects.values_mut() {
             game_object.project(&self.field, time_delta);
@@ -64,8 +67,6 @@ impl Model {
         }
 
         self.collision_world.update();
-
-
     }
 
     fn cleanup(&mut self) -> () {
@@ -125,7 +126,9 @@ impl Model {
                 group.set_membership(&[SHIP_GROUP]);
                 group.set_whitelist(&[ROID_GROUP]);
             }
-            Kind::Debris => {}
+            Kind::Debris => {
+                group.set_membership(&[DEBRIS_GROUP]);
+            }
         }
 
         group
@@ -147,7 +150,8 @@ impl Model {
 }
 
 // Collision groups
-const ROID_GROUP: usize = 1;
-const SHIP_GROUP: usize = 2;
-const WEAPON_GROUP: usize = 3;
+const ROID_GROUP: usize = 0;
+const SHIP_GROUP: usize = 1;
+const WEAPON_GROUP: usize = 2;
+const DEBRIS_GROUP: usize = 3;
 

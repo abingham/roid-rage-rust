@@ -64,8 +64,8 @@ impl GameObject for Bullet {
 
         (0..rng.gen_range(1, 10))
             .map(|_| {
-                let speed = rng.gen::<f64>() * 400.0 + 200.0;
-                let max_age = rng.gen::<f64>() * 0.5;
+                let speed = rng.gen::<f64>() * 400.0 + 200.0; 
+                let max_age = rng.gen::<f64>() * 1.0;
                 Box::new(Fragment::new(
                     self.position,
                     make_velocity_vector(speed, random_bearing()),
