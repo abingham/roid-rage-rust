@@ -1,4 +1,4 @@
-use crate::model::model::Model;
+use crate::model::Model;
 use crate::model::objects::bullet::Bullet;
 use nalgebra::Point2;
 
