@@ -1,5 +1,5 @@
 use graphics;
-use nalgebra::{Point2, Vector2};
+use nalgebra::Point2;
 use ncollide2d::shape::ShapeHandle;
 use opengl_graphics::GlGraphics;
 use std::hash::{Hash, Hasher};

@@ -1,4 +1,4 @@
-#[macro_use] extern crate approx;
+#[macro_use] #[cfg(test)] extern crate approx;
 
 pub mod collide;
 pub mod controller;

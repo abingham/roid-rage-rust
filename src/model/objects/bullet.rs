@@ -15,19 +15,19 @@ pub struct Bullet {
 }
 
 impl Bullet {
-    pub fn new(position: Point2<f64>, velocity: Vector2<f64>) -> Bullet {
+    pub fn new(position: Point2<f64>, bearing: f64) -> Bullet {
         Bullet {
             position: position,
-            velocity: velocity,
+            velocity: make_velocity_vector(Bullet::speed(), bearing),
             id: uuid::Uuid::new_v4(),
         }
     }
 
-    pub fn radius() -> f64 {
+    fn radius() -> f64 {
         2.0
     }
 
-    pub fn speed() -> f64 {
+    fn speed() -> f64 {
         600.0
     }
 }

@@ -1,16 +1,14 @@
-use crate::collide::collision_vector;
 use crate::model::field::Field;
-use crate::velocity::Velocity;
 use nalgebra::{Point2, Vector2};
 use std::cmp::Ordering;
-use crate::model::game_object::{GameObject, Kind};
+use crate::model::game_object::GameObject;
 
 /// Return the bearing of the shot to make, if any.
 pub fn target<'a, I>(
-    firing_position: &Point2<f64>,
-    bullet_speed: f64,
-    field: &Field,
-    objects: I,
+    _firing_position: &Point2<f64>,
+    _bullet_speed: f64,
+    _field: &Field,
+    _objects: I,
 ) -> Option<f64>
 where I: Iterator<Item = &'a dyn GameObject>
 {
@@ -44,7 +42,7 @@ fn _furthest<'a>(
 }
 
 /// Find the closest possible hit in a group.
-fn closest<'a>(
+fn _closest<'a>(
     firing_position: &Point2<f64>,
     collisions: &'a [(Point2<f64>, Vector2<f64>)],
 ) -> Option<&'a (Point2<f64>, Vector2<f64>)> {

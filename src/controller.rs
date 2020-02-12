@@ -1,5 +1,4 @@
 use crate::model::model::Model;
-use crate::velocity::make_velocity_vector;
 use crate::model::objects::bullet::Bullet;
 use nalgebra::Point2;
 
@@ -37,7 +36,7 @@ impl BasicController {
 
         self.full_time += dt;
         if self.full_time > FIRING_FREQUENCY {
-            let bullet = Bullet::new(firing_position, make_velocity_vector(Bullet::speed(), 0.0));
+            let bullet = Bullet::new(firing_position, 0.0);
             self.model.insert(Box::new(bullet));
             self.full_time = 0.0;
         //     let target_bearing = target( &firing_position, Bullet::speed(), &self.field,
