@@ -5,7 +5,9 @@ use piston::window::WindowSettings;
 use opengl_graphics::{GlGraphics, OpenGL};
 use crate::controller::Controller;
 
+// TODO: Do we need a view trait? Or is this enough for now?
 pub struct View<'c> {
+    // TODO: This feels wrong. What's the right way to get a mutable reference to a thing like this?
     controller: &'c mut dyn Controller,
     size: [u32; 2],
 }
