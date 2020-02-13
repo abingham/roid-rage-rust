@@ -4,7 +4,6 @@ use ncollide2d::shape::{Ball, ShapeHandle};
 use uuid::Uuid;
 
 use crate::model::field::Field;
-use crate::model::game_object::{GameObject, Kind};
 
 pub struct Fragment {
     position: Point2<f64>,
@@ -28,47 +27,25 @@ impl Fragment {
     pub fn radius() -> f64 {
         1.0
     }
-}
 
-impl GameObject for Fragment {
-    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
-        use graphics::*;
-
-        let transform = c
-            .transform
-            .trans(self.position.coords[0], self.position.coords[1]);
-
-        let rect = rectangle::square(
-            -1.0 * Fragment::radius(),
-            -1.0 * Fragment::radius(),
-            2.0 * Fragment::radius(),
-        );
-        ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
-    }
-
-    fn project(&mut self, _field: &Field, time_delta: f64) -> () {
+    pub fn project(&mut self, _field: &Field, time_delta: f64) -> () {
         self.age += time_delta;
         self.position += self.velocity * time_delta;
     }
 
-    fn position(&self) -> &Point2<f64> {
+    pub fn position(&self) -> &Point2<f64> {
         &self.position
     }
 
-    fn id(&self) -> Uuid {
+    pub fn id(&self) -> Uuid {
         self.id
     }
 
-    fn alive(&self) -> bool {
+    pub fn alive(&self) -> bool {
         self.age <= self.max_age
     }
 
-    // TODO: Re-add collidable trait
-    fn collision_shape(&self) -> ShapeHandle<f64> {
+    pub fn collision_shape(&self) -> ShapeHandle<f64> {
         ShapeHandle::new(Ball::new(Fragment::radius()))
-    }
-
-    fn kind(&self) -> Kind {
-        Kind::Debris
     }
 }
