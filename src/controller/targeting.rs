@@ -1,29 +1,31 @@
 use crate::model::field::Field;
 use nalgebra::{Point2, Vector2};
 use std::cmp::Ordering;
-use crate::model::game_object::GameObject;
+use crate::model::game_object::{GameObject, Kind};
+use crate::controller::velocity_model::VelocityModel;
+use crate::collide::collision_vector;
+use crate::velocity::Velocity;
 
 /// Return the bearing of the shot to make, if any.
 pub fn target<'a, I>(
-    _firing_position: &Point2<f64>,
-    _bullet_speed: f64,
-    _field: &Field,
-    _objects: I,
+    firing_position: &Point2<f64>,
+    bullet_speed: f64,
+    field: &Field,
+    objects: I,
+    vmodel: &VelocityModel,
 ) -> Option<f64>
 where I: Iterator<Item = &'a dyn GameObject>
 {
-    // TODO: Tricky! Need to build velocity model for all roids.
+    // Find all possible collisions
+    let hits: Vec<(Point2<f64>, Vector2<f64>)> = objects
+        .filter(|obj| obj.kind() == Kind::Roid)
+        .filter_map(|obj| vmodel.velocity(obj.id()).map(|v| (obj.position(), v)))
+        .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, *pos, &vel))
+        .filter(|(p, _v)| field.contains(p))
+        .collect() ;
 
-    // // Find all possible collisions
-    // let hits: Vec<(Point2<f64>, Vector2<f64>)> = objects
-    //     .filter(|obj| obj.kind() == Kind::Roid)
-    //     .filter_map(|roid| collision_vector(firing_position, bullet_speed, *roid.position(), roid.velocity()))
-    //     .filter(|(p, _v)| field.contains(p))
-    //     .collect() ;
-
-    // // Return the bearing to the furthest collision, if any
-    // closest(firing_position, &hits).map(|(_p, v)| v.bearing())
-    None
+    // Return the bearing to the furthest collision, if any
+    closest(firing_position, &hits).map(|(_p, v)| v.bearing())
 }
 
 /// Find the furthest away possible hit in a group.
@@ -42,7 +44,7 @@ fn _furthest<'a>(
 }
 
 /// Find the closest possible hit in a group.
-fn _closest<'a>(
+fn closest<'a>(
     firing_position: &Point2<f64>,
     collisions: &'a [(Point2<f64>, Vector2<f64>)],
 ) -> Option<&'a (Point2<f64>, Vector2<f64>)> {

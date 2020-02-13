@@ -7,7 +7,7 @@ use ncollide2d::pipeline::{CollisionGroups, CollisionObjectSlabHandle, ContactEv
 use ncollide2d::world::CollisionWorld;
 use opengl_graphics::GlGraphics;
 use piston::input::RenderArgs;
-use std::collections::HashMap;
+use std::collections::hash_map::HashMap;
 
 use game_object::{GameObject, Kind};
 use field::Field;
@@ -26,6 +26,11 @@ impl Model {
             game_objects: HashMap::<CollisionObjectSlabHandle, Box<dyn GameObject>>::new(),
             collision_world: CollisionWorld::new(0.02f64),
         }
+    }
+
+    // pub fn objects(&self) -> Values<CollisionObjectSlabHandle, Box<dyn GameObject>> {
+    pub fn objects(&self) -> impl Iterator<Item = &dyn GameObject> {
+        self.game_objects.values().map(|o| o.as_ref())
     }
 
     pub fn field(&self) -> &Field {
