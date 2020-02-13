@@ -4,9 +4,15 @@ use uuid::Uuid;
 use crate::model::game_object::GameObject;
 use crate::velocity::{make_velocity_vector, Velocity};
 
+struct TrackingData {
+    start: Point2<f64>,
+    end: Point2<f64>,
+    duration: f64
+}
+
 enum State {
-    Single(Point2<f64>),
-    Pair(Point2<f64>, Point2<f64>, f64)
+    Initiated(Point2<f64>),
+    Tracked(TrackingData)
 }
 
 pub struct VelocityModel {
@@ -27,20 +33,28 @@ impl VelocityModel {
             .map(|obj| {
                 let state = match self.objects.get(&obj.id()) {
                     None => {
-                        State::Single(*obj.position())
+                        State::Initiated(*obj.position())
                     },
-                    Some(State::Single(p1)) => {
-                        State::Pair(*p1, *obj.position(), time_delta)
+                    Some(State::Initiated(p1)) => {
+                        State::Tracked(TrackingData {
+                            start: *p1, 
+                            end: *obj.position(), 
+                            duration: time_delta
+                        })
                     },
-                    Some(State::Pair(p1, p2, ptd)) => {
-                        let cur_vec = p2 - p1;
-                        let new_vec = obj.position() - p2;
+                    Some(State::Tracked(tracked)) => {
+                        let cur_vec = tracked.end - tracked.start;
+                        let new_vec = obj.position() - tracked.end;
 
                         if cur_vec.bearing() != new_vec.bearing() {
-                            State::Single(*obj.position())
+                            State::Initiated(*obj.position())
                         }
                         else {
-                            State::Pair(*p1, *obj.position(), ptd + time_delta)
+                            State::Tracked(TrackingData {
+                                start: tracked.start, 
+                                end: *obj.position(), 
+                                duration: tracked.duration + time_delta
+                            })
                         }
                     }
                 };
@@ -52,9 +66,9 @@ impl VelocityModel {
 
     pub fn velocity(&self, id: Uuid) -> Option<Vector2<f64>> {
         match self.objects.get(&id) {
-            Some(State::Pair(p1, p2, time_delta)) => {
-                let dvel = p2 - p1;
-                Some(make_velocity_vector(dvel.speed() * time_delta, dvel.bearing()))
+            Some(State::Tracked(tracked)) => {
+                let dvel = tracked.end - tracked.start;
+                Some(make_velocity_vector(dvel.speed() * tracked.duration, dvel.bearing()))
             },
             _ => {
                 None

@@ -4,6 +4,8 @@ use ncollide2d::shape::ShapeHandle;
 use opengl_graphics::GlGraphics;
 use std::hash::{Hash, Hasher};
 use uuid;
+use crate::velocity;
+use nalgebra::Vector2;
 
 use super::field::Field;
 
