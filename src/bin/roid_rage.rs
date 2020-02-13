@@ -2,7 +2,7 @@ extern crate roid_rage;
 
 use nalgebra::Point2;
 use rand::prelude::*;
-use roid_rage::controller::BasicController;
+use roid_rage::controller::basic_controller::BasicController;
 use roid_rage::model::field::Field;
 use roid_rage::model::game_object::GameObject;
 use roid_rage::model::Model;
