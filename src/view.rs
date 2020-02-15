@@ -8,6 +8,8 @@ use crate::controller::Controller;
 use crate::model::objects::roid::Roid;
 use crate::model::objects::bullet::Bullet;
 use crate::model::objects::fragment::Fragment;
+use crate::model::traits::*;
+use graphics;
 
 // TODO: Do we need a view trait? Or is this enough for now?
 pub struct View {
@@ -51,20 +53,20 @@ impl View {
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
         gl.draw(args.viewport(), |c, gl| {
-            clear(BLACK, gl);
+            graphics::clear(BLACK, gl);
 
-            for roid in self.controller.model().objects.roids {
+            for roid in &self.controller.model().objects.roids {
                 roid.render(c, gl);
             }
 
-            for bullet in self.controller.model().objects.bullets {
+            for bullet in &self.controller.model().objects.bullets {
                 bullet.render(c, gl);
             }
 
-            for fragment in self.controller.model().objects.fragments {
+            for fragment in &self.controller.model().objects.fragments {
                 fragment.render(c, gl);
             }
-        }
+        });
     }
 }
 
@@ -73,25 +75,25 @@ trait Renderable {
 }
 
 impl Renderable for Roid {
-    pub fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
             .transform
-            .trans(self.position.coords[0], self.position.coords[1]);
+            .trans(self.position().coords[0], self.position().coords[1]);
 
-        let rect = rectangle::square(-1.0 * self.radius, -1.0 * self.radius, 2.0 * self.radius);
-        ellipse(self.color, rect, transform, gl);
+        let rect = rectangle::square(-1.0 * self.radius(), -1.0 * self.radius(), 2.0 * self.radius());
+        ellipse(*self.color(), rect, transform, gl);
     }
 }
 
 impl Renderable for Bullet {
-   pub fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
+   fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
             .transform
-            .trans(self.position.coords[0], self.position.coords[1]);
+            .trans(self.position().coords[0], self.position().coords[1]);
 
         let rect = rectangle::square(
             -1.0 * Bullet::radius(),
@@ -103,12 +105,12 @@ impl Renderable for Bullet {
 }
 
 impl Renderable for Fragment {
-    pub fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
         use graphics::*;
 
         let transform = c
             .transform
-            .trans(self.position.coords[0], self.position.coords[1]);
+            .trans(self.position().coords[0], self.position().coords[1]);
 
         let rect = rectangle::square(
             -1.0 * Fragment::radius(),

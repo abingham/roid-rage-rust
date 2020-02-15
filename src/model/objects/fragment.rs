@@ -4,6 +4,7 @@ use ncollide2d::shape::{Ball, ShapeHandle};
 use uuid::Uuid;
 
 use crate::model::field::Field;
+use super::super::traits::{Identifiable, Positioned};
 
 pub struct Fragment {
     position: Point2<f64>,
@@ -27,25 +28,30 @@ impl Fragment {
     pub fn radius() -> f64 {
         1.0
     }
+}
 
-    pub fn project(&mut self, _field: &Field, time_delta: f64) -> () {
+impl Positioned for Fragment {
+    fn project(&mut self, _field: &Field, time_delta: f64) -> () {
         self.age += time_delta;
         self.position += self.velocity * time_delta;
     }
 
-    pub fn position(&self) -> &Point2<f64> {
-        &self.position
+    fn position(&self) -> Point2<f64> {
+        self.position
     }
+}
 
-    pub fn id(&self) -> Uuid {
+impl Identifiable for Fragment {
+    fn id(&self) -> Uuid {
         self.id
     }
 
-    pub fn alive(&self) -> bool {
+    fn alive(&self) -> bool {
         self.age <= self.max_age
     }
-
-    pub fn collision_shape(&self) -> ShapeHandle<f64> {
-        ShapeHandle::new(Ball::new(Fragment::radius()))
-    }
 }
+
+//     pub fn collision_shape(&self) -> ShapeHandle<f64> {
+//         ShapeHandle::new(Ball::new(Fragment::radius()))
+//     }
+// }

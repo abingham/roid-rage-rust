@@ -1,10 +1,10 @@
 use crate::model::field::Field;
 use nalgebra::{Point2, Vector2};
 use std::cmp::Ordering;
-use crate::model::game_object::{GameObject, Kind};
 use crate::controller::velocity_model::VelocityModel;
 use crate::collide::collision_vector;
 use crate::velocity::Velocity;
+use uuid::Uuid;
 
 /// Return the bearing of the shot to make, if any.
 pub fn target<'a, I>(
@@ -14,13 +14,12 @@ pub fn target<'a, I>(
     objects: I,
     vmodel: &VelocityModel,
 ) -> Option<f64>
-where I: Iterator<Item = &'a dyn GameObject>
+where I: Iterator<Item = (Uuid, Point2<f64>)>
 {
     // Find all possible collisions
     let hits: Vec<(Point2<f64>, Vector2<f64>)> = objects
-        .filter(|obj| obj.kind() == Kind::Roid)
-        .filter_map(|obj| vmodel.velocity(obj.id()).map(|v| (obj.position(), v)))
-        .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, *pos, &vel))
+        .filter_map(|(id, position)| vmodel.velocity(id).map(|v| (position, v)))
+        .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, pos, &vel))
         .filter(|(p, _v)| field.contains(p))
         .collect() ;
 

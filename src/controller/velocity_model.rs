@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use nalgebra::{Point2, Vector2};
 use uuid::Uuid;
-use crate::model::game_object::GameObject;
 use crate::velocity::{make_velocity_vector, Velocity};
 
 struct TrackingData {
@@ -26,39 +25,39 @@ impl VelocityModel {
         }
     }
 
-    pub fn update<'a, I>(&mut self, objects: I, time_delta: f64) -> () 
-        where I: Iterator<Item = &'a dyn GameObject>
+    pub fn update<'a, I>(&mut self, source: I, time_delta: f64) -> () 
+        where I: Iterator<Item = (Uuid, Point2<f64>)>
     {
-        let updates = objects
-            .map(|obj| {
-                let state = match self.objects.get(&obj.id()) {
+        let updates = source
+            .map(|(id, position)| {
+                let state = match self.objects.get(&id) {
                     None => {
-                        State::Initiated(*obj.position())
+                        State::Initiated(position)
                     },
                     Some(State::Initiated(p1)) => {
                         State::Tracked(TrackingData {
                             start: *p1, 
-                            end: *obj.position(), 
+                            end: position, 
                             duration: time_delta
                         })
                     },
                     Some(State::Tracked(tracked)) => {
                         let cur_vec = tracked.end - tracked.start;
-                        let new_vec = obj.position() - tracked.end;
+                        let new_vec = position - tracked.end;
 
                         if cur_vec.bearing() != new_vec.bearing() {
-                            State::Initiated(*obj.position())
+                            State::Initiated(position)
                         }
                         else {
                             State::Tracked(TrackingData {
                                 start: tracked.start, 
-                                end: *obj.position(), 
+                                end: position, 
                                 duration: tracked.duration + time_delta
                             })
                         }
                     }
                 };
-                (obj.id(), state)
+                (id, state)
             });
         
         self.objects = updates.collect();
