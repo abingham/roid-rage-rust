@@ -1,10 +1,11 @@
 use crate::model::Model;
-// use crate::model::objects::bullet::Bullet;
+use crate::model::objects::bullet::Bullet;
 use nalgebra::Point2;
 use super::Controller;
 use super::targeting::target;
 use super::velocity_model::VelocityModel;
 use crate::model::traits::*;
+use crate::model::object_set::ObjectSet;
 
 pub struct BasicController {
     model: Model,
@@ -37,16 +38,18 @@ impl BasicController {
 
         self.full_time += dt;
         if self.full_time > FIRING_FREQUENCY {
-            // let target_bearing = target( &firing_position, 
-            //                              Bullet::speed(), 
-            //                              &self.model.field,
-            //                              self.model.objects.roids.iter().map(|r| (r.id(), r.position())),
-            //                              &self.vmodel);
-            // if let Some(bearing) = target_bearing {
-            //     self.full_time = 0.0;
-            //     let bullet = Bullet::new(firing_position, bearing);
-            //     self.model.objects.bullets.push(bullet);
-            // }
+            let target_bearing = target( &firing_position, 
+                                         Bullet::speed(), 
+                                         &self.model.field(),
+                                         self.model.roids().map(|r| (r.id(), r.position())),
+                                         &self.vmodel);
+            if let Some(bearing) = target_bearing {
+                self.full_time = 0.0;
+                let mut object_set = ObjectSet::new();
+                object_set.bullets.push(
+                    Bullet::new(firing_position, bearing));
+                self.model.insert(object_set);
+            }
         }
     }
 }

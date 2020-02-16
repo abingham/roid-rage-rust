@@ -1,10 +1,8 @@
 use nalgebra::{Point2, Vector2};
-use opengl_graphics::GlGraphics;
-use ncollide2d::shape::{Ball, ShapeHandle};
 use uuid::Uuid;
 
-use crate::model::field::Field;
 use super::super::traits::{Identifiable, Positioned};
+use crate::model::field::Field;
 
 pub struct Fragment {
     position: Point2<f64>,
@@ -50,8 +48,3 @@ impl Identifiable for Fragment {
         self.age <= self.max_age
     }
 }
-
-//     pub fn collision_shape(&self) -> ShapeHandle<f64> {
-//         ShapeHandle::new(Ball::new(Fragment::radius()))
-//     }
-// }

@@ -6,8 +6,8 @@ use piston::window::WindowSettings;
 use opengl_graphics::{GlGraphics, OpenGL};
 use crate::controller::Controller;
 use crate::model::objects::roid::Roid;
-// use crate::model::objects::bullet::Bullet;
-// use crate::model::objects::fragment::Fragment;
+use crate::model::objects::bullet::Bullet;
+use crate::model::objects::fragment::Fragment;
 use crate::model::traits::*;
 use graphics;
 
@@ -59,13 +59,13 @@ impl View {
                 roid.render(c, gl);
             }
 
-            // for bullet in &self.controller.model().objects.bullets {
-            //     bullet.render(c, gl);
-            // }
+            for bullet in self.controller.model().bullets() {
+                bullet.render(c, gl);
+            }
 
-            // for fragment in &self.controller.model().objects.fragments {
-            //     fragment.render(c, gl);
-            // }
+            for fragment in self.controller.model().fragments() {
+                fragment.render(c, gl);
+            }
         });
     }
 }
@@ -87,36 +87,36 @@ impl Renderable for Roid {
     }
 }
 
-// impl Renderable for Bullet {
-//    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
-//         use graphics::*;
+impl Renderable for Bullet {
+   fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
+        use graphics::*;
 
-//         let transform = c
-//             .transform
-//             .trans(self.position().coords[0], self.position().coords[1]);
+        let transform = c
+            .transform
+            .trans(self.position().coords[0], self.position().coords[1]);
 
-//         let rect = rectangle::square(
-//             -1.0 * Bullet::radius(),
-//             -1.0 * Bullet::radius(),
-//             2.0 * Bullet::radius(),
-//         );
-//         ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
-//     }
-// }
+        let rect = rectangle::square(
+            -1.0 * Bullet::radius(),
+            -1.0 * Bullet::radius(),
+            2.0 * Bullet::radius(),
+        );
+        ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
+    }
+}
 
-// impl Renderable for Fragment {
-//     fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
-//         use graphics::*;
+impl Renderable for Fragment {
+    fn render(&self, c: graphics::Context, gl: &mut GlGraphics) {
+        use graphics::*;
 
-//         let transform = c
-//             .transform
-//             .trans(self.position().coords[0], self.position().coords[1]);
+        let transform = c
+            .transform
+            .trans(self.position().coords[0], self.position().coords[1]);
 
-//         let rect = rectangle::square(
-//             -1.0 * Fragment::radius(),
-//             -1.0 * Fragment::radius(),
-//             2.0 * Fragment::radius(),
-//         );
-//         ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
-//     }
-// }
+        let rect = rectangle::square(
+            -1.0 * Fragment::radius(),
+            -1.0 * Fragment::radius(),
+            2.0 * Fragment::radius(),
+        );
+        ellipse([1.0, 1.0, 1.0, 1.0], rect, transform, gl);
+    }
+}

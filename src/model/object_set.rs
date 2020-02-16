@@ -1,19 +1,25 @@
-// use super::objects::bullet::Bullet;
-// use super::objects::fragment::Fragment;
+use super::objects::bullet::Bullet;
+use super::objects::fragment::Fragment;
 use super::objects::roid::Roid;
 
 pub struct ObjectSet {
-    // pub bullets: Vec<Bullet>,
-    // pub fragments: Vec<Fragment>,
+    pub bullets: Vec<Bullet>,
+    pub fragments: Vec<Fragment>,
     pub roids: Vec<Roid>,
 }
 
 impl ObjectSet {
     pub fn new() -> ObjectSet {
         ObjectSet {
-            // bullets: vec![],
-            // fragments: vec![],
+            bullets: vec![],
+            fragments: vec![],
             roids: vec![],
         }
+    }
+
+    pub fn extend(&mut self, other: ObjectSet) {
+        self.bullets.extend(other.bullets);
+        self.fragments.extend(other.fragments);
+        self.roids.extend(other.roids);
     }
 }

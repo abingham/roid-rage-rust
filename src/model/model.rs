@@ -1,30 +1,32 @@
-use nalgebra::{Isometry2, Vector2, zero};
-use ncollide2d::pipeline::{CollisionGroups, CollisionObjectSlabHandle, ContactEvent, GeometricQueryType};
-use ncollide2d::shape::{Ball, ShapeHandle};
+use nalgebra::{zero, Isometry2, Vector2};
+use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent, GeometricQueryType};
 use ncollide2d::world::CollisionWorld;
 use std::collections::HashMap;
 
+use super::collidable::Collidable;
 use super::field::Field;
+use super::object_map::ObjectMap;
 use super::object_set::ObjectSet;
-use super::traits::*;
+use super::objects::bullet::Bullet;
+use super::objects::fragment::Fragment;
 use super::objects::roid::Roid;
-use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
+use super::traits::*;
 
 pub struct Model {
     collision_world: CollisionWorld<f64, ()>,
     field: Field,
-    roids: HashMap<CollisionObjectSlabHandle, Roid>
+    bullets: HashMap<CollisionObjectSlabHandle, Bullet>,
+    roids: HashMap<CollisionObjectSlabHandle, Roid>,
+    fragments: HashMap<CollisionObjectSlabHandle, Fragment>,
 }
 
 impl Model {
-    pub fn new(
-        field: Field,
-        objects: ObjectSet,
-    ) -> Model
-    {
+    pub fn new(field: Field, objects: ObjectSet) -> Model {
         let mut model = Model {
             collision_world: CollisionWorld::new(0.02f64),
             field: field,
+            bullets: HashMap::new(),
+            fragments: HashMap::new(),
             roids: HashMap::new(),
         };
         model.insert(objects);
@@ -35,194 +37,123 @@ impl Model {
         &self.field
     }
 
-    pub fn roids(&self) -> impl Iterator<Item=&Roid> {
+    pub fn roids(&self) -> impl Iterator<Item = &Roid> {
         self.roids.values()
     }
 
-    fn _project_group<I: Positioned + Identifiable + Exploding + Collidable>(
-        &mut self, 
-        objects: &mut HashMap::<CollisionObjectSlabHandle, I>, 
-        collisions: &[CollisionObjectSlabHandle],
-        time_delta: f64)
-    {
-        // Collect the objects that have exploded, removing them from the objects.
-        let exploded: Vec<I> = collisions.iter()
-            .filter_map(|handle| objects.remove(handle))
-            .collect();
+    pub fn bullets(&self) -> impl Iterator<Item = &Bullet> {
+        self.bullets.values()
+    }
 
-        // Move everything    
-        for (_handle, obj) in &mut objects.iter_mut() {
-            obj.project(&self.field, time_delta);
-       }
-
-        // Trim out the objects that have moved outside the field or otherwise died
-        let mut removals: Vec<CollisionObjectSlabHandle> = objects.iter()
-            .filter(|(_h, o)| !self.field.contains(&o.position()))
-            .filter(|(_h, o)| !o.alive())
-            .map(|(h, _o)| *h)
-            .collect();
-        removals.dedup();
-        removals.sort();
-        objects.retain(|handle, _obj| removals.binary_search(&handle).is_err());
-
-        // Remove all dead objects from collision world.
-        self.collision_world.remove(collisions);
-        self.collision_world.remove(&removals);
-
-        // Update the collision world for all remaining objects
-        for (handle, obj) in objects {
-            // Update collision object
-            if let Some(collision_object) = self.collision_world.get_mut(*handle) {
-                collision_object.set_position(
-                    Isometry2::new(
-                        Vector2::new(
-                            obj.position().x, 
-                            obj.position().y),
-                    zero(),
-                ));
-            }
-        }
-
-        // Explode the collisions
-        for ex in exploded {
-            let new_objs = ex.explode();
-            for roid in new_objs.roids {
-                let (handle, _) = self.collision_world.add(
-                    Isometry2::new(
-                        Vector2::new(
-                            roid.position().x, 
-                            roid.position().y),
-                        zero()),
-                    roid.collision_shape(),
-                    roid.collision_groups(),
-                    GeometricQueryType::Contacts(0.0, 0.0),
-                    ()
-                );
-                self.roids.insert(handle, roid);
-            } 
-        }
-   } 
+    pub fn fragments(&self) -> impl Iterator<Item = &Fragment> {
+        self.fragments.values()
+    }
 
     // This is the core rule for updating the field. We bake this into the model because we treat it as the basic
     // "physics" of the game.
     pub fn project(&mut self, time_delta: f64) -> () {
-        let collisions: Vec<CollisionObjectSlabHandle> = 
-            self.collision_world.contact_events().iter()
-            .filter_map(|event| {
-                match event {
-                    ContactEvent::Started(collider1, collider2) => {
-                        Some(vec![*collider1, *collider2])
-                    },
-                    _ => None
-                }
-            }).flatten().collect();
-
-        // Update roids
-        // Collect the objects that have exploded, removing them from the objects.
-        let exploded: Vec<Roid> = collisions.iter()
-            .filter_map(|handle| self.roids.remove(handle))
+        // Find all of the handles for objects that are collided.
+        let mut collisions: Vec<CollisionObjectSlabHandle> = self
+            .collision_world
+            .contact_events()
+            .iter()
+            .filter_map(|event| match event {
+                ContactEvent::Started(collider1, collider2) => Some(vec![*collider1, *collider2]),
+                _ => None,
+            })
+            .flatten()
             .collect();
+        collisions.dedup();
 
-        // Move everything    
-        for (_handle, obj) in &mut self.roids.iter_mut() {
-            obj.project(&self.field, time_delta);
-        }
+        // Ask the objects groups to update their objects, report objects to remove, and any debris they've generated.
+        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
+        let mut debris: ObjectSet = ObjectSet::new();
 
-        // Trim out the objects that have moved outside the field or otherwise died
-        let mut removals: Vec<CollisionObjectSlabHandle> = self.roids.iter()
-            .filter(|(_h, o)| !self.field.contains(&o.position()))
-            .filter(|(_h, o)| !o.alive())
-            .map(|(h, _o)| *h)
-            .collect();
+        // TODO: It would be nice to be able to abstract over these collections, but I run into
+        // borrow checker issues when I try.
+        let (r, d) = self.roids.project(time_delta, &collisions, &self.field);
+        removals.extend(r);
+        debris.extend(d);
+
+        let (r, d) = self.fragments.project(time_delta, &collisions, &self.field);
+        removals.extend(r);
+        debris.extend(d);
+
+        let (r, d) = self.bullets.project(time_delta, &collisions, &self.field);
+        removals.extend(r);
+        debris.extend(d);
+
+        // This is close!§
+        // Calculate all of the collision objects to remove as well as the debris to add to the model.
+        // let (mut removals, debris) = groups.iter_mut().fold(
+        //     (vec![], ObjectSet::new()),
+        //     |(mut removals, mut debris), g| {
+        //         let (r, d) = g.project(time_delta, &collisions, &self.field);
+        //         removals.extend(r);
+        //         debris.extend(d);
+        //         (removals, debris)
+        //     });
+
         removals.dedup();
-        removals.sort();
-        self.roids.retain(|handle, _obj| removals.binary_search(&handle).is_err());
-
-        // Remove all dead objects from collision world.
-        self.collision_world.remove(&collisions);
         self.collision_world.remove(&removals);
 
-        // Update the collision world for all remaining objects
-        for (handle, obj) in &mut self.roids {
+        let positions = self
+            .roids
+            .iter()
+            .map(|(h, o)| (*h, o.position()))
+            .chain(self.fragments.iter().map(|(h, o)| (*h, o.position())))
+            .chain(self.bullets.iter().map(|(h, o)| (*h, o.position())));
+
+        // Update position of all collision objects
+        for (handle, pos) in positions {
             // Update collision object
-            if let Some(collision_object) = self.collision_world.get_mut(*handle) {
-                collision_object.set_position(
-                    Isometry2::new(
-                        Vector2::new(
-                            obj.position().x, 
-                            obj.position().y),
-                    zero(),
-                ));
+            if let Some(collision_object) = self.collision_world.get_mut(handle) {
+                collision_object.set_position(Isometry2::new(Vector2::new(pos.x, pos.y), zero()));
             }
         }
 
-        // Explode the collisions
-        for ex in exploded {
-            self.insert(ex.explode());
-        }
+        self.insert(debris);
 
         self.collision_world.update();
     }
 
-    fn insert(&mut self, objects: ObjectSet) -> () {
+    pub fn insert(&mut self, objects: ObjectSet) -> () {
         for roid in objects.roids {
             let (handle, _) = self.collision_world.add(
-                Isometry2::new(
-                    Vector2::new(
-                        roid.position().x, 
-                        roid.position().y),
-                    zero()),
+                Isometry2::new(Vector2::new(roid.position().x, roid.position().y), zero()),
                 roid.collision_shape(),
                 roid.collision_groups(),
                 GeometricQueryType::Contacts(0.0, 0.0),
-                ()
+                (),
             );
             self.roids.insert(handle, roid);
-        } 
+        }
+
+        for fragment in objects.fragments {
+            let (handle, _) = self.collision_world.add(
+                Isometry2::new(
+                    Vector2::new(fragment.position().x, fragment.position().y),
+                    zero(),
+                ),
+                fragment.collision_shape(),
+                fragment.collision_groups(),
+                GeometricQueryType::Contacts(0.0, 0.0),
+                (),
+            );
+            self.fragments.insert(handle, fragment);
+        }
+        for bullet in objects.bullets {
+            let (handle, _) = self.collision_world.add(
+                Isometry2::new(
+                    Vector2::new(bullet.position().x, bullet.position().y),
+                    zero(),
+                ),
+                bullet.collision_shape(),
+                bullet.collision_groups(),
+                GeometricQueryType::Contacts(0.0, 0.0),
+                (),
+            );
+            self.bullets.insert(handle, bullet);
+        }
     }
 }
-
-trait Exploding {
-    fn explode(&self) -> ObjectSet;
-}
-
-impl Exploding for Roid {
-    fn explode(&self) -> ObjectSet {
-        let new_radius = self.radius() / 2.0;
-        let num_sub_roids = if new_radius >= Roid::min_radius() { 2 } else { 0 };
-        let new_roids = (0..num_sub_roids)
-                .map(|_| {
-                    let velocity = make_velocity_vector(self.velocity().speed() * 1.5, random_bearing());
-                    Roid::new(self.position(), new_radius, velocity)
-                });
-
-        let mut objs = ObjectSet::new();
-        objs.roids.extend(new_roids);
-        objs
-    }
-}
-
-trait Collidable {
-    fn collision_shape(&self) -> ShapeHandle<f64>;
-    fn collision_groups(&self) -> CollisionGroups;
-}
-
-impl Collidable for Roid {
-    fn collision_shape(&self) -> ShapeHandle<f64> {
-        ShapeHandle::new(Ball::new(self.radius()))
-    }
-
-    fn collision_groups(&self) -> CollisionGroups {
-        let mut group = CollisionGroups::new();
-        group.set_membership(&[ROID_GROUP]);
-        group.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
-        group
-    }
-}
-
-const ROID_GROUP: usize = 1;
-const SHIP_GROUP: usize = 2;
-const WEAPON_GROUP: usize = 3;
-const DEBRIS_GROUP: usize = 4;
-
-
