@@ -5,9 +5,9 @@ use rand::prelude::*;
 // use roid_rage::controller::basic_controller::BasicController;
 use roid_rage::model::field::Field;
 // use roid_rage::model::game_object::GameObject;
-use roid_rage::model::objects::roid::Roid;
-use roid_rage::model::Model;
 // use roid_rage::model::objects::roid::Roid;
+use roid_rage::model::Model;
+use roid_rage::model::objects::roid::Roid;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
 // use roid_rage::view::View;
 

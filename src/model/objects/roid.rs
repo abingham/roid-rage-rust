@@ -1,10 +1,6 @@
 use nalgebra::{Point2, Vector2};
-use ncollide2d::shape::{Ball, ShapeHandle};
-use opengl_graphics::GlGraphics;
 
-use crate::model::object_set::ObjectSet;
 use crate::model::field::Field;
-use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use super::super::traits::{Identifiable, Positioned};
 use rand::prelude::*;
 use uuid;
@@ -40,7 +36,7 @@ impl Roid {
          self.radius
     }
 
-    pub fn velocity(&self) -> Vector<f64> {
+    pub fn velocity(&self) -> Vector2<f64> {
         self.velocity
     }
 }
@@ -63,23 +59,3 @@ impl Identifiable for Roid {
         self.id
     }
 }
-
-
-//     pub fn explode(&self) -> ObjectSet {
-//         let new_radius = self.radius / 2.0;
-//         let num_sub_roids = if new_radius >= MIN_RADIUS { 2 } else { 0 };
-//         let roids = (0..num_sub_roids)
-//             .map(|_| {
-//                 let velocity = make_velocity_vector(self.velocity.speed() * 1.5, random_bearing());
-//                 Roid::new(self.position, new_radius, velocity)
-//             });
-        
-//         let mut objects = ObjectSet::new();
-//         objects.roids.extend(roids);
-//         objects
-//     }
-
-//     pub fn collision_shape(&self) -> ShapeHandle<f64> {
-//         ShapeHandle::new(Ball::new(self.radius))
-//     }
-// }

@@ -1,5 +1,5 @@
 use crate::model::Model;
-use crate::model::objects::bullet::Bullet;
+// use crate::model::objects::bullet::Bullet;
 use nalgebra::Point2;
 use super::Controller;
 use super::targeting::target;
@@ -25,28 +25,28 @@ impl BasicController {
 
     fn update(&mut self, time_delta: f64) {
         self.model.project(time_delta);
-        self.vmodel.update(self.model.objects.roids.iter().map(|r| (r.id(), r.position())), time_delta);
+        self.vmodel.update(self.model.roids().map(|r| (r.id(), r.position())), time_delta);
         self.fire(time_delta);
     }
     
     fn fire(&mut self, dt: f64) -> () {
         let firing_position = Point2::new(
-            (self.model.field.width() / 2) as f64,
-            (self.model.field.height() / 2) as f64,
+            (self.model.field().width() / 2) as f64,
+            (self.model.field().height() / 2) as f64,
         );
 
         self.full_time += dt;
         if self.full_time > FIRING_FREQUENCY {
-            let target_bearing = target( &firing_position, 
-                                         Bullet::speed(), 
-                                         &self.model.field,
-                                         self.model.objects.roids.iter().map(|r| (r.id(), r.position())),
-                                         &self.vmodel);
-            if let Some(bearing) = target_bearing {
-                self.full_time = 0.0;
-                let bullet = Bullet::new(firing_position, bearing);
-                self.model.objects.bullets.push(bullet);
-            }
+            // let target_bearing = target( &firing_position, 
+            //                              Bullet::speed(), 
+            //                              &self.model.field,
+            //                              self.model.objects.roids.iter().map(|r| (r.id(), r.position())),
+            //                              &self.vmodel);
+            // if let Some(bearing) = target_bearing {
+            //     self.full_time = 0.0;
+            //     let bullet = Bullet::new(firing_position, bearing);
+            //     self.model.objects.bullets.push(bullet);
+            // }
         }
     }
 }
