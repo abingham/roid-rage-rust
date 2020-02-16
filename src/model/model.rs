@@ -66,11 +66,12 @@ impl Model {
         collisions.dedup();
 
         // Ask the objects groups to update their objects, report objects to remove, and any debris they've generated.
+        //
+        // TODO: It would be nice to be able to abstract over these collections, but I run into
+        // borrow checker issues when I try.
         let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
         let mut debris: ObjectSet = ObjectSet::new();
 
-        // TODO: It would be nice to be able to abstract over these collections, but I run into
-        // borrow checker issues when I try.
         let (r, d) = self.roids.project(time_delta, &collisions, &self.field);
         removals.extend(r);
         debris.extend(d);
@@ -94,9 +95,11 @@ impl Model {
         //         (removals, debris)
         //     });
 
+        // Remove collision objects for things that are removed.
         removals.dedup();
         self.collision_world.remove(&removals);
 
+        // Update position of all collision objects
         let positions = self
             .roids
             .iter()
@@ -104,7 +107,6 @@ impl Model {
             .chain(self.fragments.iter().map(|(h, o)| (*h, o.position())))
             .chain(self.bullets.iter().map(|(h, o)| (*h, o.position())));
 
-        // Update position of all collision objects
         for (handle, pos) in positions {
             // Update collision object
             if let Some(collision_object) = self.collision_world.get_mut(handle) {
