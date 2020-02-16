@@ -22,13 +22,18 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn new(field: Field) -> Model
+    pub fn new(
+        field: Field,
+        objects: ObjectSet,
+    ) -> Model
     {
-        Model {
+        let mut model = Model {
             collision_world: CollisionWorld::new(0.02f64),
             field: field,
             roids: HashMap::new(),
-        }
+        };
+        model.insert(objects);
+        model
     }
 
     pub fn field(&self) -> &Field {
@@ -39,8 +44,8 @@ impl Model {
         self.roids.values()
     }
 
-    fn project_group<I: Positioned + Identifiable + Exploding + Collidable>(
-        &self, 
+    fn _project_group<I: Positioned + Identifiable + Exploding + Collidable>(
+        &mut self, 
         objects: &mut HashMap::<CollisionObjectSlabHandle, I>, 
         collisions: &[CollisionObjectSlabHandle],
         time_delta: f64)
@@ -117,12 +122,68 @@ impl Model {
                 }
             }).flatten().collect();
 
+        // Update roids
+        // Collect the objects that have exploded, removing them from the objects.
+        let exploded: Vec<Roid> = collisions.iter()
+            .filter_map(|handle| self.roids.remove(handle))
+            .collect();
 
-        // Move all of the game objects
-        self.project_group(&mut self.roids, collisions.as_slice(), time_delta);
-        // project(&mut self.objects.bullets, &self.field, time_delta);
-        // project(&mut self.objects.fragments, &self.field, time_delta);
-       self.collision_world.update();
+        // Move everything    
+        for (_handle, obj) in &mut self.roids.iter_mut() {
+            obj.project(&self.field, time_delta);
+        }
+
+        // Trim out the objects that have moved outside the field or otherwise died
+        let mut removals: Vec<CollisionObjectSlabHandle> = self.roids.iter()
+            .filter(|(_h, o)| !self.field.contains(&o.position()))
+            .filter(|(_h, o)| !o.alive())
+            .map(|(h, _o)| *h)
+            .collect();
+        removals.dedup();
+        removals.sort();
+        self.roids.retain(|handle, _obj| removals.binary_search(&handle).is_err());
+
+        // Remove all dead objects from collision world.
+        self.collision_world.remove(&collisions);
+        self.collision_world.remove(&removals);
+
+        // Update the collision world for all remaining objects
+        for (handle, obj) in &mut self.roids {
+            // Update collision object
+            if let Some(collision_object) = self.collision_world.get_mut(*handle) {
+                collision_object.set_position(
+                    Isometry2::new(
+                        Vector2::new(
+                            obj.position().x, 
+                            obj.position().y),
+                    zero(),
+                ));
+            }
+        }
+
+        // Explode the collisions
+        for ex in exploded {
+            self.insert(ex.explode());
+        }
+
+        self.collision_world.update();
+    }
+
+    fn insert(&mut self, objects: ObjectSet) -> () {
+        for roid in objects.roids {
+            let (handle, _) = self.collision_world.add(
+                Isometry2::new(
+                    Vector2::new(
+                        roid.position().x, 
+                        roid.position().y),
+                    zero()),
+                roid.collision_shape(),
+                roid.collision_groups(),
+                GeometricQueryType::Contacts(0.0, 0.0),
+                ()
+            );
+            self.roids.insert(handle, roid);
+        } 
     }
 }
 
@@ -168,3 +229,5 @@ const ROID_GROUP: usize = 1;
 const SHIP_GROUP: usize = 2;
 const WEAPON_GROUP: usize = 3;
 const DEBRIS_GROUP: usize = 4;
+
+

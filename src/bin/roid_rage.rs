@@ -2,14 +2,13 @@ extern crate roid_rage;
 
 use nalgebra::Point2;
 use rand::prelude::*;
-// use roid_rage::controller::basic_controller::BasicController;
+use roid_rage::controller::basic_controller::BasicController;
 use roid_rage::model::field::Field;
-// use roid_rage::model::game_object::GameObject;
-// use roid_rage::model::objects::roid::Roid;
+use roid_rage::model::object_set::ObjectSet;
 use roid_rage::model::Model;
 use roid_rage::model::objects::roid::Roid;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
-// use roid_rage::view::View;
+use roid_rage::view::View;
 
 fn some_roids(width: usize, height: usize) -> Vec<Roid> {
     let mut rng = thread_rng();
@@ -37,12 +36,15 @@ fn some_roids(width: usize, height: usize) -> Vec<Roid> {
 // }
 
 fn main() {
-    let mut model = Model::new(Field::new(800, 600, 100));
+    let mut objects = ObjectSet::new();
+    objects.roids.extend(some_roids(800, 600));
+    let model = Model::new(
+        Field::new(800, 600, 100),
+        objects
+    );
 
-    model.objects.roids.extend(some_roids(800, 600));
+    let controller = BasicController::new(model);
 
-    // let controller = BasicController::new(model);
-
-    // let mut view = View::new(Box::new(controller), [800, 600]);
-    // view.run();
+    let mut view = View::new(Box::new(controller), [800, 600]);
+    view.run();
 }
