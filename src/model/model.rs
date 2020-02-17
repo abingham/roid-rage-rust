@@ -53,6 +53,24 @@ impl Model {
     // "physics" of the game.
     pub fn project(&mut self, time_delta: f64) -> () {
         // Find all of the handles for objects that are collided.
+        let collisions = self.all_collisions();
+
+        // Ask the objects groups to update their objects, report objects to remove, and any debris they've generated.
+        let (removals, debris) = self.project_groups(time_delta, &collisions);
+
+        // Remove collision objects for things that are removed.
+        self.collision_world.remove(&removals);
+
+        // Update position of all collision objects
+        self.update_collision_positions();
+
+        // Insert all the "output" from explosions
+        self.insert(debris);
+
+        self.collision_world.update();
+    }
+
+    fn all_collisions(&self) -> Vec<CollisionObjectSlabHandle> {
         let mut collisions: Vec<CollisionObjectSlabHandle> = self
             .collision_world
             .contact_events()
@@ -64,46 +82,27 @@ impl Model {
             .flatten()
             .collect();
         collisions.dedup();
+        collisions
+    }
 
-        // Ask the objects groups to update their objects, report objects to remove, and any debris they've generated.
-        //
-        // TODO: It would be nice to be able to abstract over these collections, but I run into
-        // borrow checker issues when I try.
-        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
-        let mut debris: ObjectSet = ObjectSet::new();
-
-        let (r, d) = self.roids.project(time_delta, &collisions, &self.field);
-        removals.extend(r);
-        debris.extend(d);
-
-        let (r, d) = self.fragments.project(time_delta, &collisions, &self.field);
-        removals.extend(r);
-        debris.extend(d);
-
-        let (r, d) = self.bullets.project(time_delta, &collisions, &self.field);
-        removals.extend(r);
-        debris.extend(d);
-
-        // This is close!§
-        // Calculate all of the collision objects to remove as well as the debris to add to the model.
-        // let (mut removals, debris) = groups.iter_mut().fold(
-        //     (vec![], ObjectSet::new()),
-        //     |(mut removals, mut debris), g| {
-        //         let (r, d) = g.project(time_delta, &collisions, &self.field);
-        //         removals.extend(r);
-        //         debris.extend(d);
-        //         (removals, debris)
-        //     });
-
-        // Remove collision objects for things that are removed.
+    fn project_groups(&mut self, time_delta: f64, collisions: &[CollisionObjectSlabHandle]) -> (Vec<CollisionObjectSlabHandle>, ObjectSet)
+    {
+        let mut groups: [&mut dyn ProjectionCollider; 3] = [&mut self.roids, &mut self.fragments, &mut self.bullets];
+        let field = &self.field;
+        let (mut removals, debris) = groups.iter_mut().fold(
+            (vec![], ObjectSet::new()),
+            |(mut removals, mut debris), g| {
+                let (r, d) = g.project(time_delta, collisions, field);
+                removals.extend(r);
+                debris.extend(d);
+                (removals, debris)
+            });
         removals.dedup();
-        self.collision_world.remove(&removals);
+        (removals, debris)
+    }
 
-        // Update position of all collision objects
-        let positions = self
-            .roids
-            .iter()
-            .map(|(h, o)| (*h, o.position()))
+    fn update_collision_positions(&mut self) {
+        let positions =  self.roids.iter().map(|(h, o)| (*h, o.position()))
             .chain(self.fragments.iter().map(|(h, o)| (*h, o.position())))
             .chain(self.bullets.iter().map(|(h, o)| (*h, o.position())));
 
@@ -113,11 +112,6 @@ impl Model {
                 collision_object.set_position(Isometry2::new(Vector2::new(pos.x, pos.y), zero()));
             }
         }
-
-        // Insert all the "output" from explosions
-        self.insert(debris);
-
-        self.collision_world.update();
     }
 
     pub fn insert(&mut self, objects: ObjectSet) -> () {

@@ -11,7 +11,7 @@ pub trait ProjectionCollider {
     /// fell off the field) and the debris produced by any collisions.
     fn project(&mut self, 
                time_delta: f64,
-               collisions: &Vec<CollisionObjectSlabHandle>,
+               collisions: &[CollisionObjectSlabHandle],
                field: &Field) -> (Vec<CollisionObjectSlabHandle>, ObjectSet);
 }
 
@@ -19,7 +19,7 @@ impl<T: Explodable + Identifiable + Positioned> ProjectionCollider for HashMap<C
 {
     fn project(&mut self, 
                time_delta: f64,
-               collisions: &Vec<CollisionObjectSlabHandle>,
+               collisions: &[CollisionObjectSlabHandle],
                field: &Field) -> (Vec<CollisionObjectSlabHandle>, ObjectSet)
     {
         // Collect the objects that have exploded, removing them from the objects.
