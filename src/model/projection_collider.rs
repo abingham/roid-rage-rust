@@ -6,7 +6,7 @@ use super::object_set::ObjectSet;
 use super::traits::*;
 
 /// Project and collide a group of objects.
-pub trait ObjectMap {
+pub trait ProjectionCollider {
     /// Process the managed elements, returning information about those objects which have been removed (e.g. because they
     /// fell off the field) and the debris produced by any collisions.
     fn project(&mut self, 
@@ -15,7 +15,7 @@ pub trait ObjectMap {
                field: &Field) -> (Vec<CollisionObjectSlabHandle>, ObjectSet);
 }
 
-impl<T: Explodable + Identifiable + Positioned> ObjectMap for HashMap<CollisionObjectSlabHandle, T>
+impl<T: Explodable + Identifiable + Positioned> ProjectionCollider for HashMap<CollisionObjectSlabHandle, T>
 {
     fn project(&mut self, 
                time_delta: f64,

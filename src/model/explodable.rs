@@ -6,6 +6,7 @@ use super::traits::Positioned;
 use crate::velocity::{make_velocity_vector, random_bearing, Velocity};
 use rand::prelude::*;
 
+/// An object that can explode into other objects.
 pub trait Explodable {
     fn explode(&self) -> ObjectSet {
         ObjectSet::new()

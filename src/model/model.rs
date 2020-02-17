@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use super::collidable::Collidable;
 use super::field::Field;
-use super::object_map::ObjectMap;
+use super::projection_collider::ProjectionCollider;
 use super::object_set::ObjectSet;
 use super::objects::bullet::Bullet;
 use super::objects::fragment::Fragment;

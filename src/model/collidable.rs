@@ -4,6 +4,7 @@ use super::objects::bullet::Bullet;
 use super::objects::fragment::Fragment;
 use super::objects::roid::Roid;
 
+/// An object that can collide with other objects
 pub trait Collidable {
     fn collision_shape(&self) -> ShapeHandle<f64>;
     fn collision_groups(&self) -> CollisionGroups;
