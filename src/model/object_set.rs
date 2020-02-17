@@ -2,6 +2,9 @@ use super::objects::bullet::Bullet;
 use super::objects::fragment::Fragment;
 use super::objects::roid::Roid;
 
+/// A simple collection of all object types
+/// 
+/// This is primarily used as a way of communicating change sets and so forth in the system.
 pub struct ObjectSet {
     pub bullets: Vec<Bullet>,
     pub fragments: Vec<Fragment>,

@@ -1,4 +1,3 @@
-use nalgebra::Point2;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use std::collections::HashMap;
 use super::explodable::Explodable;
@@ -6,21 +5,18 @@ use super::field::Field;
 use super::object_set::ObjectSet;
 use super::traits::*;
 
+/// Project and collide a group of objects.
 pub trait ObjectMap {
+    /// Process the managed elements, returning information about those objects which have been removed (e.g. because they
+    /// fell off the field) and the debris produced by any collisions.
     fn project(&mut self, 
                time_delta: f64,
                collisions: &Vec<CollisionObjectSlabHandle>,
                field: &Field) -> (Vec<CollisionObjectSlabHandle>, ObjectSet);
-
-    fn positions(&self) -> Vec<(CollisionObjectSlabHandle, Point2<f64>)>;
 }
 
 impl<T: Explodable + Identifiable + Positioned> ObjectMap for HashMap<CollisionObjectSlabHandle, T>
 {
-    fn positions(&self) -> Vec<(CollisionObjectSlabHandle, Point2<f64>)> {
-        self.iter().map(|(h, o)| (*h, o.position())).collect()
-    }
-
     fn project(&mut self, 
                time_delta: f64,
                collisions: &Vec<CollisionObjectSlabHandle>,
