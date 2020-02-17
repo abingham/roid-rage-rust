@@ -114,48 +114,40 @@ impl Model {
             }
         }
 
+        // Insert all the "output" from explosions
         self.insert(debris);
 
         self.collision_world.update();
     }
 
     pub fn insert(&mut self, objects: ObjectSet) -> () {
-        for roid in objects.roids {
-            let (handle, _) = self.collision_world.add(
-                Isometry2::new(Vector2::new(roid.position().x, roid.position().y), zero()),
-                roid.collision_shape(),
-                roid.collision_groups(),
-                GeometricQueryType::Contacts(0.0, 0.0),
-                (),
-            );
-            self.roids.insert(handle, roid);
-        }
+        Model::insert_(objects.roids, &mut self.collision_world, &mut self.roids);
+        Model::insert_(
+            objects.fragments,
+            &mut self.collision_world,
+            &mut self.fragments,
+        );
+        Model::insert_(
+            objects.bullets,
+            &mut self.collision_world,
+            &mut self.bullets,
+        );
+    }
 
-        for fragment in objects.fragments {
-            let (handle, _) = self.collision_world.add(
-                Isometry2::new(
-                    Vector2::new(fragment.position().x, fragment.position().y),
-                    zero(),
-                ),
-                fragment.collision_shape(),
-                fragment.collision_groups(),
+    fn insert_<T: Collidable + Positioned>(
+        objects: Vec<T>,
+        collision_world: &mut CollisionWorld<f64, ()>,
+        object_map: &mut HashMap<CollisionObjectSlabHandle, T>,
+    ) {
+        for obj in objects {
+            let (handle, _) = collision_world.add(
+                Isometry2::new(Vector2::new(obj.position().x, obj.position().y), zero()),
+                obj.collision_shape(),
+                obj.collision_groups(),
                 GeometricQueryType::Contacts(0.0, 0.0),
                 (),
             );
-            self.fragments.insert(handle, fragment);
-        }
-        for bullet in objects.bullets {
-            let (handle, _) = self.collision_world.add(
-                Isometry2::new(
-                    Vector2::new(bullet.position().x, bullet.position().y),
-                    zero(),
-                ),
-                bullet.collision_shape(),
-                bullet.collision_groups(),
-                GeometricQueryType::Contacts(0.0, 0.0),
-                (),
-            );
-            self.bullets.insert(handle, bullet);
+            object_map.insert(handle, obj);
         }
     }
 }

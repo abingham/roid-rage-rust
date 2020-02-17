@@ -5,8 +5,8 @@ use rand::prelude::*;
 use roid_rage::controller::basic_controller::BasicController;
 use roid_rage::model::field::Field;
 use roid_rage::model::object_set::ObjectSet;
-use roid_rage::model::Model;
 use roid_rage::model::objects::roid::Roid;
+use roid_rage::model::Model;
 use roid_rage::velocity::{make_velocity_vector, random_bearing};
 use roid_rage::view::View;
 
@@ -38,10 +38,7 @@ fn some_roids(width: usize, height: usize) -> Vec<Roid> {
 fn main() {
     let mut objects = ObjectSet::new();
     objects.roids.extend(some_roids(800, 600));
-    let model = Model::new(
-        Field::new(800, 600, 100),
-        objects
-    );
+    let model = Model::new(Field::new(800, 600, 100), objects);
 
     let controller = BasicController::new(model);
 
