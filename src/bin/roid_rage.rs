@@ -7,7 +7,7 @@ extern crate roid_rage;
 // use roid_rage::model::objects::roid::Roid;
 // use roid_rage::model::Model;
 // use roid_rage::velocity::{make_velocity_vector, random_bearing};
-use specs::{DispatcherBuilder, Join, Builder, WriteStorage, ReadStorage, System, World, WorldExt, RunNow};
+use specs::{Read, DispatcherBuilder, Join, Builder, WriteStorage, ReadStorage, System, World, WorldExt, RunNow};
 use roid_rage::components::{Position, Velocity};
 // use roid_rage::view::View;
 
@@ -36,6 +36,9 @@ use roid_rage::components::{Position, Velocity};
 //             0.0)))
 // }
 
+#[derive(Default)]
+struct DeltaTime(f64);
+
 struct RoidRage;
 
 impl<'a> System<'a> for RoidRage {
@@ -51,12 +54,13 @@ impl<'a> System<'a> for RoidRage {
 struct UpdatePositions;
 
 impl<'a> System<'a> for UpdatePositions {
-    type SystemData = (WriteStorage<'a, Position>, ReadStorage<'a, Velocity>);
+    type SystemData = (WriteStorage<'a, Position>, 
+                       ReadStorage<'a, Velocity>,
+                       Read<'a, DeltaTime>);
 
-    fn run(&mut self, (mut pos, vel): Self::SystemData) {
+    fn run(&mut self, (mut pos, vel, time_delta): Self::SystemData) {
         for (pos, vel) in (&mut pos, &vel).join() {
-            // TODO: 0.05 is our fake time delta. We need to get this from somewhere! See tutorial.
-            pos.pos = pos.pos + vel.vel * 0.05;
+            pos.pos = pos.pos + vel.vel * time_delta.0;
         }
     }
 }
@@ -69,12 +73,17 @@ fn main() {
         .with(Position::new(400.0, 300.0))
         .with(Velocity::from_speed_bearing(1.0, 0.0))
         .build();
+    world.insert(DeltaTime(0.05));
 
     let mut dispatcher = DispatcherBuilder::new()
         .with(RoidRage, "roid_rage", &[])
         .with(UpdatePositions, "update_positions", &["roid_rage"])
         .with(RoidRage, "roid_rage_updated", &["update_positions"])
         .build();
+
+    // Here's how to update the time delta when we get a new one, e.g. from the main loop
+    // let mut delta = world.write_resource::<f64>();
+    // *delta = 0.04;
 
     dispatcher.dispatch(&mut world);
     world.maintain();
