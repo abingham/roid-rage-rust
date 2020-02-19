@@ -1,6 +1,9 @@
-use crate::components::{Position, Velocity};
-use specs::{World, Join, Read, Write, ReadStorage, System, WriteStorage};
+use crate::components::{CollisionShape, Position, Velocity};
+use specs::{BitSet, ReaderId, World, Join, Read, Write, ReadStorage, System, WriteStorage};
 use ncollide2d::world::CollisionWorld;
+use specs::storage::ComponentEvent;
+use specs::shred::SystemData; 
+use specs::storage::Storage;
 
 #[derive(Default)]
 pub struct DeltaTime(pub f64);
@@ -36,10 +39,13 @@ impl<'a> System<'a> for UpdatePositions {
 #[derive(Default)]
 pub struct Collide {
     collision_world: Option<CollisionWorld<f64, ()>>,
+    pub reader_id: Option<ReaderId<ComponentEvent>>
 }
 
 impl<'a> System<'a> for Collide {
-    type SystemData = ();
+    type SystemData = (
+        ReadStorage<'a, CollisionShape>,
+    );
 
     fn run(&mut self, _: Self::SystemData) {
         let collision_world = &mut self.collision_world.as_mut().unwrap();
@@ -55,5 +61,7 @@ impl<'a> System<'a> for Collide {
     fn setup(&mut self, world: &mut World) {
         // Self::SystemData::setup(world);
         self.collision_world = Some(CollisionWorld::<f64, ()>::new(0.02f64));
+        self.reader_id = Some(
+            WriteStorage::<CollisionShape>::fetch(&world).register_reader());
     }
 }

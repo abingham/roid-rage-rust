@@ -1,5 +1,6 @@
 use nalgebra::{Point2, Vector2};
-use specs::{Builder, Component, ReadStorage, System, VecStorage, World, WorldExt, RunNow};
+use specs::{FlaggedStorage, Builder, Component, ReadStorage, System, VecStorage, World, WorldExt, RunNow};
+use ncollide2d::shape::ShapeHandle;
 
 pub struct Position {
     pub pos: Point2<f64>
@@ -36,6 +37,21 @@ impl Velocity {
 }
 
 impl Component for Velocity {
-    type Storage = VecStorage<Self>;
+    type Storage = FlaggedStorage<Self, VecStorage<Self>>;
 }
 
+pub struct CollisionShape {
+    pub handle: ShapeHandle<f64>
+}
+
+impl CollisionShape {
+    pub fn new(handle: ShapeHandle<f64>) -> CollisionShape {
+        CollisionShape {
+            handle: handle
+        }
+    }
+}
+
+impl Component for CollisionShape {
+    type Storage = VecStorage<Self>;
+}
