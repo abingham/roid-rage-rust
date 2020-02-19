@@ -13,9 +13,11 @@ use piston::event_loop::{EventSettings, Events};
 use piston::input::UpdateEvent;
 use piston::window::WindowSettings;
 use roid_rage::components::{Position, Velocity};
-use specs::{
-    Builder, DispatcherBuilder, Join, Read, ReadStorage, System, World, WorldExt, WriteStorage,
-};
+use specs::{Builder, DispatcherBuilder, World, WorldExt};
+use ncollide2d::world::CollisionWorld;
+
+use roid_rage::systems::*;
+
 // use roid_rage::view::View;
 
 // fn some_roids(width: usize, height: usize) -> Vec<Roid> {
@@ -43,37 +45,6 @@ use specs::{
 //             0.0)))
 // }
 
-#[derive(Default)]
-struct DeltaTime(f64);
-
-struct RoidRage;
-
-impl<'a> System<'a> for RoidRage {
-    type SystemData = (ReadStorage<'a, Position>, ReadStorage<'a, Velocity>);
-
-    fn run(&mut self, (pos, vel): Self::SystemData) {
-        for (pos, vel) in (&pos, &vel).join() {
-            println!("pos={} vel={}", pos.pos, vel.vel)
-        }
-    }
-}
-
-struct UpdatePositions;
-
-impl<'a> System<'a> for UpdatePositions {
-    type SystemData = (
-        WriteStorage<'a, Position>,
-        ReadStorage<'a, Velocity>,
-        Read<'a, DeltaTime>,
-    );
-
-    fn run(&mut self, (mut pos, vel, time_delta): Self::SystemData) {
-        for (pos, vel) in (&mut pos, &vel).join() {
-            pos.pos = pos.pos + vel.vel * time_delta.0;
-        }
-    }
-}
-
 fn main() {
     let mut world = World::new();
     world.register::<Position>();
@@ -84,11 +55,12 @@ fn main() {
         .with(Velocity::from_speed_bearing(1.0, 0.0))
         .build();
     world.insert(DeltaTime(0.05));
+    world.insert(CollisionWorld::<f64, ()>::new(0.02f64));
 
     let mut dispatcher = DispatcherBuilder::new()
-        .with(RoidRage, "roid_rage", &[])
-        .with(UpdatePositions, "update_positions", &["roid_rage"])
-        .with(RoidRage, "roid_rage_updated", &["update_positions"])
+        // .with(RoidRage, "roid_rage", &[])
+        .with(UpdatePositions, "update_positions", &[])
+        .with(PositionLogger, "log_positions", &["update_positions"])
         .build();
 
     let opengl = OpenGL::V3_2;

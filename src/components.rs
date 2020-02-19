@@ -38,3 +38,4 @@ impl Velocity {
 impl Component for Velocity {
     type Storage = VecStorage<Self>;
 }
+

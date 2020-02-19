@@ -6,6 +6,8 @@ pub mod components;
 // pub mod collide;
 // pub mod controller;
 // pub mod model;
+pub mod systems;
 pub mod velocity;
 // pub mod view;
+
 
