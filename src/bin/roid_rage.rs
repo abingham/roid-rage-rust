@@ -7,8 +7,15 @@ extern crate roid_rage;
 // use roid_rage::model::objects::roid::Roid;
 // use roid_rage::model::Model;
 // use roid_rage::velocity::{make_velocity_vector, random_bearing};
-use specs::{Read, DispatcherBuilder, Join, Builder, WriteStorage, ReadStorage, System, World, WorldExt, RunNow};
+use glutin_window::GlutinWindow as Window;
+use opengl_graphics::OpenGL;
+use piston::event_loop::{EventSettings, Events};
+use piston::input::UpdateEvent;
+use piston::window::WindowSettings;
 use roid_rage::components::{Position, Velocity};
+use specs::{
+    Builder, DispatcherBuilder, Join, Read, ReadStorage, System, World, WorldExt, WriteStorage,
+};
 // use roid_rage::view::View;
 
 // fn some_roids(width: usize, height: usize) -> Vec<Roid> {
@@ -54,9 +61,11 @@ impl<'a> System<'a> for RoidRage {
 struct UpdatePositions;
 
 impl<'a> System<'a> for UpdatePositions {
-    type SystemData = (WriteStorage<'a, Position>, 
-                       ReadStorage<'a, Velocity>,
-                       Read<'a, DeltaTime>);
+    type SystemData = (
+        WriteStorage<'a, Position>,
+        ReadStorage<'a, Velocity>,
+        Read<'a, DeltaTime>,
+    );
 
     fn run(&mut self, (mut pos, vel, time_delta): Self::SystemData) {
         for (pos, vel) in (&mut pos, &vel).join() {
@@ -69,7 +78,8 @@ fn main() {
     let mut world = World::new();
     world.register::<Position>();
     world.register::<Velocity>();
-    world.create_entity()
+    world
+        .create_entity()
         .with(Position::new(400.0, 300.0))
         .with(Velocity::from_speed_bearing(1.0, 0.0))
         .build();
@@ -81,9 +91,29 @@ fn main() {
         .with(RoidRage, "roid_rage_updated", &["update_positions"])
         .build();
 
-    // Here's how to update the time delta when we get a new one, e.g. from the main loop
-    // let mut delta = world.write_resource::<f64>();
-    // *delta = 0.04;
+    let opengl = OpenGL::V3_2;
+    // Create an Glutin window.
+    let mut window: Window = WindowSettings::new("Roid Rage!", (800, 600))
+        .opengl(opengl)
+        .exit_on_esc(true)
+        .build()
+        .unwrap();
+
+    let mut events = Events::new(EventSettings::new());
+    while let Some(e) = events.next(&mut window) {
+        // if let Some(args) = e.render_args() {
+        //     self.render_objects(&mut gl, args);
+        // }
+        if let Some(args) = e.update_args() {
+            {
+                let mut delta = world.write_resource::<DeltaTime>();
+                *delta = DeltaTime(args.dt);
+            }
+
+            dispatcher.dispatch(&mut world);
+            world.maintain();
+        }
+    }
 
     dispatcher.dispatch(&mut world);
     world.maintain();
