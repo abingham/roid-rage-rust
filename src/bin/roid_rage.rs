@@ -47,20 +47,17 @@ use roid_rage::systems::*;
 
 fn main() {
     let mut world = World::new();
-    world.register::<Position>();
-    world.register::<Velocity>();
-    world
-        .create_entity()
-        .with(Position::new(400.0, 300.0))
-        .with(Velocity::from_speed_bearing(1.0, 0.0))
-        .build();
-    world.insert(DeltaTime(0.05));
-    world.insert(CollisionWorld::<f64, ()>::new(0.02f64));
 
     let mut dispatcher = DispatcherBuilder::new()
-        // .with(RoidRage, "roid_rage", &[])
         .with(UpdatePositions, "update_positions", &[])
         .with(PositionLogger, "log_positions", &["update_positions"])
+        .build();
+
+    dispatcher.setup(&mut world);
+
+    world.create_entity()
+        .with(Position::new(400.0, 300.0))
+        .with(Velocity::from_speed_bearing(1.0, 0.0))
         .build();
 
     let opengl = OpenGL::V3_2;
