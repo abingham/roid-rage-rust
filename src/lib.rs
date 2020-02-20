@@ -2,6 +2,7 @@
 
 use specs::{Builder, Component, ReadStorage, System, VecStorage, World, WorldExt, RunNow};
 
+pub mod collision_groups;
 pub mod components;
 // pub mod collide;
 // pub mod controller;

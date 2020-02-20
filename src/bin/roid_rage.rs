@@ -12,9 +12,14 @@ use opengl_graphics::OpenGL;
 use piston::event_loop::{EventSettings, Events};
 use piston::input::UpdateEvent;
 use piston::window::WindowSettings;
-use roid_rage::components::{CollisionShape, Position, Velocity};
+use roid_rage::components::{CollisionHandle, Position, Velocity};
 use specs::{Builder, DispatcherBuilder, World, WorldExt};
 use ncollide2d::world::CollisionWorld;
+use nalgebra::{Isometry2, Vector2, zero};
+use ncollide2d::pipeline::CollisionGroups;
+use roid_rage::collision_groups::roid_collision_groups;
+use ncollide2d::shape::{Ball, ShapeHandle};
+use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent, GeometricQueryType};
 
 use roid_rage::systems::*;
 
@@ -49,18 +54,32 @@ fn add_roid(world: &mut World) {
     use ncollide2d::shape::{Ball, ShapeHandle};
 
     let radius = 10.0;
+    let (x, y) = (400.0, 300.0);
+
+    // insert collision shape into global collision world
+    let (handle, _) = world.write_resource::<CollisionWorld<f64, ()>>().add(
+        Isometry2::new(Vector2::<f64>::new(x, y), zero()),
+        ShapeHandle::new(Ball::new(radius)),
+        roid_collision_groups(),
+        GeometricQueryType::Contacts(0.0, 0.0),
+        (),
+    );
+    
+    // Create entity, with the collision handle as one of its components.
     world.create_entity()
-        .with(Position::new(400.0, 300.0))
+        .with(Position::new(x, y))
         .with(Velocity::from_speed_bearing(1.0, 0.0))
-        .with(CollisionShape::new(ShapeHandle::<f64>::new(Ball::new(radius))))
+        .with(CollisionHandle(handle))
         .build();
 }
 
 fn main() {
     let mut world = World::new();
+    world.insert(CollisionWorld::<f64, ()>::new(0.02f64));
 
     let mut dispatcher = DispatcherBuilder::new()
         .with(UpdatePositions, "update_positions", &[])
+        .with(Collide, "collide", &["update_positions"])
         .build();
 
     dispatcher.setup(&mut world);
@@ -90,7 +109,4 @@ fn main() {
             world.maintain();
         }
     }
-
-    dispatcher.dispatch(&mut world);
-    world.maintain();
 }
