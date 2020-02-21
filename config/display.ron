@@ -1,0 +1,4 @@
+(
+  title: "Roid Rage!",
+  dimensions: Some((800, 600)),
+)
