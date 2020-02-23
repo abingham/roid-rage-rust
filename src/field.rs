@@ -27,6 +27,7 @@ impl Field {
     //         && point.y <= self.height() as f32
     // }
 
+    // TODO: This should accept and number type
     pub fn wrap(&self, x: f32, y: f32) -> (f32, f32) {
         let x = if x < 0.0 {
             self.width() as f32
