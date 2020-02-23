@@ -9,7 +9,7 @@ nalgebra = "0.19.0"
 ncollide2d = "0.21.0"
 
 [dependencies.amethyst]
-version = "0.12"
+version = "0.13"
 features = ["metal"]
 
 [features]
