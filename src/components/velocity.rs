@@ -2,21 +2,20 @@ use amethyst::ecs::prelude::Component;
 use amethyst::ecs::storage::DenseVecStorage;
 use nalgebra::Vector2;
 
-pub struct Velocity 
-{
-    pub vec: Vector2<f32>
+pub struct Velocity {
+    pub vec: Vector2<f32>,
 }
 
 impl Velocity {
     pub fn new(dx: f32, dy: f32) -> Self {
         Velocity {
-            vec: Vector2::<f32>::new(dx, dy)
+            vec: Vector2::<f32>::new(dx, dy),
         }
     }
 
     pub fn from_speed_and_bearing(speed: f32, bearing: f32) -> Self {
         Velocity {
-            vec: Vector2::<f32>::new(bearing.cos(), bearing.sin()) * speed
+            vec: Vector2::<f32>::new(bearing.cos(), bearing.sin()) * speed,
         }
     }
 
@@ -32,4 +31,3 @@ impl Velocity {
 impl Component for Velocity {
     type Storage = DenseVecStorage<Self>;
 }
-
