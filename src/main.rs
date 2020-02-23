@@ -10,9 +10,12 @@ use amethyst::{
     utils::application_root_dir,
 };
 
+mod components;
 mod roid_rage;
+mod systems;
 
 use crate::roid_rage::RoidRage;
+use crate::systems::VelocitySystem;
 
 
 fn main() -> amethyst::Result<()> {
@@ -34,7 +37,9 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?
-        .with_bundle(TransformBundle::new())?;
+        .with_bundle(TransformBundle::new())?
+        .with(VelocitySystem, "velocity", &["transform_system"])
+        ;
 
     let mut game = Application::new("/", RoidRage, game_data)?;
     game.run();

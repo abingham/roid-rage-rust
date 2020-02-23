@@ -1,12 +1,13 @@
 use amethyst::{
     assets::{AssetStorage, Loader, Handle},
-    core::transform::Transform,
+    core::{Transform},
     ecs::prelude::{Component, DenseVecStorage},
     prelude::*,
     renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
 };
 
 use nalgebra::Vector2;
+use crate::components::Velocity;
 
 pub const FIELD_HEIGHT: f32 = 600.0;
 pub const FIELD_WIDTH: f32 = 800.0;
@@ -17,42 +18,11 @@ impl SimpleState for RoidRage {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
         
-        world.register::<Velocity>();
-
         initialise_camera(world);
         initialise_roids(world);
     }
 }
 
-pub struct Velocity {
-    pub vec: Vector2<f64>
-}
-
-impl Velocity {
-    pub fn new(dx: f64, dy: f64) -> Velocity {
-        Velocity {
-            vec: Vector2::<f64>::new(dx, dy)
-        }
-    }
-
-    pub fn from_speed_and_bearing(speed: f64, bearing: f64) -> Velocity {
-        Velocity {
-            vec: Vector2::<f64>::new(bearing.cos(), bearing.sin()) * speed
-        }
-    }
-
-    pub fn speed(&self) -> f64 {
-        (self.vec.x.powf(2.0) + self.vec.y.powf(2.0)).sqrt()
-    }
-
-    pub fn bearing(&self) -> f64 {
-        self.vec.y.atan2(self.vec.x)
-    }
-}
-
-impl Component for Velocity {
-    type Storage = DenseVecStorage<Self>;
-}
 
 fn initialise_camera(world: &mut World) {
     // Setup camera in a way that our screen covers whole arena and (0, 0) is in the bottom left. 
