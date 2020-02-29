@@ -20,12 +20,12 @@ impl Field {
         self.height
     }
 
-    // pub fn contains(&self, point: &Point2<f32>) -> bool {
-    //     point.x >= 0.0
-    //         && point.x <= self.width() as f32
-    //         && point.y >= 0.0
-    //         && point.y <= self.height() as f32
-    // }
+    pub fn contains(&self, x: f32, y: f32) -> bool {
+        x >= 0.0
+            && x <= self.width() as f32
+            && y >= 0.0
+            && y <= self.height() as f32
+    }
 
     // TODO: This should accept and number type
     pub fn wrap(&self, x: f32, y: f32) -> (f32, f32) {

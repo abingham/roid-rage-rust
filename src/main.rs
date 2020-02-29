@@ -16,7 +16,7 @@ mod roid_rage;
 mod systems;
 
 use crate::roid_rage::RoidRage;
-use crate::systems::{VelocitySystem, WrappingSystem};
+use crate::systems::{OutOfBoundsSystem, VelocitySystem, WrappingSystem};
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -37,7 +37,9 @@ fn main() -> amethyst::Result<()> {
         )?
         .with_bundle(TransformBundle::new())?
         .with(VelocitySystem, "velocity_system", &["transform_system"])
-        .with(WrappingSystem, "wrapping_system", &["velocity_system"]);
+        .with(WrappingSystem, "wrapping_system", &["velocity_system"])
+        .with(OutOfBoundsSystem, "out_of_bounds_system", &["wrapping_system"])
+        ;
 
     let mut game = Application::new("/", RoidRage, game_data)?;
     game.run();
