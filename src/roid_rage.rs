@@ -1,8 +1,10 @@
 use amethyst::{core::Transform, prelude::*, renderer::Camera};
+use ncollide2d::world::CollisionWorld;
 
 use crate::components::Velocity;
 use crate::components::Wrapping;
 use crate::field::Field;
+use crate::objects::make_roid;
 
 pub struct RoidRage;
 
@@ -12,6 +14,7 @@ impl SimpleState for RoidRage {
 
         // TODO: Is this the right place to put this? How can we read in the field dimension from the config file?
         world.insert(Field::new(800, 600));
+        world.insert(CollisionWorld::<f64, ()>::new(0.02f64));
 
         initialise_camera(world);
         initialise_roids(world);
@@ -41,16 +44,5 @@ fn initialise_roids(world: &mut World) {
         .map(|f| (f.width() as f32, f.height() as f32))
         .unwrap();
 
-    let mut transform = Transform::default();
-
-    // Put the roid in the middle of the field
-    transform.set_translation_xyz(width / 2.0, height / 2.0, 0.0);
-
-    // Create a roid entity
-    world
-        .create_entity()
-        .with(Velocity::new(1.0, 0.0))
-        .with(transform)
-        .with(Wrapping)
-        .build();
+    make_roid(world, width / 2.0, height / 2.0);
 }

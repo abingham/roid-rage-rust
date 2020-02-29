@@ -11,6 +11,7 @@ use amethyst::{
 
 mod components;
 mod field;
+mod objects;
 mod roid_rage;
 mod systems;
 
