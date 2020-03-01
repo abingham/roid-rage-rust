@@ -13,15 +13,15 @@ pub fn make_roid(world: &mut World, x: f32, y: f32) {
     collision_groups.set_membership(&[WEAPON_GROUP]);
     collision_groups.set_whitelist(&[ROID_GROUP]);
 
-    let collision_isometry = Isometry2::new(Vector2::new(x as f64, y as f64), zero());
+    let collision_isometry = Isometry2::new(Vector2::new(x, y), zero());
 
-    let radius: f64 = 10.0;
+    let radius: f32 = 10.0;
 
     let collision_shape = ShapeHandle::new(Ball::new(radius));
 
     // Put entry in collision world
-    let collision_world: &mut CollisionWorld<f64, ()> =
-        world.get_mut::<CollisionWorld<f64, ()>>().unwrap();
+    let collision_world: &mut CollisionWorld<f32, ()> =
+        world.get_mut::<CollisionWorld<f32, ()>>().unwrap();
 
     let (collision_handle, _) = collision_world.add(
         collision_isometry,

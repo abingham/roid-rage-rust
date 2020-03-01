@@ -15,13 +15,16 @@ mod objects;
 mod systems;
 
 // use crate::roid_rage::RoidRage;
-// use crate::systems::{
-//     CollisionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
-// };
+use crate::systems::{
+    CollisionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
+};
+use crate::field::Field;
 
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ggez::event::{self, EventHandler};
 use specs::prelude::*;
+use ncollide2d::world::CollisionWorld;
+use crate::objects::make_roid;
 
 fn main() {
 
@@ -49,11 +52,33 @@ struct RoidRage {
 
 impl RoidRage {
     pub fn new(_ctx: &mut Context) -> RoidRage {
-        let dispatcher = DispatcherBuilder::new().build();
+        let mut world = World::new();
+
+        world.insert(Field::new(800, 600));
+        world.insert(CollisionWorld::<f32, ()>::new(0.02f32));
+
+
+        let mut dispatcher = DispatcherBuilder::new()
+            .with(VelocitySystem, "velocity_system", &[])
+            .with(CollisionSystem, "collision_system", &["velocity_system"])
+            .with(WrappingSystem, "wrapping_system", &["collision_system"])
+            .with(
+                OutOfBoundsSystem,
+                "out_of_bounds_system",
+                &["wrapping_system"],
+            )
+            .with(LoggingSystem, "logging_system", &["out_of_bounds_system"])
+            .build();
+
+        dispatcher.setup(&mut world);
+
+        println!("making roid");
+        make_roid(&mut world, 400.0, 300.0);
+        println!("made roid");
 
         // Load/create resources such as images here.
         RoidRage {
-            world: World::new(),
+            world: world,
             dispatcher: dispatcher
         }
     }
