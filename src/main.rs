@@ -11,7 +11,7 @@
 
 mod components;
 mod field;
-// mod objects;
+mod objects;
 mod systems;
 
 // use crate::roid_rage::RoidRage;
