@@ -4,21 +4,20 @@ use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
-use specs::{Component, VecStorage, Builder, World, WorldExt};
-
+use specs::{Component, VecStorage};
 
 pub struct Roid {
-    pub radius: f32
+    pub radius: f32,
 }
 
 impl Roid {
     pub fn new(radius: f32) -> Self {
-        Roid {
-            radius: radius
-        }
+        Roid { radius: radius }
     }
 
-    pub fn min_radius() -> f32 { 5.0 }
+    pub fn min_radius() -> f32 {
+        5.0
+    }
 }
 
 impl Component for Roid {
@@ -26,8 +25,14 @@ impl Component for Roid {
     type Storage = VecStorage<Self>;
 }
 
-// TODO: Refactor. This is largely duplicated in the roid explosion code.
-pub fn make_roid(world: &mut World, x: f32, y: f32) {
+pub fn make_roid(
+    x: f32,
+    y: f32,
+    speed: f32,
+    bearing: f32,
+    radius: f32,
+    collision_world: &mut CollisionWorld<f32, ()>,
+) -> (Velocity, Transform, Wrapping, CollisionHandle, Roid) {
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
 
     let mut collision_groups = CollisionGroups::new();
@@ -36,14 +41,9 @@ pub fn make_roid(world: &mut World, x: f32, y: f32) {
 
     let collision_isometry = Isometry2::new(Vector2::new(x, y), zero());
 
-    let radius: f32 = 10.0;
-
     let collision_shape = ShapeHandle::new(Ball::new(radius));
 
     // Put entry in collision world
-    let collision_world: &mut CollisionWorld<f32, ()> =
-        world.get_mut::<CollisionWorld<f32, ()>>().unwrap();
-
     let (collision_handle, _) = collision_world.add(
         collision_isometry,
         collision_shape,
@@ -52,13 +52,11 @@ pub fn make_roid(world: &mut World, x: f32, y: f32) {
         (),
     );
 
-    // Create a roid entity
-    world
-        .create_entity()
-        .with(Velocity::new(2.0, 2.0))
-        .with(transform)
-        .with(Wrapping)
-        .with(CollisionHandle::new(collision_handle))
-        .with(Roid::new(10.0))
-        .build();
+    (
+        Velocity::from_speed_and_bearing(speed, bearing),
+        transform,
+        Wrapping {},
+        CollisionHandle::new(collision_handle),
+        Roid::new(radius),
+    )
 }

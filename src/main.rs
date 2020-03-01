@@ -17,6 +17,7 @@ mod systems;
 use crate::field::Field;
 use crate::systems::{
     CollisionDetectionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
+    ExplodeRoidsSystem
 };
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
@@ -61,21 +62,27 @@ impl RoidRage {
 
         let mut dispatcher = DispatcherBuilder::new()
             .with(VelocitySystem, "velocity", &[])
-            .with(CollisionDetectionSystem, "collision_detetection", &["velocity"])
-            .with(WrappingSystem, "wrapping", &["collision"])
+            .with(CollisionDetectionSystem, "collision_detection", &["velocity"])
+            .with(WrappingSystem, "wrapping", &["collision_detection"])
             .with(
                 OutOfBoundsSystem,
                 "out_of_bounds",
                 &["wrapping"],
             )
+            .with(ExplodeRoidsSystem, "explode_roids", &["out_of_bounds"])
             .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
         dispatcher.setup(&mut world);
 
-        println!("making roid");
-        make_roid(&mut world, 400.0, 300.0);
-        println!("made roid");
+        let (vel, xform, w, chandle, roid) = make_roid(400.0, 300.0, 3.0, 0.0, 40.0, world.get_mut::<CollisionWorld<f32, ()>>().unwrap());
+        world.create_entity()
+            .with(vel)
+            .with(xform)
+            .with(w)
+            .with(chandle)
+            .with(roid)
+            .build();
 
         // Load/create resources such as images here.
         RoidRage {

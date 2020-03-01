@@ -6,8 +6,7 @@ pub use self::wrapping::Wrapping;
 pub use self::collision::Collision;
 
 mod collision;
-// TODO: Un-public this when we refactor roid explosion
-pub mod collision_groups;
+mod collision_groups;
 mod collision_handle;
 mod roid;
 mod transform;
