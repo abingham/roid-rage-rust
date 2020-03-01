@@ -1,6 +1,6 @@
+use crate::components::Transform;
 use crate::field::Field;
-use amethyst::core::transform::Transform;
-use amethyst::ecs::{Entities, Join, ReadExpect, ReadStorage, System};
+use specs::{Entities, Join, ReadExpect, ReadStorage, System};
 
 pub struct OutOfBoundsSystem;
 
@@ -14,7 +14,7 @@ impl<'s> System<'s> for OutOfBoundsSystem {
 
     fn run(&mut self, (transforms, entities, field): Self::SystemData) {
         for (transform, entity) in (&transforms, &entities).join() {
-            if !field.contains(transform.translation().x, transform.translation().y) {
+            if !field.contains(transform.0.translation.x, transform.0.translation.y) {
                 entities.delete(entity);
             }
         }

@@ -1,5 +1,5 @@
-use amethyst::ecs::prelude::Component;
-use amethyst::ecs::storage::NullStorage;
+use specs::Component;
+use specs::NullStorage;
 
 #[derive(Default)]
 pub struct Wrapping;

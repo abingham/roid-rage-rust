@@ -1,5 +1,5 @@
-use amethyst::ecs::prelude::Component;
-use amethyst::ecs::storage::DenseVecStorage;
+use specs::Component;
+use specs::DenseVecStorage;
 use nalgebra::Vector2;
 
 pub struct Velocity {

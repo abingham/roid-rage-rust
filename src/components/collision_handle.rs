@@ -1,6 +1,5 @@
-use amethyst::ecs::prelude::Component;
-use amethyst::ecs::storage::DenseVecStorage;
-use nalgebra::Vector2;
+use specs::Component;
+use specs::DenseVecStorage;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 
 pub struct CollisionHandle {

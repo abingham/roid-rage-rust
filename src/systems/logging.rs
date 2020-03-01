@@ -1,5 +1,5 @@
-use amethyst::core::transform::Transform;
-use amethyst::ecs::{Join, ReadExpect, ReadStorage, System};
+use crate::components::Transform;
+use specs::{Join, ReadStorage, System};
 
 pub struct LoggingSystem;
 
@@ -9,7 +9,11 @@ impl<'s> System<'s> for LoggingSystem {
 
     fn run(&mut self, transforms: Self::SystemData) {
         for transform in transforms.join() {
-            println!("x={} y={}", transform.translation().x, transform.translation().y);
+            println!(
+                "x={} y={}",
+                transform.0.translation.x,
+                transform.0.translation.y
+            );
         }
     }
 }
