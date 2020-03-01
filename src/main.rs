@@ -19,12 +19,15 @@ use crate::field::Field;
 use crate::systems::{
     CollisionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
 };
+use ggez::graphics::{Color, DrawMode, DrawParam};
 
 use crate::objects::make_roid;
 use ggez::event::{self, EventHandler};
+use ggez::nalgebra::Point2;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ncollide2d::world::CollisionWorld;
 use specs::prelude::*;
+use specs::Join;
 
 fn main() {
     // Make a Context.
@@ -82,6 +85,8 @@ impl RoidRage {
     }
 }
 
+use crate::components::Transform;
+
 impl EventHandler for RoidRage {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         self.dispatcher.dispatch(&mut self.world);
@@ -89,8 +94,23 @@ impl EventHandler for RoidRage {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        graphics::clear(ctx, graphics::WHITE);
-        // Draw code here...
+        graphics::clear(ctx, graphics::BLACK);
+
+        for transform in (self.world.read_storage::<Transform>()).join() {
+            let mb = &mut graphics::MeshBuilder::new();
+            mb.circle(
+                DrawMode::fill(),
+                Point2::<f32>::new(
+                    transform.0.translation.vector.x,
+                    transform.0.translation.vector.y),
+                40.0,
+                0.1,
+                Color::new(1.0, 1.0, 1.0, 1.0),
+            );
+            let mesh = mb.build(ctx)?;
+            graphics::draw(ctx, &mesh, DrawParam::new())?;
+        }
+
         graphics::present(ctx)
     }
 }

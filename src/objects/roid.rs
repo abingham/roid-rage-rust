@@ -34,7 +34,7 @@ pub fn make_roid(world: &mut World, x: f32, y: f32) {
     // Create a roid entity
     world
         .create_entity()
-        .with(Velocity::new(10.0, 10.0))
+        .with(Velocity::new(2.0, 2.0))
         .with(transform)
         .with(Wrapping)
         .with(CollisionHandle::new(collision_handle))
