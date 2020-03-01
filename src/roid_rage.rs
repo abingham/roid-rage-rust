@@ -1,8 +1,11 @@
+use amethyst::renderer::{
+    light::{Light, PointLight},
+    palette::Srgb,
+};
 use amethyst::{core::Transform, prelude::*, renderer::Camera};
+
 use ncollide2d::world::CollisionWorld;
 
-use crate::components::Velocity;
-use crate::components::Wrapping;
 use crate::field::Field;
 use crate::objects::make_roid;
 
@@ -17,6 +20,7 @@ impl SimpleState for RoidRage {
         world.insert(CollisionWorld::<f64, ()>::new(0.02f64));
 
         initialise_camera(world);
+        initialize_light(world);
         initialise_roids(world);
     }
 }
@@ -34,6 +38,26 @@ fn initialise_camera(world: &mut World) {
     world
         .create_entity()
         .with(Camera::standard_2d(width, height))
+        .with(transform)
+        .build();
+}
+
+pub fn initialize_light(world: &mut World) {
+    let light = PointLight {
+        color: Srgb::new(1., 1., 1.),
+        intensity: 0.5,
+        radius: 10.,
+        smoothness: 1.,
+    };
+    let transform = {
+        let mut t = Transform::default();
+        t.set_translation_xyz(0., 0., 1.);
+        t
+    };
+
+    world
+        .create_entity()
+        .with(Light::from(light))
         .with(transform)
         .build();
 }

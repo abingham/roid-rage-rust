@@ -2,7 +2,7 @@ use amethyst::{
     core::transform::TransformBundle,
     prelude::*,
     renderer::{
-        plugins::{RenderFlat2D, RenderToWindow},
+        plugins::{RenderFlat3D, RenderFlat2D, RenderToWindow},
         types::DefaultBackend,
         RenderingBundle,
     },
@@ -16,7 +16,9 @@ mod roid_rage;
 mod systems;
 
 use crate::roid_rage::RoidRage;
-use crate::systems::{LoggingSystem, CollisionSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem};
+use crate::systems::{
+    CollisionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
+};
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
@@ -27,21 +29,24 @@ fn main() -> amethyst::Result<()> {
     let display_config_path = config_dir.join("display.ron");
 
     let game_data = GameDataBuilder::default()
+        .with_bundle(TransformBundle::new())?
+        .with(VelocitySystem, "velocity_system", &["transform_system"])
+        .with(CollisionSystem, "collision_system", &["velocity_system"])
+        .with(WrappingSystem, "wrapping_system", &["collision_system"])
+        .with(
+            OutOfBoundsSystem,
+            "out_of_bounds_system",
+            &["wrapping_system"],
+        )
+        .with(LoggingSystem, "logging_system", &["out_of_bounds_system"])
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
                     RenderToWindow::from_config_path(display_config_path)
                         .with_clear([0.34, 0.36, 0.52, 1.0]),
                 )
-                .with_plugin(RenderFlat2D::default()),
-        )?
-        .with_bundle(TransformBundle::new())?
-        .with(VelocitySystem, "velocity_system", &["transform_system"])
-        .with(CollisionSystem, "collision_system", &["velocity_system"])
-        .with(WrappingSystem, "wrapping_system", &["collision_system"])
-        .with(OutOfBoundsSystem, "out_of_bounds_system", &["wrapping_system"])
-        .with(LoggingSystem, "logging_system", &["out_of_bounds_system"])
-        ;
+                .with_plugin(RenderFlat3D::default()),
+        )?;
 
     let mut game = Application::new("/", RoidRage, game_data)?;
     game.run();
