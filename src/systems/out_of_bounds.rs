@@ -15,7 +15,10 @@ impl<'s> System<'s> for OutOfBoundsSystem {
     fn run(&mut self, (transforms, entities, field): Self::SystemData) {
         for (transform, entity) in (&transforms, &entities).join() {
             if !field.contains(transform.0.translation.x, transform.0.translation.y) {
-                entities.delete(entity);
+                match entities.delete(entity) {
+                    Err(e) => println!("Error deleting entity: {}", e),
+                    _ => {}
+                }
             }
         }
     }

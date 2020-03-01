@@ -1,6 +1,6 @@
 use crate::components::{Transform, Velocity};
 use specs::{Join, ReadStorage, System, WriteStorage};
-use nalgebra::{Translation, Vector2};
+use nalgebra::Translation;
 
 pub struct VelocitySystem;
 

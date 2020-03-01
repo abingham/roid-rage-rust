@@ -47,7 +47,10 @@ impl<'s> System<'s> for CollisionSystem {
         // Remove collided objects
         for (handle, entity) in (&collision_handles, &entities).join() {
             if collisions.contains(&handle.handle) {
-                entities.delete(entity);
+                match entities.delete(entity) {
+                    Err(e) => println!("Error deleting entity: {}", e),
+                    _ => {}
+                }
             }
         }
 
