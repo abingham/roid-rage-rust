@@ -11,17 +11,17 @@
 
 mod components;
 mod field;
-mod objects;
 mod systems;
 
 // use crate::roid_rage::RoidRage;
 use crate::field::Field;
 use crate::systems::{
-    CollisionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
+    CollisionDetectionSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem, WrappingSystem,
 };
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
-use crate::objects::make_roid;
+use crate::components::Transform;
+use crate::components::{Roid, make_roid};
 use ggez::event::{self, EventHandler};
 use ggez::nalgebra::Point2;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
@@ -60,15 +60,15 @@ impl RoidRage {
         world.insert(CollisionWorld::<f32, ()>::new(0.02f32));
 
         let mut dispatcher = DispatcherBuilder::new()
-            .with(VelocitySystem, "velocity_system", &[])
-            .with(CollisionSystem, "collision_system", &["velocity_system"])
-            .with(WrappingSystem, "wrapping_system", &["collision_system"])
+            .with(VelocitySystem, "velocity", &[])
+            .with(CollisionDetectionSystem, "collision_detetection", &["velocity"])
+            .with(WrappingSystem, "wrapping", &["collision"])
             .with(
                 OutOfBoundsSystem,
-                "out_of_bounds_system",
-                &["wrapping_system"],
+                "out_of_bounds",
+                &["wrapping"],
             )
-            .with(LoggingSystem, "logging_system", &["out_of_bounds_system"])
+            .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
         dispatcher.setup(&mut world);
@@ -85,7 +85,6 @@ impl RoidRage {
     }
 }
 
-use crate::components::Transform;
 
 impl EventHandler for RoidRage {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
@@ -96,14 +95,14 @@ impl EventHandler for RoidRage {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
 
-        for transform in (self.world.read_storage::<Transform>()).join() {
+        for (transform, roid) in (&self.world.read_storage::<Transform>(), &self.world.read_storage::<Roid>()).join() {
             let mb = &mut graphics::MeshBuilder::new();
             mb.circle(
                 DrawMode::fill(),
                 Point2::<f32>::new(
                     transform.0.translation.vector.x,
                     transform.0.translation.vector.y),
-                40.0,
+                roid.radius,
                 0.1,
                 Color::new(1.0, 1.0, 1.0, 1.0),
             );

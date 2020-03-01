@@ -1,24 +1,26 @@
+use crate::components::Collision;
 use crate::components::CollisionHandle;
 use crate::components::Transform;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent};
 use ncollide2d::world::CollisionWorld;
-use specs::{Entities, Join, ReadStorage, System, WriteExpect};
+use specs::{Entities, Join, ReadStorage, System, WriteExpect, WriteStorage};
 use std::collections::HashSet;
 
-pub struct CollisionSystem;
+pub struct CollisionDetectionSystem;
 
-impl<'s> System<'s> for CollisionSystem {
+impl<'s> System<'s> for CollisionDetectionSystem {
     type SystemData = (
         ReadStorage<'s, Transform>,
         ReadStorage<'s, CollisionHandle>,
+        WriteStorage<'s, Collision>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, ()>>,
     );
 
     fn run(
         &mut self,
-        (transforms, collision_handles, entities, mut collision_world): Self::SystemData,
+        (transforms, collision_handles, mut collision_markers, entities, mut collision_world): Self::SystemData,
     ) {
         for (transform, handle) in (&transforms, &collision_handles).join() {
             if let Some(collision_object) = collision_world.get_mut(handle.handle) {
@@ -44,16 +46,15 @@ impl<'s> System<'s> for CollisionSystem {
             .flatten()
             .collect();
 
-        // Remove collided objects
+
+        // Record collisions
         for (handle, entity) in (&collision_handles, &entities).join() {
             if collisions.contains(&handle.handle) {
-                match entities.delete(entity) {
-                    Err(e) => println!("Error deleting entity: {}", e),
+                match collision_markers.insert(entity, Collision {}) {
+                    Err(e) => println!("Error creating collision record: {}", e),
                     _ => {}
                 }
             }
         }
-
-        // TODO: Added debris from collisions
     }
 }

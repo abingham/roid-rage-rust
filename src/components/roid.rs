@@ -4,8 +4,29 @@ use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
-use specs::{Builder, World, WorldExt};
+use specs::{Component, VecStorage, Builder, World, WorldExt};
 
+
+pub struct Roid {
+    pub radius: f32
+}
+
+impl Roid {
+    pub fn new(radius: f32) -> Self {
+        Roid {
+            radius: radius
+        }
+    }
+
+    pub fn min_radius() -> f32 { 5.0 }
+}
+
+impl Component for Roid {
+    // TODO: Is this the wrong storage type? Use something sparser?
+    type Storage = VecStorage<Self>;
+}
+
+// TODO: Refactor. This is largely duplicated in the roid explosion code.
 pub fn make_roid(world: &mut World, x: f32, y: f32) {
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
 
@@ -38,5 +59,6 @@ pub fn make_roid(world: &mut World, x: f32, y: f32) {
         .with(transform)
         .with(Wrapping)
         .with(CollisionHandle::new(collision_handle))
+        .with(Roid::new(10.0))
         .build();
 }
