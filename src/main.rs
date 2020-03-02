@@ -6,12 +6,12 @@ mod util;
 use crate::field::Field;
 use crate::systems::{
     CollisionDetectionSystem, ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem,
-    WrappingSystem,
+    WrappingSystem, TargetingSystem
 };
 use crate::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
-use crate::components::{make_roid, Roid, TimeDelta, Transform};
+use crate::components::{Bullet, make_roid, Roid, TimeDelta, Transform};
 use ggez::event::{self, EventHandler};
 use ggez::nalgebra::Point2;
 use ggez::timer;
@@ -65,7 +65,8 @@ impl RoidRage {
             .with(WrappingSystem, "wrapping", &["collision_detection"])
             .with(OutOfBoundsSystem, "out_of_bounds", &["wrapping"])
             .with(ExplodeRoidsSystem, "explode_roids", &["out_of_bounds"])
-            .with(LoggingSystem, "logging", &["out_of_bounds"])
+            .with(TargetingSystem::new(), "targeting", &["out_of_bounds"])
+            // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
         dispatcher.setup(&mut world);
@@ -88,15 +89,18 @@ impl EventHandler for RoidRage {
             {
                 let mut delta = self.world.write_resource::<TimeDelta>();
                 *delta = TimeDelta(timer::delta(ctx));
-                println!("time delta: {}", timer::delta(ctx).as_secs_f32());
             }
             self.dispatcher.dispatch(&mut self.world);
+            self.world.maintain();
         }
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
+
+        // TODO: Can we express the rendering as systems? This seems like the natural way to do things, but context
+        // seems to get in the way.
 
         for (transform, roid) in (
             &self.world.read_storage::<Transform>(),
@@ -112,6 +116,27 @@ impl EventHandler for RoidRage {
                     transform.0.translation.vector.y,
                 ),
                 roid.radius,
+                0.1,
+                Color::new(1.0, 1.0, 1.0, 1.0),
+            );
+            let mesh = mb.build(ctx)?;
+            graphics::draw(ctx, &mesh, DrawParam::new())?;
+        }
+
+        for (transform, _bullet) in (
+            &self.world.read_storage::<Transform>(),
+            &self.world.read_storage::<Bullet>(),
+        )
+            .join()
+        {
+            let mb = &mut graphics::MeshBuilder::new();
+            mb.circle(
+                DrawMode::fill(),
+                Point2::<f32>::new(
+                    transform.0.translation.vector.x,
+                    transform.0.translation.vector.y,
+                ),
+                Bullet::radius(),
                 0.1,
                 Color::new(1.0, 1.0, 1.0, 1.0),
             );
