@@ -31,3 +31,4 @@ impl Velocity {
 impl Component for Velocity {
     type Storage = DenseVecStorage<Self>;
 }
+

@@ -1,12 +1,14 @@
 mod components;
 mod field;
 mod systems;
+mod util;
 
 use crate::field::Field;
 use crate::systems::{
     CollisionDetectionSystem, ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem,
     WrappingSystem,
 };
+use crate::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
 use crate::components::{make_roid, Roid, TimeDelta, Transform};
@@ -68,22 +70,7 @@ impl RoidRage {
 
         dispatcher.setup(&mut world);
 
-        let (vel, xform, w, chandle, roid) = make_roid(
-            400.0,
-            300.0,
-            100.0,
-            0.0,
-            40.0,
-            world.get_mut::<CollisionWorld<f32, ()>>().unwrap(),
-        );
-        world
-            .create_entity()
-            .with(vel)
-            .with(xform)
-            .with(w)
-            .with(chandle)
-            .with(roid)
-            .build();
+        make_some_roids(&mut world);
 
         // Load/create resources such as images here.
         RoidRage {
@@ -137,5 +124,31 @@ impl EventHandler for RoidRage {
         timer::yield_now();
 
         Ok(())
+    }
+}
+
+fn make_some_roids(world: &mut World) {
+    use rand::prelude::*;
+    let mut rng = thread_rng();
+
+    for _ in 0..10 {
+        let x = rng.gen::<f32>() * 800.0;
+        let y = rng.gen::<f32>() * 600.0;
+        let speed = rng.gen::<f32>() * 50.0 + 50.0;
+        let bearing = random_bearing();
+        let radius = rng.gen::<f32>() * 5.0 + 37.5;
+
+        let (vel, xform, w, chandle, roid) = make_roid(
+            x, y, speed, bearing, radius,
+            world.get_mut::<CollisionWorld<f32, ()>>().unwrap());
+
+        world
+            .create_entity()
+            .with(vel)
+            .with(xform)
+            .with(w)
+            .with(chandle)
+            .with(roid)
+            .build();
     }
 }

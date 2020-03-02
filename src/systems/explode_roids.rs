@@ -1,8 +1,7 @@
 use crate::components::{make_roid, Collision, Roid, Transform, Velocity};
 use ncollide2d::world::CollisionWorld;
-use rand::prelude::*;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
-use std::f32::consts::PI;
+use crate::util::random_bearing;
 
 pub struct ExplodeRoidsSystem;
 
@@ -50,9 +49,4 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             }
         }
     }
-}
-
-fn random_bearing() -> f32 {
-    let mut rng = thread_rng();
-    (rng.gen::<f32>() * 2.0 - 1.0) * PI
 }
