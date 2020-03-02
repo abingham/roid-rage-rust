@@ -24,7 +24,6 @@ impl<'s> System<'s> for CollisionDetectionSystem {
     ) {
         for (transform, handle) in (&transforms, &collision_handles).join() {
             if let Some(collision_object) = collision_world.get_mut(handle.handle) {
-                transform.0.translation.x;
                 collision_object.set_position(Isometry2::new(
                     Vector2::new(
                         transform.0.translation.x,
@@ -34,6 +33,8 @@ impl<'s> System<'s> for CollisionDetectionSystem {
                 ));
             }
         }
+
+        collision_world.update();
 
         // Find all collisions
         let collisions: HashSet<CollisionObjectSlabHandle> = collision_world

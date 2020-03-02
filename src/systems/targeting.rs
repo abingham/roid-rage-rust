@@ -28,7 +28,6 @@ impl<'s> System<'s> for TargetingSystem {
 
     fn run(&mut self, (_roids, _transforms, _bullets, time_delta, entities, mut collision_world, lazy): Self::SystemData) {
         self.time_since_last += time_delta.0.as_secs_f32();
-        println!("{}", self.time_since_last);
         
         // Fire once every second
         if self.time_since_last > 1.0 {

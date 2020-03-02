@@ -1,13 +1,15 @@
-use crate::components::{make_roid, Collision, Roid, Transform, Velocity};
+use crate::components::{make_roid, CollisionHandle, Collision, Roid, Transform, Velocity};
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
 use crate::util::random_bearing;
+use ncollide2d::pipeline::CollisionObjectSlabHandle;
 
 pub struct ExplodeRoidsSystem;
 
 /// Explode roids that have collided with something.
 impl<'s> System<'s> for ExplodeRoidsSystem {
     type SystemData = (
+        ReadStorage<'s, CollisionHandle>,
         ReadStorage<'s, Collision>,
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Velocity>,
@@ -19,10 +21,12 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
 
     fn run(
         &mut self,
-        (collisions, roids, velocities, transforms, entities, mut collision_world, lazy): Self::SystemData,
+        (collision_handles, collisions, roids, velocities, transforms, entities, mut collision_world, lazy): Self::SystemData,
     ) {
-        for (_, roid, vel, transform, entity) in
-            (&collisions, &roids, &velocities, &transforms, &entities).join()
+        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
+
+        for (chandle, _, roid, vel, transform, entity) in
+            (&collision_handles, &collisions, &roids, &velocities, &transforms, &entities).join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting roid: {}", e),
@@ -47,6 +51,10 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                 lazy.insert(new_entity, w);
                 lazy.insert(new_entity, chandle);
             }
+
+            removals.push(chandle.handle);
         }
+
+        collision_world.remove(&removals);
     }
 }

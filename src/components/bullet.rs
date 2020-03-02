@@ -17,7 +17,7 @@ impl Bullet {
         1.0
     }
     pub fn speed() -> f32 {
-        20.0
+        100.0
     }
 }
 
