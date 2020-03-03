@@ -23,7 +23,7 @@ impl<'s> System<'s> for CollisionDetectionSystem {
         (transforms, collision_handles, mut collision_markers, entities, mut collision_world): Self::SystemData,
     ) {
         for (transform, handle) in (&transforms, &collision_handles).join() {
-            if let Some(collision_object) = collision_world.get_mut(handle.handle) {
+            if let Some(collision_object) = collision_world.get_mut(handle.0) {
                 collision_object.set_position(Isometry2::new(
                     Vector2::new(
                         transform.0.translation.x,
@@ -50,7 +50,7 @@ impl<'s> System<'s> for CollisionDetectionSystem {
 
         // Record collisions
         for (handle, entity) in (&collision_handles, &entities).join() {
-            if collisions.contains(&handle.handle) {
+            if collisions.contains(&handle.0) {
                 match collision_markers.insert(entity, Collision {}) {
                     Err(e) => println!("Error creating collision record: {}", e),
                     _ => {}

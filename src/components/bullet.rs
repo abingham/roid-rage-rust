@@ -17,7 +17,7 @@ impl Bullet {
         1.0
     }
     pub fn speed() -> f32 {
-        100.0
+        500.0
     }
 }
 
@@ -54,7 +54,7 @@ pub fn make_bullet(
     (
         Velocity::from_speed_and_bearing(Bullet::speed(), bearing),
         transform,
-        CollisionHandle::new(collision_handle),
+        CollisionHandle(collision_handle),
         Bullet::new(),
     )
 }

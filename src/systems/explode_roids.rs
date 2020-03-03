@@ -70,7 +70,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                 }
             }
 
-            removals.push(chandle.handle);
+            removals.push(chandle.0);
         }
 
         collision_world.remove(&removals);

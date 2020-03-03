@@ -53,7 +53,7 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
                 lazy.insert(new_entity, vel);
                 lazy.insert(new_entity, xform);
             }
-            removals.push(chandle.handle);
+            removals.push(chandle.0);
         }
 
         collision_world.remove(&removals);

@@ -56,7 +56,7 @@ pub fn make_roid(
         Velocity::from_speed_and_bearing(speed, bearing),
         transform,
         Wrapping {},
-        CollisionHandle::new(collision_handle),
+        CollisionHandle(collision_handle),
         Roid::new(radius),
     )
 }

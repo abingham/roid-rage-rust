@@ -15,7 +15,7 @@ impl<'s> System<'s> for VelocitySystem {
         // Move all of the moving objects
         for (velocity, transform) in (&velocities, &mut transforms).join() {
             transform.0.append_translation_mut(
-                &Translation::from(velocity.vec * time_delta.0.as_secs_f32()));
+                &Translation::from(velocity.0 * time_delta.0.as_secs_f32()));
         }
     }
 }
