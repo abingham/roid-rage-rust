@@ -24,11 +24,15 @@ use std::time::Duration;
 
 use ggez::conf;
 
+const MAX_ROID_RADIUS: f32 = 42.5;
+const SCREEN_WIDTH: f32 = 800.0;
+const SCREEN_HEIGHT: f32 = 600.0;
+
 fn main() {
     // Make a Context.
     let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
-        .window_mode(conf::WindowMode::default().dimensions(800.0, 600.0))
+        .window_mode(conf::WindowMode::default().dimensions(SCREEN_WIDTH + MAX_ROID_RADIUS * 2.0, SCREEN_HEIGHT + MAX_ROID_RADIUS * 2.0))
         .build()
         .expect("aieee, could not create ggez context!");
 
@@ -52,7 +56,7 @@ impl RoidRage {
     pub fn new(_ctx: &mut Context) -> RoidRage {
         let mut world = World::new();
 
-        world.insert(Field::new(800, 600));
+        world.insert(Field::new(SCREEN_WIDTH as usize, SCREEN_HEIGHT as usize));
         world.insert(CollisionWorld::<f32, specs::world::Index>::new(0.02f32));
         world.insert(TimeDelta(Duration::from_secs(0)));
 
@@ -181,15 +185,16 @@ impl EventHandler for RoidRage {
     }
 }
 
+
 fn make_some_roids(world: &mut World) {
     use rand::prelude::*;
     let mut rng = thread_rng();
     for _ in 0..10 {
-        let x = rng.gen::<f32>() * 800.0;
-        let y = rng.gen::<f32>() * 600.0;
+        let x = rng.gen::<f32>() * (SCREEN_WIDTH + MAX_ROID_RADIUS);
+        let y = rng.gen::<f32>() * (SCREEN_HEIGHT + MAX_ROID_RADIUS);
         let speed = rng.gen::<f32>() * 50.0 + 50.0;
         let bearing = random_bearing();
-        let radius = rng.gen::<f32>() * 5.0 + 37.5;
+        let radius = rng.gen::<f32>() * 5.0 + (MAX_ROID_RADIUS - 5.0);
 
         let entity = world.write_resource::<specs::world::EntitiesRes>().create();
 
