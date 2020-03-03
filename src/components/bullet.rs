@@ -26,12 +26,13 @@ impl Component for Bullet {
     type Storage = VecStorage<Self>;
 }
 
-pub fn make_bullet(
+pub fn make_bullet<B>(
+    builder: B,
     x: f32,
     y: f32,
     bearing: f32,
-    collision_world: &mut CollisionWorld<f32, ()>,
-) -> (Velocity, Transform, CollisionHandle, Bullet) {
+    collision_world: &mut CollisionWorld<f32, specs::world::Index>,
+) where B: specs::world::Builder {
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
 
     let mut collision_groups = CollisionGroups::new();
@@ -43,18 +44,22 @@ pub fn make_bullet(
     let collision_shape = ShapeHandle::new(Ball::new(Bullet::radius()));
 
     // Put entry in collision world
-    let (collision_handle, _) = collision_world.add(
+    let (collision_handle, mut obj) = collision_world.add(
         collision_isometry,
         collision_shape,
         collision_groups,
         GeometricQueryType::Contacts(0.0, 0.0),
-        (),
+        0,
     );
 
-    (
-        Velocity::from_speed_and_bearing(Bullet::speed(), bearing),
-        transform,
-        CollisionHandle(collision_handle),
-        Bullet::new(),
-    )
+    // Create the entity
+    let entity = builder
+        .with(Bullet::new())
+        .with(Velocity::from_speed_and_bearing(Bullet::speed(), bearing))
+        .with(transform)
+        .with(CollisionHandle(collision_handle))
+        .build();
+
+    // Annotate the collision object with the entity's ID
+    *obj.data_mut() = entity.id();
 }

@@ -15,7 +15,7 @@ impl<'s> System<'s> for CollisionDetectionSystem {
         ReadStorage<'s, CollisionHandle>,
         WriteStorage<'s, Collision>,
         Entities<'s>,
-        WriteExpect<'s, CollisionWorld<f32, ()>>,
+        WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
     );
 
     fn run(

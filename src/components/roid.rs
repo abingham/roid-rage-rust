@@ -25,14 +25,18 @@ impl Component for Roid {
     type Storage = VecStorage<Self>;
 }
 
-pub fn make_roid(
+pub fn make_roid<B>
+(
+    builder: B,
     x: f32,
     y: f32,
     speed: f32,
     bearing: f32,
     radius: f32,
-    collision_world: &mut CollisionWorld<f32, ()>,
-) -> (Velocity, Transform, Wrapping, CollisionHandle, Roid) {
+    collision_world: &mut CollisionWorld<f32, specs::world::Index>,
+)
+    where B: specs::world::Builder
+{
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
 
     let mut collision_groups = CollisionGroups::new();
@@ -44,19 +48,23 @@ pub fn make_roid(
     let collision_shape = ShapeHandle::new(Ball::new(radius));
 
     // Put entry in collision world
-    let (collision_handle, _) = collision_world.add(
+    let (collision_handle, mut obj) = collision_world.add(
         collision_isometry,
         collision_shape,
         collision_groups,
         GeometricQueryType::Contacts(0.0, 0.0),
-        (),
+        0,
     );
 
-    (
-        Velocity::from_speed_and_bearing(speed, bearing),
-        transform,
-        Wrapping {},
-        CollisionHandle(collision_handle),
-        Roid::new(radius),
-    )
+    // Create the entity
+    let entity = builder
+        .with(Velocity::from_speed_and_bearing(speed, bearing))
+        .with(transform)
+        .with(Wrapping)
+        .with(CollisionHandle(collision_handle))
+        .with(Roid::new(radius))
+        .build();
+
+    // Annotate the collision object with the entity's ID
+    *obj.data_mut() = entity.id();
 }

@@ -1,4 +1,5 @@
 pub use self::age_fragments::AgeFragmentsSystem;
+pub use self::collision_cleanup::CollisionCleanupSystem;
 pub use self::collision_detection::CollisionDetectionSystem;
 pub use self::logging::LoggingSystem;
 pub use self::out_of_bounds::OutOfBoundsSystem;
@@ -9,6 +10,7 @@ pub use self::explode_roids::ExplodeRoidsSystem;
 pub use self::explode_bullets::ExplodeBulletsSystem;
 
 mod age_fragments;
+mod collision_cleanup;
 mod collision_detection;
 mod explode_bullets;
 mod explode_roids;

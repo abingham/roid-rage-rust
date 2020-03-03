@@ -5,21 +5,21 @@ mod util;
 
 use crate::field::Field;
 use crate::systems::{
-    AgeFragmentsSystem,
-    ExplodeBulletsSystem,
-    CollisionDetectionSystem, ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem,
-    WrappingSystem, TargetingSystem
+    AgeFragmentsSystem, CollisionCleanupSystem, CollisionDetectionSystem, ExplodeBulletsSystem,
+    ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem, VelocitySystem,
+    WrappingSystem,
 };
 use crate::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
-use crate::components::{Fragment, Bullet, make_roid, Roid, TimeDelta, Transform};
+use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};
 use ggez::event::{self, EventHandler};
 use ggez::nalgebra::Point2;
 use ggez::timer;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ncollide2d::world::CollisionWorld;
 use specs::prelude::*;
+use specs::world::Index;
 use specs::Join;
 use std::time::Duration;
 
@@ -54,10 +54,12 @@ impl RoidRage {
         let mut world = World::new();
 
         world.insert(Field::new(800, 600));
-        world.insert(CollisionWorld::<f32, ()>::new(0.02f32));
+        world.insert(CollisionWorld::<f32, specs::world::Index>::new(0.02f32));
         world.insert(TimeDelta(Duration::from_secs(0)));
 
         let mut dispatcher = DispatcherBuilder::new()
+            // TODO: Rename this to collision-system-maintenance or something
+            .with(CollisionCleanupSystem::default(), "collision_cleanup", &[])
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(VelocitySystem, "velocity", &[])
             .with(
@@ -180,7 +182,6 @@ impl EventHandler for RoidRage {
 fn make_some_roids(world: &mut World) {
     use rand::prelude::*;
     let mut rng = thread_rng();
-
     for _ in 0..10 {
         let x = rng.gen::<f32>() * 800.0;
         let y = rng.gen::<f32>() * 600.0;
@@ -188,17 +189,19 @@ fn make_some_roids(world: &mut World) {
         let bearing = random_bearing();
         let radius = rng.gen::<f32>() * 5.0 + 37.5;
 
-        let (vel, xform, w, chandle, roid) = make_roid(
-            x, y, speed, bearing, radius,
-            world.get_mut::<CollisionWorld<f32, ()>>().unwrap());
+        let entity = world.write_resource::<specs::world::EntitiesRes>().create();
 
-        world
-            .create_entity()
-            .with(vel)
-            .with(xform)
-            .with(w)
-            .with(chandle)
-            .with(roid)
-            .build();
+        make_roid(
+            specs::world::LazyBuilder {
+                entity: entity,
+                lazy: &*world.read_resource::<specs::world::LazyUpdate>(),
+            },
+            x,
+            y,
+            speed,
+            bearing,
+            radius,
+            &mut world.fetch_mut::<CollisionWorld<f32, specs::world::Index>>(),
+        );
     }
 }

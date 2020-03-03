@@ -1,6 +1,5 @@
-use crate::components::{make_roid, Collision, CollisionHandle, Roid, Transform, Velocity};
+use crate::components::{make_roid, Collision, Roid, Transform, Velocity};
 use crate::util::random_bearing;
-use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
 
@@ -9,20 +8,18 @@ pub struct ExplodeRoidsSystem;
 /// Explode roids that have collided with something.
 impl<'s> System<'s> for ExplodeRoidsSystem {
     type SystemData = (
-        ReadStorage<'s, CollisionHandle>,
         ReadStorage<'s, Collision>,
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Velocity>,
         ReadStorage<'s, Transform>,
         Entities<'s>,
-        WriteExpect<'s, CollisionWorld<f32, ()>>,
+        WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
         Read<'s, LazyUpdate>,
     );
 
     fn run(
         &mut self,
         (
-            collision_handles,
             collisions,
             roids,
             velocities,
@@ -32,17 +29,8 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             lazy,
         ): Self::SystemData,
     ) {
-        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
-
-        for (chandle, _, roid, vel, transform, entity) in (
-            &collision_handles,
-            &collisions,
-            &roids,
-            &velocities,
-            &transforms,
-            &entities,
-        )
-            .join()
+        for (_, roid, vel, transform, entity) in
+            (&collisions, &roids, &velocities, &transforms, &entities).join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting roid: {}", e),
@@ -51,7 +39,12 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
 
             if roid.radius >= Roid::min_radius() {
                 for _ in 0..2 {
-                    let (vel, xform, w, chandle, roid) = make_roid(
+                    let new_entity = entities.create();
+                    make_roid(
+                        specs::world::LazyBuilder {
+                            entity: new_entity,
+                            lazy: &*lazy,
+                        },
                         transform.0.translation.x,
                         transform.0.translation.y,
                         vel.speed() * 1.5,
@@ -59,20 +52,8 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                         roid.radius / 2.0,
                         &mut collision_world,
                     );
-
-                    let new_entity = entities.create();
-
-                    lazy.insert(new_entity, roid);
-                    lazy.insert(new_entity, vel);
-                    lazy.insert(new_entity, xform);
-                    lazy.insert(new_entity, w);
-                    lazy.insert(new_entity, chandle);
                 }
             }
-
-            removals.push(chandle.0);
         }
-
-        collision_world.remove(&removals);
     }
 }

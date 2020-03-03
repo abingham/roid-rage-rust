@@ -1,31 +1,24 @@
-use crate::components::{make_fragment, Bullet, Collision, CollisionHandle, Transform};
+use crate::components::{make_fragment, Bullet, Collision, Transform};
 use crate::util::random_bearing;
-use ncollide2d::pipeline::CollisionObjectSlabHandle;
-use ncollide2d::world::CollisionWorld;
-use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
+use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 
 pub struct ExplodeBulletsSystem;
 
 /// Explode roids that have collided with something.
 impl<'s> System<'s> for ExplodeBulletsSystem {
     type SystemData = (
-        ReadStorage<'s, CollisionHandle>,
         ReadStorage<'s, Collision>,
         ReadStorage<'s, Bullet>,
         ReadStorage<'s, Transform>,
         Entities<'s>,
-        WriteExpect<'s, CollisionWorld<f32, ()>>,
         Read<'s, LazyUpdate>,
     );
 
     fn run(
         &mut self,
-        (collision_handles, collisions, bullets, transforms, entities, mut collision_world, lazy): Self::SystemData,
+        (collisions, bullets, transforms, entities, lazy): Self::SystemData,
     ) {
-        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
-
-        for (chandle, _collision, _bullet, transform, entity) in (
-            &collision_handles,
+        for (_collision, _bullet, transform, entity) in (
             &collisions,
             &bullets,
             &transforms,
@@ -53,9 +46,6 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
                 lazy.insert(new_entity, vel);
                 lazy.insert(new_entity, xform);
             }
-            removals.push(chandle.0);
         }
-
-        collision_world.remove(&removals);
     }
 }

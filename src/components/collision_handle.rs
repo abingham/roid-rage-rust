@@ -1,9 +1,8 @@
-use specs::Component;
-use specs::DenseVecStorage;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
+use specs::{storage::FlaggedStorage, Component, DenseVecStorage};
 
 pub struct CollisionHandle(pub CollisionObjectSlabHandle);
 
 impl Component for CollisionHandle {
-    type Storage = DenseVecStorage<Self>;
+    type Storage = FlaggedStorage<Self, DenseVecStorage<Self>>;
 }

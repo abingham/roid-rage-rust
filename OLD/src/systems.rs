@@ -41,7 +41,7 @@ impl<'a> System<'a> for Collide {
     type SystemData = (
         ReadStorage<'a, CollisionHandle>,
         ReadStorage<'a, Position>,
-        WriteExpect<'a, CollisionWorld<f64, ()>>,
+        WriteExpect<'a, CollisionWorld<f64, specs::world::Index>>,
     );
 
     fn run(&mut self, (handles, positions, mut world): Self::SystemData) {
