@@ -2,6 +2,7 @@ use ncollide2d::world::CollisionWorld;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use crate::components::CollisionHandle;
 use specs::{Join, World, BitSet, System, ReaderId, SystemData, ReadStorage, WriteStorage, WriteExpect, storage::ComponentEvent};
+use std::collections::HashSet;
 
 #[derive(Default)]
 pub struct CollisionCleanupSystem {
@@ -20,23 +21,28 @@ impl<'a> System<'a> for CollisionCleanupSystem {
         self.dirty.clear();
 
         let events = collision_handles.channel().read(self.reader_id.as_mut().unwrap());
+        let removed: HashSet<specs::world::Index> = events
+            .filter_map(|event| {
+                match event {
+                    ComponentEvent::Removed(id) => {
+                        Some(*id)
+                    },
+                    _ => None
+                }
+            }).collect();
+        
+        let removed_handles: Vec<CollisionObjectSlabHandle> = collision_world.collision_objects()
+            .filter_map(|(handle, obj)| {
+                if removed.contains(obj.data()) {
+                    Some(handle)
+                }
+                else {
+                    None
+                }
+            })
+            .collect();
 
-        for event in events {
-            match event {
-                ComponentEvent::Removed(id) => {
-                    self.dirty.add(*id);
-                },
-                _ => {}
-            }
-        }
-
-        // TODO: This doesn't work because the collision handles have already been removed and thus we can't iterate
-        // over them.
-        let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
-        for (collision_handle, _) in (&collision_handles, &self.dirty).join() {
-            removals.push(collision_handle.0);
-        }
-        collision_world.remove(&removals);
+        collision_world.remove(&removed_handles);
     }
 
     fn setup(&mut self, world: &mut World) {

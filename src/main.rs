@@ -201,7 +201,7 @@ fn make_some_roids(world: &mut World) {
             speed,
             bearing,
             radius,
-            &mut world.fetch_mut::<CollisionWorld<f32, specs::world::Index>>(),
+            &mut world.write_resource::<CollisionWorld<f32, specs::world::Index>>(),
         );
     }
 }
