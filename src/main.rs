@@ -102,6 +102,9 @@ impl EventHandler for RoidRage {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+        // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
+        graphics::set_screen_coordinates(ctx, graphics::Rect::new(30.0, 30.0, 740.0, 540.0))?;
+
         graphics::clear(ctx, graphics::BLACK);
 
         // TODO: Can we express the rendering as systems? This seems like the natural way to do things, but context

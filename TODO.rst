@@ -1,5 +1,9 @@
 * Add actual targeting.
 
-* See if we can "zoom the camera out" to add a fringe to the field. We don't want roids popping from side-to-side as they do.
-
 * Can the rendering be done systems?
+
+* The fringe around the screen needs some work:
+
+  * Its size should be calculated from the maximum radius of a roid
+
+  * We need to account for it when setting the window size so that the actual *displayed* area is correct.
