@@ -1,7 +1,4 @@
-use crate::components::{
-    make_fragment, make_roid, Bullet, Collision, CollisionHandle, Fragment, Roid, Transform,
-    Velocity,
-};
+use crate::components::{make_fragment, Bullet, Collision, CollisionHandle, Transform};
 use crate::util::random_bearing;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use ncollide2d::world::CollisionWorld;
@@ -21,11 +18,20 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
         Read<'s, LazyUpdate>,
     );
 
-    fn run(&mut self, (collision_handles, collisions, bullets, transforms, entities, mut collision_world, lazy): Self::SystemData) {
+    fn run(
+        &mut self,
+        (collision_handles, collisions, bullets, transforms, entities, mut collision_world, lazy): Self::SystemData,
+    ) {
         let mut removals: Vec<CollisionObjectSlabHandle> = vec![];
 
-        for (chandle, _collision, _bullet, transform, entity) in
-            (&collision_handles, &collisions, &bullets, &transforms, &entities).join()
+        for (chandle, _collision, _bullet, transform, entity) in (
+            &collision_handles,
+            &collisions,
+            &bullets,
+            &transforms,
+            &entities,
+        )
+            .join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting bullet: {}", e),

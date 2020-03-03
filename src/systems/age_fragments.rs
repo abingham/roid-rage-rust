@@ -1,11 +1,5 @@
-use crate::components::{
-    make_fragment, make_roid, Bullet, Collision, CollisionHandle, Fragment, Roid, TimeDelta,
-    Transform, Velocity,
-};
-use crate::util::random_bearing;
-use ncollide2d::pipeline::CollisionObjectSlabHandle;
-use ncollide2d::world::CollisionWorld;
-use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect, WriteStorage};
+use crate::components::{Fragment, TimeDelta};
+use specs::{Entities, Join, Read, System, WriteStorage};
 
 pub struct AgeFragmentsSystem;
 

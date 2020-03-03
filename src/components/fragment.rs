@@ -1,9 +1,5 @@
-use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, Transform, Velocity, Wrapping};
-use nalgebra::{zero, Isometry2, Vector2};
-use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
-use ncollide2d::shape::{Ball, ShapeHandle};
-use ncollide2d::world::CollisionWorld;
+use crate::components::{Transform, Velocity};
+use nalgebra::{Isometry2, Vector2};
 use specs::{Component, VecStorage};
 use std::time::Duration;
 
@@ -16,7 +12,7 @@ impl Fragment {
     pub fn new() -> Self {
         Fragment {
             max_age: Duration::from_secs_f32(0.25),
-            age: Duration::from_secs(0)
+            age: Duration::from_secs(0),
         }
     }
 
