@@ -5,13 +5,15 @@ mod util;
 
 use crate::field::Field;
 use crate::systems::{
+    AgeFragmentsSystem,
+    ExplodeBulletsSystem,
     CollisionDetectionSystem, ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, VelocitySystem,
     WrappingSystem, TargetingSystem
 };
 use crate::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
-use crate::components::{Bullet, make_roid, Roid, TimeDelta, Transform};
+use crate::components::{Fragment, Bullet, make_roid, Roid, TimeDelta, Transform};
 use ggez::event::{self, EventHandler};
 use ggez::nalgebra::Point2;
 use ggez::timer;
@@ -56,6 +58,7 @@ impl RoidRage {
         world.insert(TimeDelta(Duration::from_secs(0)));
 
         let mut dispatcher = DispatcherBuilder::new()
+            .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(VelocitySystem, "velocity", &[])
             .with(
                 CollisionDetectionSystem,
@@ -65,6 +68,7 @@ impl RoidRage {
             .with(WrappingSystem, "wrapping", &["collision_detection"])
             .with(OutOfBoundsSystem, "out_of_bounds", &["wrapping"])
             .with(ExplodeRoidsSystem, "explode_roids", &["out_of_bounds"])
+            .with(ExplodeBulletsSystem, "explode_bullets", &["out_of_bounds"])
             .with(TargetingSystem::new(), "targeting", &["out_of_bounds"])
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
@@ -137,6 +141,27 @@ impl EventHandler for RoidRage {
                     transform.0.translation.vector.y,
                 ),
                 Bullet::radius(),
+                0.1,
+                Color::new(1.0, 1.0, 1.0, 1.0),
+            );
+            let mesh = mb.build(ctx)?;
+            graphics::draw(ctx, &mesh, DrawParam::new())?;
+        }
+
+        for (transform, _fragment) in (
+            &self.world.read_storage::<Transform>(),
+            &self.world.read_storage::<Fragment>(),
+        )
+            .join()
+        {
+            let mb = &mut graphics::MeshBuilder::new();
+            mb.circle(
+                DrawMode::fill(),
+                Point2::<f32>::new(
+                    transform.0.translation.vector.x,
+                    transform.0.translation.vector.y,
+                ),
+                Fragment::radius(),
                 0.1,
                 Color::new(1.0, 1.0, 1.0, 1.0),
             );
