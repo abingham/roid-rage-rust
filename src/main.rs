@@ -19,7 +19,6 @@ use ggez::timer;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ncollide2d::world::CollisionWorld;
 use specs::prelude::*;
-use specs::world::Index;
 use specs::Join;
 use std::time::Duration;
 

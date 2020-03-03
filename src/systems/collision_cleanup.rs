@@ -1,7 +1,7 @@
 use ncollide2d::world::CollisionWorld;
 use ncollide2d::pipeline::CollisionObjectSlabHandle;
 use crate::components::CollisionHandle;
-use specs::{Join, World, BitSet, System, ReaderId, SystemData, ReadStorage, WriteStorage, WriteExpect, storage::ComponentEvent};
+use specs::{World, BitSet, System, ReaderId, SystemData, ReadStorage, WriteStorage, WriteExpect, storage::ComponentEvent};
 use std::collections::HashSet;
 
 #[derive(Default)]

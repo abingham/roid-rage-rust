@@ -44,7 +44,7 @@ pub fn make_bullet<B>(
     let collision_shape = ShapeHandle::new(Ball::new(Bullet::radius()));
 
     // Put entry in collision world
-    let (collision_handle, mut obj) = collision_world.add(
+    let (collision_handle, obj) = collision_world.add(
         collision_isometry,
         collision_shape,
         collision_groups,
