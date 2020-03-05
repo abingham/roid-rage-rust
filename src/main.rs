@@ -1,9 +1,10 @@
+mod collide;
 mod components;
 mod field;
 mod systems;
 mod types;
 mod util;
-mod velocity_model;
+// mod velocity_model;
 
 use crate::field::Field;
 use crate::systems::{
