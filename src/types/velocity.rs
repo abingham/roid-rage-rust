@@ -1,26 +1,29 @@
 use nalgebra::Vector2;
+use num::Float;
 
-pub trait Velocity {
-    fn dx(&self) -> f32;
+pub trait Velocity<T: Float> {
+    fn dx(&self) -> T;
 
-    fn dy(&self) -> f32;
+    fn dy(&self) -> T;
 
-    fn speed(&self) -> f32 {
+    fn speed(&self) -> T {
         (self.dx().powf(2.0) + self.dy().powf(2.0)).sqrt()
     }
 
-    fn bearing(&self) -> f32 {
+    fn bearing(&self) -> T {
         self.dy().atan2(self.dx())
     }
 
 }
 
-impl Velocity for Vector2<f32> {
-    fn dx(&self) -> f32 {
+impl<'a, T> Velocity<T> for Vector2<T>
+    where T: Float + std::fmt::Debug
+{
+    fn dx(&self) -> T {
         self.x
     }
 
-    fn dy(&self) -> f32 {
+    fn dy(&self) -> T {
         self.y
     }
 }
