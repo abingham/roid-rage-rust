@@ -1,12 +1,14 @@
 mod components;
 mod field;
 mod systems;
+mod types;
 mod util;
+mod velocity_model;
 
 use crate::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CollisionCleanupSystem, CollisionDetectionSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem, VelocitySystem,
+    ExplodeRoidsSystem, LinearMotionSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem,
     WrappingSystem,
 };
 use crate::util::random_bearing;
@@ -32,7 +34,10 @@ fn main() {
     // Make a Context.
     let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
-        .window_mode(conf::WindowMode::default().dimensions(SCREEN_WIDTH + MAX_ROID_RADIUS * 2.0, SCREEN_HEIGHT + MAX_ROID_RADIUS * 2.0))
+        .window_mode(conf::WindowMode::default().dimensions(
+            SCREEN_WIDTH + MAX_ROID_RADIUS * 2.0,
+            SCREEN_HEIGHT + MAX_ROID_RADIUS * 2.0,
+        ))
         .build()
         .expect("aieee, could not create ggez context!");
 
@@ -64,7 +69,7 @@ impl RoidRage {
             // TODO: Rename this to collision-system-maintenance or something
             .with(CollisionCleanupSystem::default(), "collision_cleanup", &[])
             .with(AgeFragmentsSystem, "age_fragments", &[])
-            .with(VelocitySystem, "velocity", &[])
+            .with(LinearMotionSystem, "velocity", &[])
             .with(
                 CollisionDetectionSystem,
                 "collision_detection",
@@ -108,12 +113,14 @@ impl EventHandler for RoidRage {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
         graphics::set_screen_coordinates(
-            ctx, 
+            ctx,
             graphics::Rect::new(
                 MAX_ROID_RADIUS,
                 MAX_ROID_RADIUS,
                 SCREEN_WIDTH - MAX_ROID_RADIUS * 2.0,
-                SCREEN_HEIGHT - MAX_ROID_RADIUS * 2.0))?;
+                SCREEN_HEIGHT - MAX_ROID_RADIUS * 2.0,
+            ),
+        )?;
 
         graphics::clear(ctx, graphics::BLACK);
 
@@ -190,7 +197,6 @@ impl EventHandler for RoidRage {
         Ok(())
     }
 }
-
 
 fn make_some_roids(world: &mut World) {
     use rand::prelude::*;

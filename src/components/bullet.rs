@@ -1,10 +1,11 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, Transform, Velocity};
+use crate::components::{CollisionHandle, Transform, LinearMotion};
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
+use crate::types::velocity::from_speed_and_bearing;
 
 pub struct Bullet {}
 
@@ -55,7 +56,7 @@ pub fn make_bullet<B>(
     // Create the entity
     let entity = builder
         .with(Bullet::new())
-        .with(Velocity::from_speed_and_bearing(Bullet::speed(), bearing))
+        .with(LinearMotion(from_speed_and_bearing(Bullet::speed(), bearing)))
         .with(transform)
         .with(CollisionHandle(collision_handle))
         .build();

@@ -1,5 +1,6 @@
-use super::collision_groups::{SHIP_GROUP, ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, Transform, Velocity, Wrapping};
+use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
+use crate::components::{CollisionHandle, LinearMotion, Transform, Wrapping};
+use crate::types::velocity::from_speed_and_bearing;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
@@ -25,8 +26,7 @@ impl Component for Roid {
     type Storage = VecStorage<Self>;
 }
 
-pub fn make_roid<B>
-(
+pub fn make_roid<B>(
     builder: B,
     x: f32,
     y: f32,
@@ -34,8 +34,8 @@ pub fn make_roid<B>
     bearing: f32,
     radius: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
-)
-    where B: specs::world::Builder
+) where
+    B: specs::world::Builder,
 {
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
 
@@ -58,7 +58,7 @@ pub fn make_roid<B>
 
     // Create the entity
     let entity = builder
-        .with(Velocity::from_speed_and_bearing(speed, bearing))
+        .with(LinearMotion(from_speed_and_bearing(speed, bearing)))
         .with(transform)
         .with(Wrapping)
         .with(CollisionHandle(collision_handle))

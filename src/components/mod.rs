@@ -5,7 +5,7 @@ pub use self::fragment::{make_fragment, Fragment};
 pub use self::roid::{make_roid, Roid};
 pub use self::time_delta::TimeDelta;
 pub use self::transform::Transform;
-pub use self::velocity::Velocity;
+pub use self::linear_motion::LinearMotion;
 pub use self::wrapping::Wrapping;
 
 mod bullet;
@@ -16,5 +16,5 @@ mod fragment;
 mod roid;
 mod time_delta;
 mod transform;
-mod velocity;
+mod linear_motion;
 mod wrapping;
