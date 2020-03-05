@@ -34,8 +34,6 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
                 _ => {}
             }
 
-            // TODO: Random number of fragments
-            // TODO: Fragments should have randomized speeds
             for _ in 0..(rng.next_u32() % 5 + 5) {
                 let (vel, xform, bullet) = make_fragment(
                     transform.0.translation.x,
