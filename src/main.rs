@@ -30,7 +30,7 @@ const SCREEN_HEIGHT: f32 = 600.0;
 
 fn main() {
     // Make a Context.
-    let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage", "Austin Bingham")
+    let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
         .window_mode(conf::WindowMode::default().dimensions(SCREEN_WIDTH + MAX_ROID_RADIUS * 2.0, SCREEN_HEIGHT + MAX_ROID_RADIUS * 2.0))
         .build()
@@ -107,7 +107,13 @@ impl EventHandler for RoidRage {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
-        graphics::set_screen_coordinates(ctx, graphics::Rect::new(30.0, 30.0, 740.0, 540.0))?;
+        graphics::set_screen_coordinates(
+            ctx, 
+            graphics::Rect::new(
+                MAX_ROID_RADIUS,
+                MAX_ROID_RADIUS,
+                SCREEN_WIDTH - MAX_ROID_RADIUS * 2.0,
+                SCREEN_HEIGHT - MAX_ROID_RADIUS * 2.0))?;
 
         graphics::clear(ctx, graphics::BLACK);
 
