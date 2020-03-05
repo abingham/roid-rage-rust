@@ -92,7 +92,7 @@ impl RoidRage {
 
 impl EventHandler for RoidRage {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        const DESIRED_FPS: u32 = 30;
+        const DESIRED_FPS: u32 = 60;
 
         while timer::check_update_time(ctx, DESIRED_FPS as u32) {
             {
