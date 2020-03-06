@@ -3,7 +3,7 @@ use nalgebra::{Isometry2, Vector2};
 use specs::{Component, VecStorage};
 use std::time::Duration;
 use rand::prelude::*;
-use crate::types::velocity::from_speed_and_bearing;
+use crate::core::velocity::from_speed_and_bearing;
 
 pub struct Fragment {
     pub max_age: Duration,

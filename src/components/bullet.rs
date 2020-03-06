@@ -5,7 +5,7 @@ use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
-use crate::types::velocity::from_speed_and_bearing;
+use crate::core::velocity::from_speed_and_bearing;
 
 pub struct Bullet {}
 

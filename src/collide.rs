@@ -1,4 +1,4 @@
-use crate::types::velocity::Velocity;
+use crate::core::velocity::Velocity;
 use nalgebra::{Point2, Vector2};
 use std::cmp::Ordering;
 use num::{Float, NumCast};
@@ -11,7 +11,7 @@ use num::{Float, NumCast};
 /// :param b: The "b" in the quadratic
 /// :param c: The "c" in the quadratic
 /// :return: A list of real roots, sized 0, 1, or 2
-fn solve_quadratic<T: num::Float>(a: T, b: T, c: T) -> Vec<T> {
+fn solve_quadratic<T: Float>(a: T, b: T, c: T) -> Vec<T> {
     let four: T = NumCast::from(4).unwrap(); // TODO: Why is this necessary?
     let two: T = NumCast::from(2).unwrap(); // TODO: Why is this necessary?
     let neg1: T = NumCast::from(-1).unwrap();
