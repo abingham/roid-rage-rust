@@ -1,7 +1,6 @@
 use crate::core::velocity::Velocity;
-use nalgebra::{Point2, Vector2};
+use nalgebra::*;
 use std::cmp::Ordering;
-use num::{Float, NumCast};
 
 /// Find real roots for a quadratic of the form:
 ///
@@ -11,22 +10,18 @@ use num::{Float, NumCast};
 /// :param b: The "b" in the quadratic
 /// :param c: The "c" in the quadratic
 /// :return: A list of real roots, sized 0, 1, or 2
-fn solve_quadratic<T: Float>(a: T, b: T, c: T) -> Vec<T> {
-    let four: T = NumCast::from(4).unwrap(); // TODO: Why is this necessary?
-    let two: T = NumCast::from(2).unwrap(); // TODO: Why is this necessary?
-    let neg1: T = NumCast::from(-1).unwrap();
+fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
+    let disc: f32 = b.powf(2.0) - 4.0 * a * c;
 
-    let disc: T = b.powf(NumCast::from(2).unwrap()) - four * a * c;
-
-    if disc < NumCast::from(0).unwrap() {
+    if disc < 0.0 {
         vec![]
-    } else if disc == NumCast::from(0).unwrap() {
-        vec![(neg1 * b) / (two * a)]
+    } else if disc == 0.0 {
+        vec![(-1.0 * b) / (2.0 * a)]
     } else {
         let sqrt_disc = disc.sqrt();
         vec![
-            (neg1 * b + sqrt_disc) / (two * a),
-            (neg1 * b - sqrt_disc) / (two * a),
+            (-1.0 * b + sqrt_disc) / (2.0 * a),
+            (-1.0 * b - sqrt_disc) / (2.0 * a),
         ]
     }
 }
@@ -45,7 +40,8 @@ pub fn collision_point(
     speed: f32,
     target_position: Point2<f32>,
     target_velocity: Vector2<f32>,
-) -> Option<Point2<f32>> {
+) -> Option<Point2<f32>> 
+{
     let delta_x = position[0] - target_position.x;
     let delta_y = position[1] - target_position.y;
 
@@ -54,7 +50,7 @@ pub fn collision_point(
     let a = target_velocity.speed().powf(2.0) * cos_target_bearing.powf(2.0)
         + target_velocity.speed().powf(2.0) * sin_target_bearing.powf(2.0)
         - speed.powf(2.0);
-    let b = -1.0
+    let b = -1.0 
         * (2.0 * delta_x * target_velocity.speed() * cos_target_bearing
             + 2.0 * delta_y * target_velocity.speed() * sin_target_bearing);
     let c = delta_x.powf(2.0) + delta_y.powf(2.0);
@@ -64,8 +60,8 @@ pub fn collision_point(
         .filter(|r| **r >= 0.0)
         .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less))
         .map(|dt| {
-            let coll_x = dt * target_velocity.speed() * f32::cos(target_velocity.bearing()) + target_position.x;
-            let coll_y = dt * target_velocity.speed() * f32::sin(target_velocity.bearing()) + target_position.y;
+            let coll_x = *dt * target_velocity.speed() * f32::cos(target_velocity.bearing()) + target_position.x;
+            let coll_y = *dt * target_velocity.speed() * f32::sin(target_velocity.bearing()) + target_position.y;
             Point2::new(coll_x, coll_y)
         })
 }
@@ -85,9 +81,12 @@ pub fn collision_vector(
     speed: f32,
     target_position: Point2<f32>,
     target_velocity: Vector2<f32>,
-) -> Option<(Point2<f32>, Vector2<f32>)> {
+) -> Option<(Point2<f32>, Vector2<f32>)> 
+{
     collision_point(position, speed, target_position, target_velocity)
-        .map(|p| (p, p - position))
+        .map(|p| {
+            (p, p - position)
+        })
 }
 
 #[cfg(test)]
