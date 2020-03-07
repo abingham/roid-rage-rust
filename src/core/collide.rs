@@ -43,8 +43,7 @@ pub fn collision_point(
     speed: f32,
     target_position: &Point2<f32>,
     target_velocity: &Vector2<f32>,
-) -> Option<Point2<f32>> 
-{
+) -> Option<Point2<f32>> {
     let delta_x = position[0] - target_position.x;
     let delta_y = position[1] - target_position.y;
 
@@ -53,7 +52,7 @@ pub fn collision_point(
     let a = target_velocity.speed().powf(2.0) * cos_target_bearing.powf(2.0)
         + target_velocity.speed().powf(2.0) * sin_target_bearing.powf(2.0)
         - speed.powf(2.0);
-    let b = -1.0 
+    let b = -1.0
         * (2.0 * delta_x * target_velocity.speed() * cos_target_bearing
             + 2.0 * delta_y * target_velocity.speed() * sin_target_bearing);
     let c = delta_x.powf(2.0) + delta_y.powf(2.0);
@@ -63,8 +62,10 @@ pub fn collision_point(
         .filter(|r| **r >= 0.0)
         .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less))
         .map(|dt| {
-            let coll_x = *dt * target_velocity.speed() * f32::cos(target_velocity.bearing()) + target_position.x;
-            let coll_y = *dt * target_velocity.speed() * f32::sin(target_velocity.bearing()) + target_position.y;
+            let coll_x = *dt * target_velocity.speed() * f32::cos(target_velocity.bearing())
+                + target_position.x;
+            let coll_y = *dt * target_velocity.speed() * f32::sin(target_velocity.bearing())
+                + target_position.y;
             Point2::new(coll_x, coll_y)
         })
 }
@@ -84,12 +85,8 @@ pub fn collision_vector(
     speed: f32,
     target_position: &Point2<f32>,
     target_velocity: &Vector2<f32>,
-) -> Option<(Point2<f32>, Vector2<f32>)> 
-{
-    collision_point(position, speed, target_position, target_velocity)
-        .map(|p| {
-            (p, p - position)
-        })
+) -> Option<(Point2<f32>, Vector2<f32>)> {
+    collision_point(position, speed, target_position, target_velocity).map(|p| (p, p - position))
 }
 
 #[cfg(test)]

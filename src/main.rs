@@ -3,12 +3,12 @@ mod core;
 mod systems;
 
 use crate::core::field::Field;
+use crate::core::util::random_bearing;
 use crate::systems::{
     AgeFragmentsSystem, CollisionCleanupSystem, CollisionDetectionSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, LinearMotionSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem,
     WrappingSystem,
 };
-use crate::core::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
 use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};

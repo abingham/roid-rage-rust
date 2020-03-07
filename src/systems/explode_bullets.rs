@@ -1,7 +1,7 @@
 use crate::components::{make_fragment, Bullet, Collision, Transform};
 use crate::core::util::random_bearing;
-use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 use rand::prelude::*;
+use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 
 pub struct ExplodeBulletsSystem;
 
@@ -15,19 +15,11 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
         Read<'s, LazyUpdate>,
     );
 
-    fn run(
-        &mut self,
-        (collisions, bullets, transforms, entities, lazy): Self::SystemData,
-    ) {
+    fn run(&mut self, (collisions, bullets, transforms, entities, lazy): Self::SystemData) {
         let mut rng = rand::thread_rng();
 
-        for (_collision, _bullet, transform, entity) in (
-            &collisions,
-            &bullets,
-            &transforms,
-            &entities,
-        )
-            .join()
+        for (_collision, _bullet, transform, entity) in
+            (&collisions, &bullets, &transforms, &entities).join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting bullet: {}", e),

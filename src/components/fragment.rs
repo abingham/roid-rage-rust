@@ -1,9 +1,9 @@
-use crate::components::{Transform, LinearMotion};
+use crate::components::{LinearMotion, Transform};
+use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::{Isometry2, Vector2};
+use rand::prelude::*;
 use specs::{Component, VecStorage};
 use std::time::Duration;
-use rand::prelude::*;
-use crate::core::velocity::from_speed_and_bearing;
 
 pub struct Fragment {
     pub max_age: Duration,

@@ -11,8 +11,7 @@ impl<'s> System<'s> for LoggingSystem {
         for (_, transform) in (&bullets, &transforms).join() {
             println!(
                 "x={} y={}",
-                transform.0.translation.x,
-                transform.0.translation.y
+                transform.0.translation.x, transform.0.translation.y
             );
         }
     }

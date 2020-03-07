@@ -1,5 +1,5 @@
 use nalgebra::Vector2;
-use num::{FromPrimitive, Float, NumCast};
+use num::{Float, FromPrimitive, NumCast};
 
 pub trait Velocity<T: Float + FromPrimitive> {
     fn dx(&self) -> T;
@@ -17,7 +17,8 @@ pub trait Velocity<T: Float + FromPrimitive> {
 }
 
 impl<T> Velocity<T> for Vector2<T>
-    where T: Float + FromPrimitive + std::fmt::Debug + 'static
+where
+    T: Float + FromPrimitive + std::fmt::Debug + 'static,
 {
     fn dx(&self) -> T {
         NumCast::from::<T>(self.x).unwrap()

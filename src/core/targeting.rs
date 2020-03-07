@@ -12,14 +12,15 @@ pub fn find_target<'a, I>(
     field: &Field,
     objects: I,
 ) -> Option<f32>
-where I: Iterator<Item = (Point2<f32>, Vector2<f32>)>,
+where
+    I: Iterator<Item = (Point2<f32>, Vector2<f32>)>,
 {
     // Find all possible collisions
     let hits: Vec<(Point2<f32>, Vector2<f32>)> = objects
         // .filter_map(|(id, position)| vmodel.velocity(id).map(|v| (position, v)))
         .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, &pos, &vel))
         .filter(|(p, _v)| field.contains(p.x, p.y))
-        .collect() ;
+        .collect();
 
     // Return the bearing to the furthest collision, if any
     closest(firing_position, &hits).map(|(_p, v)| v.bearing())
@@ -29,8 +30,7 @@ where I: Iterator<Item = (Point2<f32>, Vector2<f32>)>,
 fn _furthest<'a>(
     firing_position: &Point2<f32>,
     collisions: &'a [(Point2<f32>, Vector2<f32>)],
-) -> Option<&'a (Point2<f32>, Vector2<f32>)> 
-{
+) -> Option<&'a (Point2<f32>, Vector2<f32>)> {
     collisions.iter().max_by(|(p1, _v1), (p2, _v2)| {
         let d1 = (firing_position - p1).magnitude();
         let d2 = (firing_position - p2).magnitude();
@@ -45,8 +45,7 @@ fn _furthest<'a>(
 fn closest<'a>(
     firing_position: &Point2<f32>,
     collisions: &'a [(Point2<f32>, Vector2<f32>)],
-) -> Option<&'a (Point2<f32>, Vector2<f32>)> 
-{
+) -> Option<&'a (Point2<f32>, Vector2<f32>)> {
     collisions.iter().min_by(|(p1, _v1), (p2, _v2)| {
         let d1 = (firing_position - p1).magnitude();
         let d2 = (firing_position - p2).magnitude();

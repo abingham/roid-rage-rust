@@ -25,10 +25,7 @@ impl<'s> System<'s> for CollisionDetectionSystem {
         for (transform, handle) in (&transforms, &collision_handles).join() {
             if let Some(collision_object) = collision_world.get_mut(handle.0) {
                 collision_object.set_position(Isometry2::new(
-                    Vector2::new(
-                        transform.0.translation.x,
-                        transform.0.translation.y,
-                    ),
+                    Vector2::new(transform.0.translation.x, transform.0.translation.y),
                     zero(),
                 ));
             }
@@ -46,7 +43,6 @@ impl<'s> System<'s> for CollisionDetectionSystem {
             })
             .flatten()
             .collect();
-
 
         // Record collisions
         for (handle, entity) in (&collision_handles, &entities).join() {

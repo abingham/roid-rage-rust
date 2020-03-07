@@ -14,10 +14,7 @@ impl<'s> System<'s> for WrappingSystem {
 
     fn run(&mut self, (mut transforms, wrapping, field): Self::SystemData) {
         for (transform, _wrapping) in (&mut transforms, &wrapping).join() {
-            let (x, y) = field.wrap(
-                transform.0.translation.x,
-                transform.0.translation.y,
-            );
+            let (x, y) = field.wrap(transform.0.translation.x, transform.0.translation.y);
 
             transform.0.translation.vector.x = x;
             transform.0.translation.vector.y = y;
