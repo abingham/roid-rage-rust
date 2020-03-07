@@ -5,9 +5,9 @@ mod systems;
 use crate::core::field::Field;
 use crate::core::util::random_bearing;
 use crate::systems::{
-    AgeFragmentsSystem, CollisionCleanupSystem, CollisionDetectionSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, LinearMotionSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem,
-    WrappingSystem,
+    AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
+    ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
+    RemoveOutOfBoundsSystem, WrapObjectsSystem,
 };
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
@@ -64,19 +64,15 @@ impl RoidRage {
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
-            .with(CollisionCleanupSystem::default(), "collision_cleanup", &[])
+            .with(CleanupCollisionsSystem::default(), "cleanup_collisions", &[])
             .with(AgeFragmentsSystem, "age_fragments", &[])
-            .with(LinearMotionSystem, "velocity", &[])
-            .with(
-                CollisionDetectionSystem,
-                "collision_detection",
-                &["velocity"],
-            )
-            .with(WrappingSystem, "wrapping", &["collision_detection"])
-            .with(OutOfBoundsSystem, "out_of_bounds", &["wrapping"])
-            .with(ExplodeRoidsSystem, "explode_roids", &["out_of_bounds"])
-            .with(ExplodeBulletsSystem, "explode_bullets", &["out_of_bounds"])
-            .with(TargetingSystem::new(), "targeting", &["out_of_bounds"])
+            .with(MoveObjectsSystem, "move_objects", &[])
+            .with(DetectCollisionsSystem, "detect_collisions", &["move_objects"])
+            .with(WrapObjectsSystem, "wrap_objects", &["detect_collisions"])
+            .with(RemoveOutOfBoundsSystem, "remove_out_of_bounds", &["wrap_objects"])
+            .with(ExplodeRoidsSystem, "explode_roids", &["remove_out_of_bounds"])
+            .with(ExplodeBulletsSystem, "explode_bullets", &["remove_out_of_bounds"])
+            .with(FireOnTargetsSystem::new(), "fire_on_targets", &["remove_out_of_bounds"])
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 

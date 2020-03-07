@@ -2,10 +2,10 @@ use crate::components::{Transform, Wrapping};
 use crate::core::field::Field;
 use specs::{Join, ReadExpect, ReadStorage, System, WriteStorage};
 
-pub struct WrappingSystem;
+pub struct WrapObjectsSystem;
 
 /// Wrap entities that are supposed to wrap
-impl<'s> System<'s> for WrappingSystem {
+impl<'s> System<'s> for WrapObjectsSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, Wrapping>,

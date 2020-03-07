@@ -8,13 +8,13 @@ use specs::{
 use std::collections::HashSet;
 
 #[derive(Default)]
-pub struct CollisionCleanupSystem {
+pub struct CleanupCollisionsSystem {
     pub dirty: BitSet,
     pub reader_id: Option<ReaderId<ComponentEvent>>,
 }
 
 /// Monitors removed CollisionHandles and removes them from the collision world
-impl<'a> System<'a> for CollisionCleanupSystem {
+impl<'a> System<'a> for CleanupCollisionsSystem {
     type SystemData = (
         ReadStorage<'a, CollisionHandle>,
         WriteExpect<'a, CollisionWorld<f32, specs::world::Index>>,

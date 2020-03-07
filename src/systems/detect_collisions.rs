@@ -7,9 +7,9 @@ use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, ReadStorage, System, WriteExpect, WriteStorage};
 use std::collections::HashSet;
 
-pub struct CollisionDetectionSystem;
+pub struct DetectCollisionsSystem;
 
-impl<'s> System<'s> for CollisionDetectionSystem {
+impl<'s> System<'s> for DetectCollisionsSystem {
     type SystemData = (
         ReadStorage<'s, Transform>,
         ReadStorage<'s, CollisionHandle>,

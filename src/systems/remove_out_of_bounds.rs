@@ -2,10 +2,10 @@ use crate::components::Transform;
 use crate::core::field::Field;
 use specs::{Entities, Join, ReadExpect, ReadStorage, System};
 
-pub struct OutOfBoundsSystem;
+pub struct RemoveOutOfBoundsSystem;
 
 /// Delete entities that have left the field
-impl<'s> System<'s> for OutOfBoundsSystem {
+impl<'s> System<'s> for RemoveOutOfBoundsSystem {
     type SystemData = (
         ReadStorage<'s, Transform>,
         Entities<'s>,

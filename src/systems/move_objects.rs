@@ -2,9 +2,9 @@ use crate::components::{LinearMotion, TimeDelta, Transform};
 use nalgebra::Translation;
 use specs::{Join, Read, ReadStorage, System, WriteStorage};
 
-pub struct LinearMotionSystem;
+pub struct MoveObjectsSystem;
 
-impl<'s> System<'s> for LinearMotionSystem {
+impl<'s> System<'s> for MoveObjectsSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
         ReadStorage<'s, LinearMotion>,

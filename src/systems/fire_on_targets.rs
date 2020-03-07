@@ -7,20 +7,20 @@ use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
 
-pub struct TargetingSystem {
+pub struct FireOnTargetsSystem {
     time_since_last: f32,
 }
 
-impl TargetingSystem {
-    pub fn new() -> TargetingSystem {
-        TargetingSystem {
+impl FireOnTargetsSystem {
+    pub fn new() -> FireOnTargetsSystem {
+        FireOnTargetsSystem {
             time_since_last: 0.0,
         }
     }
 }
 
 /// Identify target and shoot a bullet
-impl<'s> System<'s> for TargetingSystem {
+impl<'s> System<'s> for FireOnTargetsSystem {
     type SystemData = (
         ReadStorage<'s, Roid>,
         ReadStorage<'s, LinearMotion>,
