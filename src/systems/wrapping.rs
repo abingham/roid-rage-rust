@@ -1,5 +1,5 @@
 use crate::components::{Transform, Wrapping};
-use crate::field::Field;
+use crate::core::field::Field;
 use specs::{Join, ReadExpect, ReadStorage, System, WriteStorage};
 
 pub struct WrappingSystem;

@@ -1,11 +1,11 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, Transform, LinearMotion};
-use nalgebra::{zero, Isometry2, Vector2};
+use crate::components::{CollisionHandle, LinearMotion, Transform};
+use crate::core::velocity::from_speed_and_bearing;
+use nalgebra::{zero, Isometry2, Point2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
-use crate::core::velocity::from_speed_and_bearing;
 
 pub struct Bullet {}
 
@@ -29,24 +29,24 @@ impl Component for Bullet {
 
 pub fn make_bullet<B>(
     builder: B,
-    x: f32,
-    y: f32,
+    pos: Point2<f32>,
     bearing: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
-) where B: specs::world::Builder {
-    let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
+) where
+    B: specs::world::Builder,
+{
+    let isometry = Isometry2::new(Vector2::new(pos.x, pos.y), zero());
+    let transform = Transform(isometry);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[WEAPON_GROUP]);
     collision_groups.set_whitelist(&[ROID_GROUP]);
 
-    let collision_isometry = Isometry2::new(Vector2::new(x, y), zero());
-
     let collision_shape = ShapeHandle::new(Ball::new(Bullet::radius()));
 
     // Put entry in collision world
     let (collision_handle, obj) = collision_world.add(
-        collision_isometry,
+        isometry,
         collision_shape,
         collision_groups,
         GeometricQueryType::Contacts(0.0, 0.0),
@@ -56,7 +56,10 @@ pub fn make_bullet<B>(
     // Create the entity
     let entity = builder
         .with(Bullet::new())
-        .with(LinearMotion(from_speed_and_bearing(Bullet::speed(), bearing)))
+        .with(LinearMotion(from_speed_and_bearing(
+            Bullet::speed(),
+            bearing,
+        )))
         .with(transform)
         .with(CollisionHandle(collision_handle))
         .build();

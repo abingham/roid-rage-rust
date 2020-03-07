@@ -1,5 +1,5 @@
 use crate::components::Transform;
-use crate::field::Field;
+use crate::core::field::Field;
 use specs::{Entities, Join, ReadExpect, ReadStorage, System};
 
 pub struct OutOfBoundsSystem;

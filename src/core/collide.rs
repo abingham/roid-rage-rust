@@ -41,8 +41,8 @@ fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
 pub fn collision_point(
     position: &Point2<f32>,
     speed: f32,
-    target_position: Point2<f32>,
-    target_velocity: Vector2<f32>,
+    target_position: &Point2<f32>,
+    target_velocity: &Vector2<f32>,
 ) -> Option<Point2<f32>> 
 {
     let delta_x = position[0] - target_position.x;
@@ -82,8 +82,8 @@ pub fn collision_point(
 pub fn collision_vector(
     position: &Point2<f32>,
     speed: f32,
-    target_position: Point2<f32>,
-    target_velocity: Vector2<f32>,
+    target_position: &Point2<f32>,
+    target_velocity: &Vector2<f32>,
 ) -> Option<(Point2<f32>, Vector2<f32>)> 
 {
     collision_point(position, speed, target_position, target_velocity)

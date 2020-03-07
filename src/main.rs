@@ -1,12 +1,10 @@
-mod collide;
 mod components;
 mod core;
-mod field;
 mod systems;
 mod util;
 // mod velocity_model;
 
-use crate::field::Field;
+use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CollisionCleanupSystem, CollisionDetectionSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, LinearMotionSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem,
