@@ -2,6 +2,9 @@ use crate::core::velocity::Velocity;
 use nalgebra::*;
 use std::cmp::Ordering;
 
+// TODO: I'd like this to be generic on the float type, but I ran into hairy
+// issues with collision_vector. Try again sometime.
+
 /// Find real roots for a quadratic of the form:
 ///
 /// ax^2 + bx + c
