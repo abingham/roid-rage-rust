@@ -1,8 +1,8 @@
-use crate::components::{make_roid, Collision, Roid, Transform, LinearMotion};
-use crate::util::random_bearing;
+use crate::components::{make_roid, Collision, LinearMotion, Roid, Transform};
+use crate::core::util::random_bearing;
+use crate::core::velocity::Velocity;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
-use crate::core::velocity::Velocity;
 
 pub struct ExplodeRoidsSystem;
 

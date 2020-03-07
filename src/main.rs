@@ -1,8 +1,6 @@
 mod components;
 mod core;
 mod systems;
-mod util;
-// mod velocity_model;
 
 use crate::core::field::Field;
 use crate::systems::{
@@ -10,7 +8,7 @@ use crate::systems::{
     ExplodeRoidsSystem, LinearMotionSystem, LoggingSystem, OutOfBoundsSystem, TargetingSystem,
     WrappingSystem,
 };
-use crate::util::random_bearing;
+use crate::core::util::random_bearing;
 use ggez::graphics::{Color, DrawMode, DrawParam};
 
 use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};

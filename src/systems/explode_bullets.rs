@@ -1,5 +1,5 @@
 use crate::components::{make_fragment, Bullet, Collision, Transform};
-use crate::util::random_bearing;
+use crate::core::util::random_bearing;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 use rand::prelude::*;
 
