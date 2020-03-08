@@ -4,3 +4,7 @@
 
   Right now we read velocity directly from the component, but this seems like cheating. Targeting should be required
   to derive velocity, at least as an exercise.
+
+* Load details from a config
+
+  e.g. field size, roid parameters, fire rate, etc.
