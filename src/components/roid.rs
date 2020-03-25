@@ -6,14 +6,26 @@ use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
+use rand::prelude::*;
 
 pub struct Roid {
     pub radius: f32,
+    pub points: Vec<f32>
 }
 
 impl Roid {
     pub fn new(radius: f32) -> Self {
-        Roid { radius: radius }
+        let mut rng = rand::thread_rng();
+        let num_points = rng.next_u32() % 5 + 5;
+        let point_variance = radius / 3.0;
+        let points: Vec::<f32> = (0..num_points)
+            .map(|_| rng.gen::<f32>() * point_variance - point_variance / 2.0 + radius)
+            .collect();
+
+        Roid { 
+            radius: radius,
+            points: points,
+        }
     }
 
     pub fn min_radius() -> f32 {

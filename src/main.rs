@@ -9,11 +9,12 @@ use crate::systems::{
     ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
     RemoveOutOfBoundsSystem, WrapObjectsSystem,
 };
-use ggez::graphics::{Color, DrawMode, DrawParam};
+use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
+use std::f32::consts::PI;
 
 use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};
 use ggez::event::{self, EventHandler};
-use ggez::nalgebra::Point2;
+use ggez::nalgebra::{Point2, Vector2};
 use ggez::timer;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ncollide2d::world::CollisionWorld;
@@ -64,15 +65,39 @@ impl RoidRage {
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
-            .with(CleanupCollisionsSystem::default(), "cleanup_collisions", &[])
+            .with(
+                CleanupCollisionsSystem::default(),
+                "cleanup_collisions",
+                &[],
+            )
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(MoveObjectsSystem, "move_objects", &[])
-            .with(DetectCollisionsSystem, "detect_collisions", &["move_objects"])
+            .with(
+                DetectCollisionsSystem,
+                "detect_collisions",
+                &["move_objects"],
+            )
             .with(WrapObjectsSystem, "wrap_objects", &["detect_collisions"])
-            .with(RemoveOutOfBoundsSystem, "remove_out_of_bounds", &["wrap_objects"])
-            .with(ExplodeRoidsSystem, "explode_roids", &["remove_out_of_bounds"])
-            .with(ExplodeBulletsSystem, "explode_bullets", &["remove_out_of_bounds"])
-            .with(FireOnTargetsSystem::new(), "fire_on_targets", &["remove_out_of_bounds"])
+            .with(
+                RemoveOutOfBoundsSystem,
+                "remove_out_of_bounds",
+                &["wrap_objects"],
+            )
+            .with(
+                ExplodeRoidsSystem,
+                "explode_roids",
+                &["remove_out_of_bounds"],
+            )
+            .with(
+                ExplodeBulletsSystem,
+                "explode_bullets",
+                &["remove_out_of_bounds"],
+            )
+            .with(
+                FireOnTargetsSystem::new(),
+                "fire_on_targets",
+                &["remove_out_of_bounds"],
+            )
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
@@ -126,17 +151,30 @@ impl EventHandler for RoidRage {
         )
             .join()
         {
-            let mb = &mut graphics::MeshBuilder::new();
-            mb.circle(
-                DrawMode::fill(),
-                Point2::<f32>::new(
-                    transform.0.translation.vector.x,
-                    transform.0.translation.vector.y,
-                ),
-                roid.radius,
-                0.1,
-                Color::new(1.0, 1.0, 1.0, 1.0),
+            let angle_step = (PI * 2.0) / roid.points.len() as f32;
+            let center = Point2::<f32>::new(
+                transform.0.translation.vector.x,
+                transform.0.translation.vector.y,
             );
+            let line_points: Vec<Point2<f32>> = roid
+                .points
+                .iter()
+                .enumerate()
+                .map(|(i, p)| {
+                    let angle = angle_step * i as f32;
+                    let offset = Vector2::<f32>::new(angle.cos(), angle.sin()) * *p;
+                    center + offset
+                })
+                .collect();
+            // line_points.append(line_points[0]);
+
+            let mb = &mut graphics::MeshBuilder::new();
+            mb.polygon(
+                DrawMode::Stroke(StrokeOptions::DEFAULT),
+                &line_points,
+                Color::new(1.0, 1.0, 1.0, 1.0),
+            )?;
+
             let mesh = mb.build(ctx)?;
             graphics::draw(ctx, &mesh, DrawParam::new())?;
         }
