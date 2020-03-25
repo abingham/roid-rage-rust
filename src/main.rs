@@ -1,5 +1,6 @@
 mod components;
 mod core;
+mod rendering;
 mod systems;
 
 use crate::core::field::Field;
@@ -9,12 +10,10 @@ use crate::systems::{
     ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
     RemoveOutOfBoundsSystem, WrapObjectsSystem,
 };
-use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
-use std::f32::consts::PI;
 
 use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};
+use crate::rendering::Render;
 use ggez::event::{self, EventHandler};
-use ggez::nalgebra::{Point2, Vector2};
 use ggez::timer;
 use ggez::{graphics, Context, ContextBuilder, GameResult};
 use ncollide2d::world::CollisionWorld;
@@ -151,74 +150,25 @@ impl EventHandler for RoidRage {
         )
             .join()
         {
-            let angle_step = (PI * 2.0) / roid.points.len() as f32;
-            let center = Point2::<f32>::new(
-                transform.0.translation.vector.x,
-                transform.0.translation.vector.y,
-            );
-            let line_points: Vec<Point2<f32>> = roid
-                .points
-                .iter()
-                .enumerate()
-                .map(|(i, p)| {
-                    let angle = angle_step * i as f32;
-                    let offset = Vector2::<f32>::new(angle.cos(), angle.sin()) * *p;
-                    center + offset
-                })
-                .collect();
-            // line_points.append(line_points[0]);
-
-            let mb = &mut graphics::MeshBuilder::new();
-            mb.polygon(
-                DrawMode::Stroke(StrokeOptions::DEFAULT),
-                &line_points,
-                Color::new(1.0, 1.0, 1.0, 1.0),
-            )?;
-
-            let mesh = mb.build(ctx)?;
-            graphics::draw(ctx, &mesh, DrawParam::new())?;
+            roid.render(&transform, ctx)?;
         }
 
-        for (transform, _bullet) in (
+        for (transform, bullet) in (
             &self.world.read_storage::<Transform>(),
             &self.world.read_storage::<Bullet>(),
         )
             .join()
         {
-            let mb = &mut graphics::MeshBuilder::new();
-            mb.circle(
-                DrawMode::fill(),
-                Point2::<f32>::new(
-                    transform.0.translation.vector.x,
-                    transform.0.translation.vector.y,
-                ),
-                Bullet::radius(),
-                0.1,
-                Color::new(1.0, 1.0, 1.0, 1.0),
-            );
-            let mesh = mb.build(ctx)?;
-            graphics::draw(ctx, &mesh, DrawParam::new())?;
+            bullet.render(&transform, ctx)?;
         }
 
-        for (transform, _fragment) in (
+        for (transform, fragment) in (
             &self.world.read_storage::<Transform>(),
             &self.world.read_storage::<Fragment>(),
         )
             .join()
         {
-            let mb = &mut graphics::MeshBuilder::new();
-            mb.circle(
-                DrawMode::fill(),
-                Point2::<f32>::new(
-                    transform.0.translation.vector.x,
-                    transform.0.translation.vector.y,
-                ),
-                Fragment::radius(),
-                0.1,
-                Color::new(1.0, 1.0, 1.0, 1.0),
-            );
-            let mesh = mb.build(ctx)?;
-            graphics::draw(ctx, &mesh, DrawParam::new())?;
+            fragment.render(&transform, ctx)?;
         }
 
         graphics::present(ctx)?;
