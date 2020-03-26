@@ -9,12 +9,14 @@ use specs::{
 
 pub struct FireOnTargetsSystem {
     time_since_last: f32,
+    firing_position: Point2<f32>,
 }
 
 impl FireOnTargetsSystem {
-    pub fn new() -> FireOnTargetsSystem {
+    pub fn new(firing_position: Point2<f32>) -> FireOnTargetsSystem {
         FireOnTargetsSystem {
             time_since_last: 0.0,
+            firing_position: firing_position,
         }
     }
 }
@@ -59,25 +61,21 @@ impl<'s> System<'s> for FireOnTargetsSystem {
             },
         );
 
-        find_target(
-            &Point2::<f32>::new(400.0, 300.0),
-            Bullet::speed(),
-            &*field,
-            targets,
-        )
-        .map(|target_bearing| {
-            self.time_since_last = 0.0;
+        find_target(&self.firing_position, Bullet::speed(), &*field, targets).map(
+            |target_bearing| {
+                self.time_since_last = 0.0;
 
-            let new_entity = entities.create();
-            make_bullet(
-                specs::world::LazyBuilder {
-                    entity: new_entity,
-                    lazy: &*lazy,
-                },
-                Point2::<f32>::new(400.0, 300.0),
-                target_bearing,
-                &mut collision_world,
-            );
-        });
+                let new_entity = entities.create();
+                make_bullet(
+                    specs::world::LazyBuilder {
+                        entity: new_entity,
+                        lazy: &*lazy,
+                    },
+                    self.firing_position,
+                    target_bearing,
+                    &mut collision_world,
+                );
+            },
+        );
     }
 }

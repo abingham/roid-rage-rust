@@ -1,6 +1,7 @@
 mod components;
 mod core;
 mod rendering;
+mod settings;
 mod systems;
 
 use crate::core::field::Field;
@@ -24,23 +25,23 @@ use std::time::Duration;
 use ggez::conf;
 
 const MAX_ROID_RADIUS: f32 = 42.5;
-const SCREEN_WIDTH: f32 = 800.0;
-const SCREEN_HEIGHT: f32 = 600.0;
 
 fn main() {
+    let settings = settings::Settings::load().expect("Unable to load Roid Rage settings!");
+
     // Make a Context.
     let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
         .window_mode(conf::WindowMode::default().dimensions(
-            SCREEN_WIDTH + MAX_ROID_RADIUS * 2.0,
-            SCREEN_HEIGHT + MAX_ROID_RADIUS * 2.0,
+            settings.screen_width + MAX_ROID_RADIUS * 2.0,
+            settings.screen_height + MAX_ROID_RADIUS * 2.0,
         ))
         .build()
         .expect("aieee, could not create ggez context!");
 
     // Create an instance of your event handler. Usually, you should provide it with the Context object to use when
     // setting your game up.
-    let mut my_game = RoidRage::new(&mut ctx);
+    let mut my_game = RoidRage::new(&mut ctx, settings);
 
     // Run!
     match event::run(&mut ctx, &mut event_loop, &mut my_game) {
@@ -52,13 +53,17 @@ fn main() {
 struct RoidRage {
     world: World,
     dispatcher: Dispatcher<'static, 'static>,
+    settings: settings::Settings,
 }
 
 impl RoidRage {
-    pub fn new(_ctx: &mut Context) -> RoidRage {
+    pub fn new(_ctx: &mut Context, settings: settings::Settings) -> RoidRage {
         let mut world = World::new();
 
-        world.insert(Field::new(SCREEN_WIDTH as usize, SCREEN_HEIGHT as usize));
+        world.insert(Field::new(
+            settings.screen_width as usize,
+            settings.screen_height as usize,
+        ));
         world.insert(CollisionWorld::<f32, specs::world::Index>::new(0.02f32));
         world.insert(TimeDelta(Duration::from_secs(0)));
 
@@ -93,7 +98,10 @@ impl RoidRage {
                 &["remove_out_of_bounds"],
             )
             .with(
-                FireOnTargetsSystem::new(),
+                FireOnTargetsSystem::new(nalgebra::Point2::<f32>::new(
+                    settings.screen_width / 2.0,
+                    settings.screen_height / 2.0,
+                )),
                 "fire_on_targets",
                 &["remove_out_of_bounds"],
             )
@@ -102,12 +110,13 @@ impl RoidRage {
 
         dispatcher.setup(&mut world);
 
-        make_some_roids(&mut world);
+        make_some_roids(&mut world, &settings);
 
         // Load/create resources such as images here.
         RoidRage {
             world: world,
             dispatcher: dispatcher,
+            settings: settings,
         }
     }
 }
@@ -134,8 +143,8 @@ impl EventHandler for RoidRage {
             graphics::Rect::new(
                 MAX_ROID_RADIUS,
                 MAX_ROID_RADIUS,
-                SCREEN_WIDTH - MAX_ROID_RADIUS * 2.0,
-                SCREEN_HEIGHT - MAX_ROID_RADIUS * 2.0,
+                self.settings.screen_width - MAX_ROID_RADIUS * 2.0,
+                self.settings.screen_height - MAX_ROID_RADIUS * 2.0,
             ),
         )?;
 
@@ -179,12 +188,12 @@ impl EventHandler for RoidRage {
     }
 }
 
-fn make_some_roids(world: &mut World) {
+fn make_some_roids(world: &mut World, settings: &settings::Settings) {
     use rand::prelude::*;
     let mut rng = thread_rng();
     for _ in 0..10 {
-        let x = rng.gen::<f32>() * (SCREEN_WIDTH + MAX_ROID_RADIUS);
-        let y = rng.gen::<f32>() * (SCREEN_HEIGHT + MAX_ROID_RADIUS);
+        let x = rng.gen::<f32>() * (settings.screen_width + MAX_ROID_RADIUS);
+        let y = rng.gen::<f32>() * (settings.screen_height + MAX_ROID_RADIUS);
         let speed = rng.gen::<f32>() * 50.0 + 50.0;
         let bearing = random_bearing();
         let radius = rng.gen::<f32>() * 5.0 + (MAX_ROID_RADIUS - 5.0);
