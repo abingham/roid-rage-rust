@@ -1,6 +1,6 @@
 use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
-use ggez::nalgebra::{Point2, Vector2};
-use ggez::{graphics, Context, ContextBuilder, GameResult};
+use nalgebra::{Vector2, Point2};
+use ggez::{graphics, Context, GameResult};
 use std::f32::consts::PI;
 
 use crate::components::{Bullet, Fragment, Roid, Transform};
@@ -12,18 +12,16 @@ pub trait Render {
 impl Render for Roid {
     fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
         let angle_step = (PI * 2.0) / self.points.len() as f32;
-        let center = Point2::<f32>::new(
-            transform.0.translation.vector.x,
-            transform.0.translation.vector.y,
-        );
-        let line_points: Vec<Point2<f32>> = self
+        let center = Point2::<f32>::from(transform.0.translation.vector);
+        let line_points: Vec<ggez::nalgebra::Point2<f32>> = self
             .points
             .iter()
             .enumerate()
             .map(|(i, p)| {
                 let angle = angle_step * i as f32;
                 let offset = Vector2::<f32>::new(angle.cos(), angle.sin()) * *p;
-                center + offset
+                let pt = center + offset;
+                ggez::nalgebra::Point2::new(pt.x, pt.y)
             })
             .collect();
 
@@ -35,7 +33,10 @@ impl Render for Roid {
         )?;
 
         let mesh = mb.build(ctx)?;
-        graphics::draw(ctx, &mesh, DrawParam::new())
+        graphics::draw(
+            ctx,
+            &mesh,
+            DrawParam::new())
     }
 }
 
@@ -44,7 +45,7 @@ impl Render for Bullet {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            Point2::<f32>::new(
+            ggez::nalgebra::Point2::<f32>::new(
                 transform.0.translation.vector.x,
                 transform.0.translation.vector.y,
             ),
@@ -62,7 +63,7 @@ impl Render for Fragment {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            Point2::<f32>::new(
+            ggez::nalgebra::Point2::<f32>::new(
                 transform.0.translation.vector.x,
                 transform.0.translation.vector.y,
             ),
