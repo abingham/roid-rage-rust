@@ -1,17 +1,17 @@
-use crate::components::{make_roid, Collision, LinearVelocity, AngularVelocity, Roid, Transform};
+use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Roid, Transform};
 use crate::core::util::random_bearing;
 use crate::core::velocity::Velocity;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
 
 pub struct ExplodeRoidsSystem {
-    min_roid_radius: f32
+    min_roid_radius: f32,
 }
 
 impl ExplodeRoidsSystem {
     pub fn new(min_roid_radius: f32) -> ExplodeRoidsSystem {
         ExplodeRoidsSystem {
-            min_roid_radius: min_roid_radius
+            min_roid_radius: min_roid_radius,
         }
     }
 }
@@ -42,8 +42,15 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             lazy,
         ): Self::SystemData,
     ) {
-        for (_, roid, lm, av, transform, entity) in
-            (&collisions, &roids, &linear_motions, &angular_velocities, &transforms, &entities).join()
+        for (_, roid, lm, av, transform, entity) in (
+            &collisions,
+            &roids,
+            &linear_motions,
+            &angular_velocities,
+            &transforms,
+            &entities,
+        )
+            .join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting roid: {}", e),

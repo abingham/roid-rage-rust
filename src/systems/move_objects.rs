@@ -1,4 +1,4 @@
-use crate::components::{LinearVelocity, AngularVelocity, TimeDelta, Transform};
+use crate::components::{AngularVelocity, LinearVelocity, TimeDelta, Transform};
 use nalgebra::{Translation, UnitComplex};
 use specs::{Join, Read, ReadStorage, System, WriteStorage};
 
@@ -12,7 +12,10 @@ impl<'s> System<'s> for MoveObjectsSystem {
         Read<'s, TimeDelta>,
     );
 
-    fn run(&mut self, (mut transforms, linear_motions, angular_velocities, time_delta): Self::SystemData) {
+    fn run(
+        &mut self,
+        (mut transforms, linear_motions, angular_velocities, time_delta): Self::SystemData,
+    ) {
         // Move all of the moving objects
         for (linear_motion, transform) in (&linear_motions, &mut transforms).join() {
             transform.0.append_translation_mut(&Translation::from(
@@ -22,8 +25,9 @@ impl<'s> System<'s> for MoveObjectsSystem {
 
         // Rotate all of the rotating objects
         for (angular_velocity, transform) in (&angular_velocities, &mut transforms).join() {
-            transform.0.append_rotation_wrt_center_mut(
-                &UnitComplex::new(angular_velocity.0)); 
+            transform
+                .0
+                .append_rotation_wrt_center_mut(&UnitComplex::new(angular_velocity.0));
         }
     }
 }
