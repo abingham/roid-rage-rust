@@ -4,7 +4,17 @@ use crate::core::velocity::Velocity;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
 
-pub struct ExplodeRoidsSystem;
+pub struct ExplodeRoidsSystem {
+    min_roid_radius: f32
+}
+
+impl ExplodeRoidsSystem {
+    pub fn new(min_roid_radius: f32) -> ExplodeRoidsSystem {
+        ExplodeRoidsSystem {
+            min_roid_radius: min_roid_radius
+        }
+    }
+}
 
 /// Explode roids that have collided with something.
 impl<'s> System<'s> for ExplodeRoidsSystem {
@@ -40,7 +50,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                 _ => {}
             }
 
-            if roid.radius >= Roid::min_radius() {
+            if roid.radius >= self.min_roid_radius {
                 for _ in 0..2 {
                     let new_entity = entities.create();
                     make_roid(

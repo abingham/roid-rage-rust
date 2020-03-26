@@ -83,7 +83,7 @@ impl RoidRage {
                 &["wrap_objects"],
             )
             .with(
-                ExplodeRoidsSystem,
+                ExplodeRoidsSystem::new(15.0),
                 "explode_roids",
                 &["remove_out_of_bounds"],
             )

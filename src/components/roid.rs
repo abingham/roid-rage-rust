@@ -34,10 +34,6 @@ impl Roid {
             points: points,
         }
     }
-
-    pub fn min_radius() -> f32 {
-        5.0
-    }
 }
 
 impl Component for Roid {
