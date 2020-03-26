@@ -2,9 +2,8 @@ use nalgebra::Vector2;
 use specs::Component;
 use specs::DenseVecStorage;
 
-/// rotational rate
-pub struct RotationalMotion(pub f32);
+pub struct LinearVelocity(pub Vector2<f32>);
 
-impl Component for RotationalMotion {
+impl Component for LinearVelocity {
     type Storage = DenseVecStorage<Self>;
 }

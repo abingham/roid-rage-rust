@@ -1,5 +1,5 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, LinearMotion, Transform};
+use crate::components::{CollisionHandle, LinearVelocity, Transform};
 use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::{zero, Isometry2, Point2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
@@ -56,7 +56,7 @@ pub fn make_bullet<B>(
     // Create the entity
     let entity = builder
         .with(Bullet::new())
-        .with(LinearMotion(from_speed_and_bearing(
+        .with(LinearVelocity(from_speed_and_bearing(
             Bullet::speed(),
             bearing,
         )))

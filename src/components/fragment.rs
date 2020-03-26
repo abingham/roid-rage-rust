@@ -1,4 +1,4 @@
-use crate::components::{LinearMotion, Transform};
+use crate::components::{LinearVelocity, Transform};
 use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::{Isometry2, Vector2};
 use rand::prelude::*;
@@ -29,11 +29,11 @@ impl Component for Fragment {
 }
 
 // TODO: This should use the builder pattern from e.g. roid.
-pub fn make_fragment(x: f32, y: f32, bearing: f32) -> (LinearMotion, Transform, Fragment) {
+pub fn make_fragment(x: f32, y: f32, bearing: f32) -> (LinearVelocity, Transform, Fragment) {
     let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
     let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
     (
-        LinearMotion(from_speed_and_bearing(speed, bearing)),
+        LinearVelocity(from_speed_and_bearing(speed, bearing)),
         transform,
         Fragment::new(),
     )

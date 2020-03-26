@@ -1,4 +1,4 @@
-use crate::components::{make_bullet, Bullet, LinearMotion, Roid, TimeDelta, Transform};
+use crate::components::{make_bullet, Bullet, LinearVelocity, Roid, TimeDelta, Transform};
 use crate::core::field::Field;
 use crate::core::targeting::find_target;
 use nalgebra::Point2;
@@ -23,7 +23,7 @@ impl FireOnTargetsSystem {
 impl<'s> System<'s> for FireOnTargetsSystem {
     type SystemData = (
         ReadStorage<'s, Roid>,
-        ReadStorage<'s, LinearMotion>,
+        ReadStorage<'s, LinearVelocity>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
