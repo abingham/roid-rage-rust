@@ -5,12 +5,12 @@ use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
-use specs::{Component, VecStorage};
 use rand::prelude::*;
+use specs::{Component, VecStorage};
 
 pub struct Roid {
     pub radius: f32,
-    pub points: Vec<f32>
+    pub points: Vec<f32>,
 }
 
 impl Roid {
@@ -19,15 +19,17 @@ impl Roid {
         let num_points = rng.next_u32() % 5 + 5;
         let point_variance = radius / 10.0;
 
-        let points: Vec::<f32> = (0..num_points)
-            .map(|_| vec![
-                radius + rng.gen::<f32>() * point_variance, 
-                radius - rng.gen::<f32>() * point_variance, 
-            ])
+        let points: Vec<f32> = (0..num_points)
+            .map(|_| {
+                vec![
+                    radius + rng.gen::<f32>() * point_variance,
+                    radius - rng.gen::<f32>() * point_variance,
+                ]
+            })
             .flatten()
             .collect();
 
-        Roid { 
+        Roid {
             radius: radius,
             points: points,
         }
