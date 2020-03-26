@@ -1,4 +1,4 @@
-use crate::components::{make_roid, Collision, LinearMotion, Roid, Transform};
+use crate::components::{make_roid, Collision, LinearMotion, RotationalMotion, Roid, Transform};
 use crate::core::util::random_bearing;
 use crate::core::velocity::Velocity;
 use ncollide2d::world::CollisionWorld;
@@ -12,6 +12,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
         ReadStorage<'s, Collision>,
         ReadStorage<'s, Roid>,
         ReadStorage<'s, LinearMotion>,
+        ReadStorage<'s, RotationalMotion>,
         ReadStorage<'s, Transform>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
@@ -24,14 +25,15 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             collisions,
             roids,
             linear_motions,
+            rotational_motions,
             transforms,
             entities,
             mut collision_world,
             lazy,
         ): Self::SystemData,
     ) {
-        for (_, roid, lm, transform, entity) in
-            (&collisions, &roids, &linear_motions, &transforms, &entities).join()
+        for (_, roid, lm, rm, transform, entity) in
+            (&collisions, &roids, &linear_motions, &rotational_motions, &transforms, &entities).join()
         {
             match entities.delete(entity) {
                 Err(e) => println!("Error deleting roid: {}", e),
@@ -50,6 +52,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                         transform.0.translation.y,
                         lm.0.speed() * 1.5,
                         random_bearing(),
+                        rm.0 * 2.0,
                         roid.radius / 2.0,
                         &mut collision_world,
                     );

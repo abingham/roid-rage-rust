@@ -188,6 +188,7 @@ fn make_some_roids(world: &mut World) {
         let speed = rng.gen::<f32>() * 50.0 + 50.0;
         let bearing = random_bearing();
         let radius = rng.gen::<f32>() * 5.0 + (MAX_ROID_RADIUS - 5.0);
+        let angular_velocity = rng.gen::<f32>() * 0.005 + 0.005;
 
         let entity = world.write_resource::<specs::world::EntitiesRes>().create();
 
@@ -200,6 +201,7 @@ fn make_some_roids(world: &mut World) {
             y,
             speed,
             bearing,
+            angular_velocity,
             radius,
             &mut world.write_resource::<CollisionWorld<f32, specs::world::Index>>(),
         );
