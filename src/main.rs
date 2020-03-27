@@ -71,11 +71,7 @@ impl RoidRage {
                 "cleanup_collisions",
                 &[],
             )
-            .with(
-                RepopulateSystem,
-                "repopulate",
-                &["cleanup_collisions"],
-            )
+            .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(MoveObjectsSystem, "move_objects", &["repopulate"])
             .with(
