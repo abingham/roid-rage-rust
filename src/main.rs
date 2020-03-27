@@ -24,8 +24,6 @@ use std::time::Duration;
 
 use ggez::conf;
 
-const MAX_ROID_RADIUS: f32 = 42.5;
-
 fn main() {
     let settings = settings::Settings::load().expect("Unable to load Roid Rage settings!");
 
@@ -33,8 +31,8 @@ fn main() {
     let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
         .window_mode(conf::WindowMode::default().dimensions(
-            settings.screen_width + MAX_ROID_RADIUS * 2.0,
-            settings.screen_height + MAX_ROID_RADIUS * 2.0,
+            settings.screen_width + settings.maximum_roid_radius * 2.0,
+            settings.screen_height + settings.maximum_roid_radius * 2.0,
         ))
         .build()
         .expect("aieee, could not create ggez context!");
@@ -141,10 +139,10 @@ impl EventHandler for RoidRage {
         graphics::set_screen_coordinates(
             ctx,
             graphics::Rect::new(
-                MAX_ROID_RADIUS,
-                MAX_ROID_RADIUS,
-                self.settings.screen_width - MAX_ROID_RADIUS * 2.0,
-                self.settings.screen_height - MAX_ROID_RADIUS * 2.0,
+                self.settings.maximum_roid_radius,
+                self.settings.maximum_roid_radius,
+                self.settings.screen_width - self.settings.maximum_roid_radius * 2.0,
+                self.settings.screen_height - self.settings.maximum_roid_radius * 2.0,
             ),
         )?;
 
@@ -192,11 +190,11 @@ fn make_some_roids(world: &mut World, settings: &settings::Settings) {
     use rand::prelude::*;
     let mut rng = thread_rng();
     for _ in 0..10 {
-        let x = rng.gen::<f32>() * (settings.screen_width + MAX_ROID_RADIUS);
-        let y = rng.gen::<f32>() * (settings.screen_height + MAX_ROID_RADIUS);
+        let x = rng.gen::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
+        let y = rng.gen::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
         let speed = rng.gen::<f32>() * 50.0 + 50.0;
         let bearing = random_bearing();
-        let radius = rng.gen::<f32>() * 5.0 + (MAX_ROID_RADIUS - 5.0);
+        let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
         let angular_velocity = rng.gen::<f32>() * 0.005 + 0.005;
 
         let entity = world.write_resource::<specs::world::EntitiesRes>().create();

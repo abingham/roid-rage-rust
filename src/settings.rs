@@ -43,11 +43,12 @@ macro_rules! initialize_settings {
 }
 
 initialize_settings!(
+    // (setting-name, setting-type, default-value)
     (screen_width, f32, 800.0),
     (screen_height, f32, 600.0),
-    (minimum_roid_radius, f32, 15.0)
+    (minimum_roid_radius, f32, 15.0),
+    (maximum_roid_radius, f32, 42.5)
     // TODO: More settings:
-    // initial roid radius
     // roid bumpiness
     // initial roid speed
     // initial number of roids
