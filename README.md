@@ -1,26 +1,18 @@
-# roid_rage
+# Roid Rage!!!
+
+A silly asteroids game.
 
 ## How to run
 
 To run the game, use
 
 ```
-cargo run --features "vulkan"
+cargo run
 ```
 
-on Windows and Linux, and
+## Settings
 
-```
-cargo run --features "metal"
-```
+Roid Rage has a number of setting you can modify. These can be controlled via environment variables
+or a settings file.
 
-on macOS.
-
-For building without any graphics backend, you can use
-
-```
-cargo run --features "empty"
-```
-
-but be aware that as soon as you need any rendering you won't be able to run your game when using
-the `empty` feature.
+TODO: Document these and how to set them.
