@@ -88,7 +88,7 @@ impl RoidRage {
                 &["wrap_objects"],
             )
             .with(
-                ExplodeRoidsSystem::new(15.0),
+                ExplodeRoidsSystem::new(settings.minimum_roid_radius),
                 "explode_roids",
                 &["remove_out_of_bounds"],
             )
