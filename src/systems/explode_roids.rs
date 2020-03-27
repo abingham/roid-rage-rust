@@ -1,22 +1,11 @@
 use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Roid, Transform};
 use crate::core::util::random_bearing;
 use crate::core::velocity::Velocity;
+use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
-use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
+use specs::{Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
 
-pub struct ExplodeRoidsSystem {
-    min_roid_radius: f32,
-    roid_bumpiness: f32,
-}
-
-impl ExplodeRoidsSystem {
-    pub fn new(min_roid_radius: f32, roid_bumpiness: f32) -> ExplodeRoidsSystem {
-        ExplodeRoidsSystem {
-            min_roid_radius: min_roid_radius,
-            roid_bumpiness: roid_bumpiness,
-        }
-    }
-}
+pub struct ExplodeRoidsSystem;
 
 /// Explode roids that have collided with something.
 impl<'s> System<'s> for ExplodeRoidsSystem {
@@ -28,6 +17,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
         ReadStorage<'s, Transform>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
+        ReadExpect<'s, Settings>,
         Read<'s, LazyUpdate>,
     );
 
@@ -41,6 +31,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             transforms,
             entities,
             mut collision_world,
+            settings,
             lazy,
         ): Self::SystemData,
     ) {
@@ -59,7 +50,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                 _ => {}
             }
 
-            if roid.radius >= self.min_roid_radius {
+            if roid.radius >= settings.minimum_roid_radius {
                 for _ in 0..2 {
                     let new_entity = entities.create();
                     make_roid(
@@ -73,7 +64,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                         random_bearing(),
                         av.0 * 2.0,
                         roid.radius / 2.0,
-                        self.roid_bumpiness,
+                        settings.roid_bumpiness,
                         &mut collision_world,
                     );
                 }

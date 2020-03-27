@@ -35,7 +35,6 @@ macro_rules! initialize_settings {
                     let mut default = Settings::default();
                     $(
                         default.$setting = cfg.get::<$type>(stringify!($setting)).unwrap_or(default.$setting);
-                        println!("{:?}", default.$setting);
                     )*
 
                     Ok(default)

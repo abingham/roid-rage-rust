@@ -50,7 +50,6 @@ fn main() {
 struct RoidRage {
     world: World,
     dispatcher: Dispatcher<'static, 'static>,
-    settings: settings::Settings,
 }
 
 impl RoidRage {
@@ -63,6 +62,7 @@ impl RoidRage {
         ));
         world.insert(CollisionWorld::<f32, specs::world::Index>::new(0.02f32));
         world.insert(TimeDelta(Duration::from_secs(0)));
+        world.insert(settings);
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
@@ -72,7 +72,7 @@ impl RoidRage {
                 &[],
             )
             .with(
-                RepopulateSystem::new(settings),
+                RepopulateSystem,
                 "repopulate",
                 &["cleanup_collisions"],
             )
@@ -90,7 +90,7 @@ impl RoidRage {
                 &["wrap_objects"],
             )
             .with(
-                ExplodeRoidsSystem::new(settings.minimum_roid_radius, settings.roid_bumpiness),
+                ExplodeRoidsSystem,
                 "explode_roids",
                 &["remove_out_of_bounds"],
             )
@@ -100,14 +100,7 @@ impl RoidRage {
                 &["remove_out_of_bounds"],
             )
             .with(
-                FireOnTargetsSystem::new(
-                    settings.rate_of_fire,
-                    nalgebra::Point2::<f32>::new(
-                        settings.screen_width / 2.0,
-                        settings.screen_height / 2.0,
-                    ),
-                    settings.bullet_speed,
-                ),
+                FireOnTargetsSystem::new(),
                 "fire_on_targets",
                 &["remove_out_of_bounds"],
             )
@@ -120,7 +113,6 @@ impl RoidRage {
         RoidRage {
             world: world,
             dispatcher: dispatcher,
-            settings: settings,
         }
     }
 }
@@ -142,13 +134,14 @@ impl EventHandler for RoidRage {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
+        let settings = self.world.read_resource::<settings::Settings>();
         graphics::set_screen_coordinates(
             ctx,
             graphics::Rect::new(
-                self.settings.maximum_roid_radius,
-                self.settings.maximum_roid_radius,
-                self.settings.screen_width - self.settings.maximum_roid_radius * 2.0,
-                self.settings.screen_height - self.settings.maximum_roid_radius * 2.0,
+                settings.maximum_roid_radius,
+                settings.maximum_roid_radius,
+                settings.screen_width - settings.maximum_roid_radius * 2.0,
+                settings.screen_height - settings.maximum_roid_radius * 2.0,
             ),
         )?;
 

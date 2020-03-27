@@ -6,25 +6,17 @@ use ncollide2d::world::CollisionWorld;
 use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
+use crate::settings::Settings;
 
 pub struct FireOnTargetsSystem {
-    rate_of_fire: f32,
     time_since_last: f32,
-    firing_position: Point2<f32>,
-    bullet_speed: f32,
 }
 
 impl FireOnTargetsSystem {
     pub fn new(
-        rate_of_fire: f32,
-        firing_position: Point2<f32>,
-        bullet_speed: f32,
     ) -> FireOnTargetsSystem {
         FireOnTargetsSystem {
-            rate_of_fire: rate_of_fire,
             time_since_last: 0.0,
-            firing_position: firing_position,
-            bullet_speed: bullet_speed,
         }
     }
 }
@@ -40,6 +32,7 @@ impl<'s> System<'s> for FireOnTargetsSystem {
         Read<'s, TimeDelta>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
+        ReadExpect<'s, Settings>,
         Read<'s, LazyUpdate>,
     );
 
@@ -54,11 +47,12 @@ impl<'s> System<'s> for FireOnTargetsSystem {
             time_delta,
             entities,
             mut collision_world,
+            settings,
             lazy,
         ): Self::SystemData,
     ) {
         self.time_since_last += time_delta.0.as_secs_f32();
-        if self.time_since_last <= self.rate_of_fire {
+        if self.time_since_last <= settings.rate_of_fire {
             return;
         }
 
@@ -69,7 +63,8 @@ impl<'s> System<'s> for FireOnTargetsSystem {
             },
         );
 
-        find_target(&self.firing_position, self.bullet_speed, &*field, targets).map(
+        let firing_position = Point2::<f32>::new(settings.screen_width / 2.0, settings.screen_height / 2.0);
+        find_target(&firing_position, settings.bullet_speed, &*field, targets).map(
             |target_bearing| {
                 self.time_since_last = 0.0;
 
@@ -79,8 +74,8 @@ impl<'s> System<'s> for FireOnTargetsSystem {
                         entity: new_entity,
                         lazy: &*lazy,
                     },
-                    self.firing_position,
-                    self.bullet_speed,
+                    firing_position,
+                    settings.bullet_speed,
                     target_bearing,
                     &mut collision_world,
                 );
