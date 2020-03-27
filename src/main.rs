@@ -86,7 +86,7 @@ impl RoidRage {
                 &["wrap_objects"],
             )
             .with(
-                ExplodeRoidsSystem::new(settings.minimum_roid_radius),
+                ExplodeRoidsSystem::new(settings.minimum_roid_radius, settings.roid_bumpiness),
                 "explode_roids",
                 &["remove_out_of_bounds"],
             )
@@ -210,6 +210,7 @@ fn make_some_roids(world: &mut World, settings: &settings::Settings) {
             bearing,
             angular_velocity,
             radius,
+            settings.roid_bumpiness,
             &mut world.write_resource::<CollisionWorld<f32, specs::world::Index>>(),
         );
     }

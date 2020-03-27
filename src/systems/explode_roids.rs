@@ -6,12 +6,14 @@ use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System, WriteExpect};
 
 pub struct ExplodeRoidsSystem {
     min_roid_radius: f32,
+    roid_bumpiness: f32,
 }
 
 impl ExplodeRoidsSystem {
-    pub fn new(min_roid_radius: f32) -> ExplodeRoidsSystem {
+    pub fn new(min_roid_radius: f32, roid_bumpiness: f32) -> ExplodeRoidsSystem {
         ExplodeRoidsSystem {
             min_roid_radius: min_roid_radius,
+            roid_bumpiness: roid_bumpiness,
         }
     }
 }
@@ -71,6 +73,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                         random_bearing(),
                         av.0 * 2.0,
                         roid.radius / 2.0,
+                        self.roid_bumpiness,
                         &mut collision_world,
                     );
                 }

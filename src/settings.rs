@@ -25,15 +25,16 @@ macro_rules! initialize_settings {
                     cfg
                         // .merge(fig::File::with_name("Settings"))
                         .merge(config::File::with_name("Settings").required(false))
-                        .unwrap();
+                        .unwrap()
                     // Add in settings from the environment (with a prefix of APP)
                     // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
-                    cfg.merge(config::Environment::with_prefix("ROID_RAGE"))
+                        .merge(config::Environment::with_prefix("ROID_RAGE"))
                         .unwrap();
 
                     let mut default = Settings::default();
                     $(
-                        default.$setting = cfg.get::<$type>("$setting").unwrap_or(default.$setting);
+                        default.$setting = cfg.get::<$type>(stringify!($setting)).unwrap_or(default.$setting);
+                        println!("{:?}", default.$setting);
                     )*
 
                     Ok(default)
@@ -47,9 +48,9 @@ initialize_settings!(
     (screen_width, f32, 800.0),
     (screen_height, f32, 600.0),
     (minimum_roid_radius, f32, 15.0),
-    (maximum_roid_radius, f32, 42.5)
+    (maximum_roid_radius, f32, 42.5),
+    (roid_bumpiness, f32, 0.1)
     // TODO: More settings:
-    // roid bumpiness
     // initial roid speed
     // initial number of roids
     // bullet speed

@@ -14,10 +14,10 @@ pub struct Roid {
 }
 
 impl Roid {
-    pub fn new(radius: f32) -> Self {
+    pub fn new(radius: f32, bumpiness: f32) -> Self {
         let mut rng = rand::thread_rng();
         let num_points = rng.next_u32() % 5 + 5;
-        let point_variance = radius / 10.0;
+        let point_variance = radius * bumpiness;
 
         let points: Vec<f32> = (0..num_points)
             .map(|_| {
@@ -49,6 +49,7 @@ pub fn make_roid<B>(
     bearing: f32,
     angular_velocity: f32,
     radius: f32,
+    bumpiness: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
     B: specs::world::Builder,
@@ -79,7 +80,7 @@ pub fn make_roid<B>(
         .with(transform)
         .with(Wrapping)
         .with(CollisionHandle(collision_handle))
-        .with(Roid::new(radius))
+        .with(Roid::new(radius, bumpiness))
         .build();
 
     // Annotate the collision object with the entity's ID
