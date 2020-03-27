@@ -17,9 +17,6 @@ impl Bullet {
     pub fn radius() -> f32 {
         1.0
     }
-    pub fn speed() -> f32 {
-        500.0
-    }
 }
 
 impl Component for Bullet {
@@ -30,6 +27,7 @@ impl Component for Bullet {
 pub fn make_bullet<B>(
     builder: B,
     pos: Point2<f32>,
+    speed: f32,
     bearing: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
@@ -57,7 +55,7 @@ pub fn make_bullet<B>(
     let entity = builder
         .with(Bullet::new())
         .with(LinearVelocity(from_speed_and_bearing(
-            Bullet::speed(),
+            speed,
             bearing,
         )))
         .with(transform)

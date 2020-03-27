@@ -102,6 +102,7 @@ impl RoidRage {
                         settings.screen_width / 2.0,
                         settings.screen_height / 2.0,
                     ),
+                    settings.bullet_speed,
                 ),
                 "fire_on_targets",
                 &["remove_out_of_bounds"],

@@ -11,14 +11,16 @@ pub struct FireOnTargetsSystem {
     rate_of_fire: f32,
     time_since_last: f32,
     firing_position: Point2<f32>,
+    bullet_speed: f32
 }
 
 impl FireOnTargetsSystem {
-    pub fn new(rate_of_fire: f32, firing_position: Point2<f32>) -> FireOnTargetsSystem {
+    pub fn new(rate_of_fire: f32, firing_position: Point2<f32>, bullet_speed: f32) -> FireOnTargetsSystem {
         FireOnTargetsSystem {
             rate_of_fire: rate_of_fire,
             time_since_last: 0.0,
             firing_position: firing_position,
+            bullet_speed: bullet_speed
         }
     }
 }
@@ -63,7 +65,7 @@ impl<'s> System<'s> for FireOnTargetsSystem {
             },
         );
 
-        find_target(&self.firing_position, Bullet::speed(), &*field, targets).map(
+        find_target(&self.firing_position, self.bullet_speed, &*field, targets).map(
             |target_bearing| {
                 self.time_since_last = 0.0;
 
@@ -74,6 +76,7 @@ impl<'s> System<'s> for FireOnTargetsSystem {
                         lazy: &*lazy,
                     },
                     self.firing_position,
+                    self.bullet_speed,
                     target_bearing,
                     &mut collision_world,
                 );
