@@ -96,10 +96,13 @@ impl RoidRage {
                 &["remove_out_of_bounds"],
             )
             .with(
-                FireOnTargetsSystem::new(nalgebra::Point2::<f32>::new(
-                    settings.screen_width / 2.0,
-                    settings.screen_height / 2.0,
-                )),
+                FireOnTargetsSystem::new(
+                    settings.rate_of_fire,
+                    nalgebra::Point2::<f32>::new(
+                        settings.screen_width / 2.0,
+                        settings.screen_height / 2.0,
+                    ),
+                ),
                 "fire_on_targets",
                 &["remove_out_of_bounds"],
             )

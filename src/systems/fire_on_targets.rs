@@ -8,13 +8,15 @@ use specs::{
 };
 
 pub struct FireOnTargetsSystem {
+    rate_of_fire: f32,
     time_since_last: f32,
     firing_position: Point2<f32>,
 }
 
 impl FireOnTargetsSystem {
-    pub fn new(firing_position: Point2<f32>) -> FireOnTargetsSystem {
+    pub fn new(rate_of_fire: f32, firing_position: Point2<f32>) -> FireOnTargetsSystem {
         FireOnTargetsSystem {
+            rate_of_fire: rate_of_fire,
             time_since_last: 0.0,
             firing_position: firing_position,
         }
@@ -50,7 +52,7 @@ impl<'s> System<'s> for FireOnTargetsSystem {
         ): Self::SystemData,
     ) {
         self.time_since_last += time_delta.0.as_secs_f32();
-        if self.time_since_last <= 1.0 {
+        if self.time_since_last <= self.rate_of_fire {
             return;
         }
 
