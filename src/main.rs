@@ -5,14 +5,13 @@ mod settings;
 mod systems;
 
 use crate::core::field::Field;
-use crate::core::util::random_bearing;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
-    RemoveOutOfBoundsSystem, WrapObjectsSystem,
+    RemoveOutOfBoundsSystem, RepopulateSystem, WrapObjectsSystem,
 };
 
-use crate::components::{make_roid, Bullet, Fragment, Roid, TimeDelta, Transform};
+use crate::components::{Bullet, Fragment, Roid, TimeDelta, Transform};
 use crate::rendering::Render;
 use ggez::event::{self, EventHandler};
 use ggez::timer;
@@ -72,8 +71,13 @@ impl RoidRage {
                 "cleanup_collisions",
                 &[],
             )
+            .with(
+                RepopulateSystem::new(settings),
+                "repopulate",
+                &["cleanup_collisions"],
+            )
             .with(AgeFragmentsSystem, "age_fragments", &[])
-            .with(MoveObjectsSystem, "move_objects", &[])
+            .with(MoveObjectsSystem, "move_objects", &["repopulate"])
             .with(
                 DetectCollisionsSystem,
                 "detect_collisions",
@@ -111,8 +115,6 @@ impl RoidRage {
             .build();
 
         dispatcher.setup(&mut world);
-
-        make_some_roids(&mut world, &settings);
 
         // Load/create resources such as images here.
         RoidRage {
@@ -187,35 +189,5 @@ impl EventHandler for RoidRage {
         timer::yield_now();
 
         Ok(())
-    }
-}
-
-fn make_some_roids(world: &mut World, settings: &settings::Settings) {
-    use rand::prelude::*;
-    let mut rng = thread_rng();
-    for _ in 0..settings.initial_roid_count {
-        let x = rng.gen::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
-        let y = rng.gen::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
-        let speed = rng.gen::<f32>() * (settings.max_initial_roid_speed - settings.min_initial_roid_speed) + settings.min_initial_roid_speed;
-        let bearing = random_bearing();
-        let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
-        let angular_velocity = rng.gen::<f32>() * 0.005 + 0.005;
-
-        let entity = world.write_resource::<specs::world::EntitiesRes>().create();
-
-        make_roid(
-            specs::world::LazyBuilder {
-                entity: entity,
-                lazy: &*world.read_resource::<specs::world::LazyUpdate>(),
-            },
-            x,
-            y,
-            speed,
-            bearing,
-            angular_velocity,
-            radius,
-            settings.roid_bumpiness,
-            &mut world.write_resource::<CollisionWorld<f32, specs::world::Index>>(),
-        );
     }
 }

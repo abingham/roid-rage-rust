@@ -44,6 +44,9 @@ impl<'a> System<'a> for CleanupCollisionsSystem {
             })
             .collect();
 
+        if !removed_handles.is_empty() {
+            println!("removed: {:?}", removed_handles);
+        }
         collision_world.remove(&removed_handles);
     }
 

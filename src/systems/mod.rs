@@ -7,6 +7,7 @@ pub use self::fire_on_targets::FireOnTargetsSystem;
 pub use self::logging::LoggingSystem;
 pub use self::move_objects::MoveObjectsSystem;
 pub use self::remove_out_of_bounds::RemoveOutOfBoundsSystem;
+pub use self::repopulate::RepopulateSystem;
 pub use self::wrap_objects::WrapObjectsSystem;
 
 mod age_fragments;
@@ -18,4 +19,5 @@ mod fire_on_targets;
 mod logging;
 mod move_objects;
 mod remove_out_of_bounds;
+mod repopulate;
 mod wrap_objects;

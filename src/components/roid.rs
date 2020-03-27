@@ -73,6 +73,8 @@ pub fn make_roid<B>(
         0,
     );
 
+    println!("Create handle {:?}", collision_handle);
+
     // Create the entity
     let entity = builder
         .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))

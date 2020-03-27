@@ -1,8 +1,9 @@
 /// Create a Settings struct that holds all of our application settings.
-/// 
+///
 /// The struct has static `load()` method which returns a fully configured Settings object.
 macro_rules! initialize_settings {
     ( $( ($setting:ident, $type:ident, $default_value:expr) ),* ) => {
+            #[derive(Copy, Clone)]
             pub struct Settings {
                 $(
                     pub $setting: $type,

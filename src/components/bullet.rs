@@ -54,10 +54,7 @@ pub fn make_bullet<B>(
     // Create the entity
     let entity = builder
         .with(Bullet::new())
-        .with(LinearVelocity(from_speed_and_bearing(
-            speed,
-            bearing,
-        )))
+        .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
         .with(transform)
         .with(CollisionHandle(collision_handle))
         .build();
