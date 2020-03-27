@@ -196,7 +196,7 @@ fn make_some_roids(world: &mut World, settings: &settings::Settings) {
     for _ in 0..10 {
         let x = rng.gen::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
         let y = rng.gen::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
-        let speed = rng.gen::<f32>() * 50.0 + 50.0;
+        let speed = rng.gen::<f32>() * (settings.max_initial_roid_speed - settings.min_initial_roid_speed) + settings.min_initial_roid_speed;
         let bearing = random_bearing();
         let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
         let angular_velocity = rng.gen::<f32>() * 0.005 + 0.005;
