@@ -53,9 +53,6 @@ initialize_settings!(
     (rate_of_fire, f32, 1.0),
     (bullet_speed, f32, 500.0),
     (min_initial_roid_speed, f32, 50.0),
-    (max_initial_roid_speed, f32, 100.0)
-    // TODO: More settings:
-    // initial number of roids
-    // bullet speed
-    // fire rate
+    (max_initial_roid_speed, f32, 100.0),
+    (initial_roid_count, u32, 10)
 );

@@ -193,7 +193,7 @@ impl EventHandler for RoidRage {
 fn make_some_roids(world: &mut World, settings: &settings::Settings) {
     use rand::prelude::*;
     let mut rng = thread_rng();
-    for _ in 0..10 {
+    for _ in 0..settings.initial_roid_count {
         let x = rng.gen::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
         let y = rng.gen::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
         let speed = rng.gen::<f32>() * (settings.max_initial_roid_speed - settings.min_initial_roid_speed) + settings.min_initial_roid_speed;
