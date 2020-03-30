@@ -7,7 +7,7 @@ extern crate nalgebra;
 use rocket::{catch, catchers, post, routes};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::pilot::{Command, GameState};
+use roid_rage::core::pilot::{Command, GameState};
 use crate::targeting::find_target;
 
 #[post("/", format = "json", data = "<game_state>")]

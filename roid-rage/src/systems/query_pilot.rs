@@ -1,6 +1,6 @@
 use crate::components::{make_bullet, Bullet, LinearVelocity, Roid, TimeDelta, Transform};
 use crate::core::field::Field;
-use crate::pilot;
+use crate::core::pilot;
 use crate::settings::Settings;
 use nalgebra::Point2;
 use ncollide2d::world::CollisionWorld;
@@ -57,7 +57,7 @@ impl<'s> System<'s> for QueryPilotSystem {
 
         let roids = (&roids, &linear_velocities, &transforms, &entities).join().map(
             |(roid, linear_velocity, transform, entity)| {
-                crate::pilot::Roid {
+                pilot::Roid {
                     id: entity.id(),
                     radius: roid.radius,
                     position: pilot::Point::from(transform.0.translation.vector),
@@ -67,7 +67,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         );
         let firing_position = Point2::<f32>::new(settings.screen_width / 2.0, settings.screen_height / 2.0);
 
-        let game_state = crate::pilot::GameState {
+        let game_state = pilot::GameState {
             field: field.clone(),    
             firing_position: pilot::Point::from(firing_position),
             bullet_speed: settings.bullet_speed,
