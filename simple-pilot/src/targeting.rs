@@ -1,7 +1,8 @@
 use nalgebra::{Point2, Vector2};
 use roid_rage::core::collide::collision_vector;
 use roid_rage::core::velocity::Velocity;
-use roid_rage::pilot::{Field, Roid};
+use roid_rage::pilot::Roid;
+use roid_rage::core::field::Field;
 use std::cmp::Ordering;
 
 /// Return the bearing of the shot to make, if any.
@@ -17,12 +18,12 @@ pub fn find_target(
         // .filter_map(|(id, position)| vmodel.velocity(id).map(|v| (position, v)))
         .map(|roid| {
             (
-                Point2::<f32>::new(roid.position.0, roid.position.1),
-                Vector2::<f32>::new(roid.velocity.0, roid.velocity.1),
+                Point2::<f32>::new(roid.position.x, roid.position.y),
+                Vector2::<f32>::new(roid.velocity.x, roid.velocity.y),
             )
         })
         .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, &pos, &vel))
-        .filter(|(p, _v)| field.contains(p))
+        .filter(|(p, _v)| field.contains(p.x, p.y))
         .collect();
 
     // Return the bearing to the furthest collision, if any

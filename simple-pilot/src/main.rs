@@ -7,20 +7,34 @@ extern crate nalgebra;
 use rocket::{catch, catchers, post, routes};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::pilot::GameState;
+use roid_rage::pilot::{Command, GameState};
 use crate::targeting::find_target;
 
 #[post("/", format = "json", data = "<game_state>")]
-fn update(game_state: Json<GameState>) -> JsonValue {
-    find_target(
-        &nalgebra::Point2::<f32>::new(game_state.firing_position.0, game_state.firing_position.1),
+fn update(game_state: Json<GameState>) -> Json<Command> {
+    let target = find_target(
+        &nalgebra::Point2::<f32>::new(game_state.firing_position.x, game_state.firing_position.y),
         game_state.bullet_speed,
         &game_state.field,
         &game_state.roids,
     );
-    json!({
-        "status": "coolio...",
-    })
+
+    let cmd = match target {
+        Some(bearing) => {
+            Command {
+                fire: true,
+                fire_bearing: bearing,
+            }
+        },
+        None => {
+            Command {
+                fire: false,
+                fire_bearing: 0.0,
+            }
+        }
+    };
+
+    Json(cmd)
 }
 
 #[catch(404)]

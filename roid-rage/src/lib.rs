@@ -9,7 +9,7 @@ use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
-    RemoveOutOfBoundsSystem, RepopulateSystem, WrapObjectsSystem,
+    RemoveOutOfBoundsSystem, QueryPilotSystem, RepopulateSystem, WrapObjectsSystem,
 };
 
 use crate::components::{Bullet, Fragment, Roid, TimeDelta, Transform};
@@ -70,10 +70,15 @@ impl RoidRage {
                 "explode_bullets",
                 &["remove_out_of_bounds"],
             )
+            // .with(
+            //     FireOnTargetsSystem::new(),
+            //     "fire_on_targets",
+            //     &["remove_out_of_bounds"],
+            // )
             .with(
-                FireOnTargetsSystem::new(),
-                "fire_on_targets",
-                &["remove_out_of_bounds"],
+                QueryPilotSystem::new(),
+                "query_pilot",
+                &["remove_out_of_bounds"]
             )
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();

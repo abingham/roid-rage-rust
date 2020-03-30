@@ -9,6 +9,7 @@ pub use self::move_objects::MoveObjectsSystem;
 pub use self::remove_out_of_bounds::RemoveOutOfBoundsSystem;
 pub use self::repopulate::RepopulateSystem;
 pub use self::wrap_objects::WrapObjectsSystem;
+pub use self::query_pilot::QueryPilotSystem;
 
 mod age_fragments;
 mod cleanup_collisions;
@@ -21,3 +22,4 @@ mod move_objects;
 mod remove_out_of_bounds;
 mod repopulate;
 mod wrap_objects;
+mod query_pilot;
