@@ -20,12 +20,11 @@ pub struct Roid {
     pub position: (f32, f32),
     pub velocity: (f32, f32)
 }
+
 #[derive(Serialize, Deserialize, Debug)]
-struct GameState {
-    field: Field,
-    firing_position: (f32, f32),
-    bullet_speed: f32,
-    roids: Vec<Roid>
+pub struct GameState {
+    pub field: Field,
+    pub firing_position: (f32, f32),
+    pub bullet_speed: f32,
+    pub roids: Vec<Roid>
 }
-
-

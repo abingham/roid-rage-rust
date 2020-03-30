@@ -1,9 +1,8 @@
 use nalgebra::{Point2, Vector2};
-use std::cmp::Ordering;
 use roid_rage::core::collide::collision_vector;
 use roid_rage::core::velocity::Velocity;
-
-use crate::types::{Field, Roid};
+use roid_rage::pilot::{Field, Roid};
+use std::cmp::Ordering;
 
 /// Return the bearing of the shot to make, if any.
 pub fn find_target(
@@ -11,13 +10,17 @@ pub fn find_target(
     bullet_speed: f32,
     field: &Field,
     objects: &[Roid],
-) -> Option<f32>
-{
+) -> Option<f32> {
     // Find all possible collisions
-    let hits: Vec<(Point2<f32>, Vector2<f32>)> = objects.iter()
+    let hits: Vec<(Point2<f32>, Vector2<f32>)> = objects
+        .iter()
         // .filter_map(|(id, position)| vmodel.velocity(id).map(|v| (position, v)))
-        .map(|roid| (Point2::<f32>::new(roid.position.0, roid.position.1), 
-                     Vector2::<f32>::new(roid.velocity.0, roid.velocity.1)))
+        .map(|roid| {
+            (
+                Point2::<f32>::new(roid.position.0, roid.position.1),
+                Vector2::<f32>::new(roid.velocity.0, roid.velocity.1),
+            )
+        })
         .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, &pos, &vel))
         .filter(|(p, _v)| field.contains(p))
         .collect();
@@ -55,4 +58,3 @@ fn closest<'a>(
         }
     })
 }
-

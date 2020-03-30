@@ -1,5 +1,6 @@
 mod components;
-mod core;
+pub mod core;
+pub mod pilot;
 mod rendering;
 pub mod settings;
 mod systems;
