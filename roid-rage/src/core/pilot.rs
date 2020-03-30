@@ -1,5 +1,5 @@
+use nalgebra::{Point2, Vector2};
 use serde::{Deserialize, Serialize};
-use nalgebra::{Vector2, Point2};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Point {
@@ -9,17 +9,17 @@ pub struct Point {
 
 impl Point {
     pub fn new(x: f32, y: f32) -> Point {
-        Point { x: x, y: y}
+        Point { x: x, y: y }
     }
 }
 
-impl From<Point2::<f32>> for Point {
+impl From<Point2<f32>> for Point {
     fn from(p: Point2<f32>) -> Point {
         Point::new(p.x, p.y)
     }
 }
 
-impl From<Vector2::<f32>> for Point {
+impl From<Vector2<f32>> for Point {
     fn from(v: Vector2<f32>) -> Point {
         Point::new(v.x, v.y)
     }
@@ -38,7 +38,7 @@ pub struct GameState {
     pub field: crate::core::field::Field,
     pub firing_position: Point,
     pub bullet_speed: f32,
-    pub roids: Vec<Roid>
+    pub roids: Vec<Roid>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -49,11 +49,12 @@ pub struct Command {
 
 pub fn query_pilot(url: &str, game_state: &GameState) -> Result<Command, String> {
     let client = reqwest::blocking::Client::new();
-    let cmd = client.post(url)
+    let cmd = client
+        .post(url)
         .json(game_state)
         .send()
         .or_else(|e| Err(format!("{:?}", e)))?
         .json::<Command>()
-        .or_else(|e| Err(format!("{:?}", e)))?;   
+        .or_else(|e| Err(format!("{:?}", e)))?;
     Ok(cmd)
 }

@@ -7,8 +7,8 @@ mod systems;
 use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, MoveObjectsSystem,
-    RemoveOutOfBoundsSystem, QueryPilotSystem, RepopulateSystem, WrapObjectsSystem,
+    ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
+    RepopulateSystem, WrapObjectsSystem,
 };
 
 use crate::components::{Bullet, Fragment, Roid, TimeDelta, Transform};
@@ -77,7 +77,7 @@ impl RoidRage {
             .with(
                 QueryPilotSystem::new(),
                 "query_pilot",
-                &["remove_out_of_bounds"]
+                &["remove_out_of_bounds"],
             )
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();

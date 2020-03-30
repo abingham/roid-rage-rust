@@ -1,9 +1,10 @@
-use ggez::ContextBuilder;
 use ggez::conf;
 use ggez::event;
+use ggez::ContextBuilder;
 
 fn main() {
-    let settings = roid_rage::settings::Settings::load().expect("Unable to load Roid Rage settings!");
+    let settings =
+        roid_rage::settings::Settings::load().expect("Unable to load Roid Rage settings!");
 
     // Make a Context.
     let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
@@ -25,4 +26,3 @@ fn main() {
         Err(e) => println!("Error occured: {}", e),
     }
 }
-

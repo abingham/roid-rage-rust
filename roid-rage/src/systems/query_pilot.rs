@@ -14,9 +14,7 @@ pub struct QueryPilotSystem {
 
 impl QueryPilotSystem {
     pub fn new() -> QueryPilotSystem {
-        QueryPilotSystem {
-            fire_timer: 0.0,
-        }
+        QueryPilotSystem { fire_timer: 0.0 }
     }
 }
 
@@ -55,20 +53,19 @@ impl<'s> System<'s> for QueryPilotSystem {
         //     return;
         // }
 
-        let roids = (&roids, &linear_velocities, &transforms, &entities).join().map(
-            |(roid, linear_velocity, transform, entity)| {
-                pilot::Roid {
-                    id: entity.id(),
-                    radius: roid.radius,
-                    position: pilot::Point::from(transform.0.translation.vector),
-                    velocity: pilot::Point::from(linear_velocity.0),
-                }
-            },
-        );
-        let firing_position = Point2::<f32>::new(settings.screen_width / 2.0, settings.screen_height / 2.0);
+        let roids = (&roids, &linear_velocities, &transforms, &entities)
+            .join()
+            .map(|(roid, linear_velocity, transform, entity)| pilot::Roid {
+                id: entity.id(),
+                radius: roid.radius,
+                position: pilot::Point::from(transform.0.translation.vector),
+                velocity: pilot::Point::from(linear_velocity.0),
+            });
+        let firing_position =
+            Point2::<f32>::new(settings.screen_width / 2.0, settings.screen_height / 2.0);
 
         let game_state = pilot::GameState {
-            field: field.clone(),    
+            field: field.clone(),
             firing_position: pilot::Point::from(firing_position),
             bullet_speed: settings.bullet_speed,
             roids: roids.collect(),
@@ -80,7 +77,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         match result {
             Err(msg) => println!("Error communicating with pilot: {:?}", msg),
             Ok(command) => {
-                if command.fire && self.fire_timer >= settings.rate_of_fire  {
+                if command.fire && self.fire_timer >= settings.rate_of_fire {
                     self.fire_timer = 0.0;
 
                     let new_entity = entities.create();

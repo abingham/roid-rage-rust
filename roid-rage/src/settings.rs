@@ -57,4 +57,3 @@ initialize_settings!(
     (initial_roid_count, u32, 10),
     (pilot_url, String, String::from("http://localhost:8000/"))
 );
-
