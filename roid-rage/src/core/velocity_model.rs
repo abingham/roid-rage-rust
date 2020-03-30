@@ -2,7 +2,8 @@ use crate::types::velocity::{from_speed_and_bearing, Velocity};
 use nalgebra::{Point2, Vector2};
 use std::collections::HashMap;
 
-// TODO: This should probably just be made into a component.
+// TODO: This doesn't belong in the core anymore. It should be moved into a pilot
+// implementation probably.
 
 struct TrackingData {
     start: Point2<f32>,

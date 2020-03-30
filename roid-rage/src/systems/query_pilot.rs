@@ -1,6 +1,5 @@
 use crate::components::{make_bullet, Bullet, LinearVelocity, Roid, TimeDelta, Transform};
 use crate::core::field::Field;
-use crate::core::targeting::find_target;
 use crate::pilot;
 use crate::settings::Settings;
 use nalgebra::Point2;

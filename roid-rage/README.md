@@ -1,18 +1,6 @@
-# Roid Rage!!!
+# roid-rage
 
-A silly asteroids game.
+This top-level game engine for Roid Rage.
 
-## How to run
-
-To run the game, use
-
-```
-cargo run
-```
-
-## Settings
-
-Roid Rage has a number of setting you can modify. These can be controlled via environment variables
-or a settings file.
-
-TODO: Document these and how to set them.
+This manages the game state and renders it. This delegates to an external
+"pilot" process to determine when and where to fire.

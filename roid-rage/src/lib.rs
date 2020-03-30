@@ -8,7 +8,7 @@ mod systems;
 use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, FireOnTargetsSystem, LoggingSystem, MoveObjectsSystem,
+    ExplodeRoidsSystem, MoveObjectsSystem,
     RemoveOutOfBoundsSystem, QueryPilotSystem, RepopulateSystem, WrapObjectsSystem,
 };
 
