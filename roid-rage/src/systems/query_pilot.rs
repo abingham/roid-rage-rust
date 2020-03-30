@@ -75,8 +75,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         };
 
         // Pass game-state to pilot process
-        // TODO: Get host from settings.
-        let result = pilot::query_pilot("http://localhost:8000/update", &game_state);
+        let result = pilot::query_pilot(&settings.pilot_url, &game_state);
 
         match result {
             Err(msg) => println!("Error communicating with pilot: {:?}", msg),

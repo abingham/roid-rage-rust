@@ -47,7 +47,7 @@ fn not_found() -> JsonValue {
 
 fn rocket() -> rocket::Rocket {
     rocket::ignite()
-        .mount("/update", routes![update])
+        .mount("/", routes![update])
         .register(catchers![not_found])
 }
 

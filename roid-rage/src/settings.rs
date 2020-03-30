@@ -3,7 +3,7 @@
 /// The struct has static `load()` method which returns a fully configured Settings object.
 macro_rules! initialize_settings {
     ( $( ($setting:ident, $type:ident, $default_value:expr) ),* ) => {
-            #[derive(Copy, Clone)]
+            #[derive(Clone)]
             pub struct Settings {
                 $(
                     pub $setting: $type,
@@ -54,5 +54,7 @@ initialize_settings!(
     (bullet_speed, f32, 500.0),
     (min_initial_roid_speed, f32, 50.0),
     (max_initial_roid_speed, f32, 100.0),
-    (initial_roid_count, u32, 10)
+    (initial_roid_count, u32, 10),
+    (pilot_url, String, String::from("http://localhost:8000/"))
 );
+
