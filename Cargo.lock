@@ -1943,6 +1943,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "rr-pilot"
+version = "0.1.0"
+dependencies = [
+ "nalgebra 0.19.0",
+ "num",
+ "roid_rage",
+ "serde 1.0.105",
+ "serde_derive",
+]
+
+[[package]]
 name = "rust-argon2"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2066,6 +2077,9 @@ name = "serde"
 version = "1.0.105"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e707fbbf255b8fc8c3b99abb91e7257a622caeb20a9818cbadbeeede4e0932ff"
+dependencies = [
+ "serde_derive",
+]
 
 [[package]]
 name = "serde-hjson"

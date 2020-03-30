@@ -1,5 +1,7 @@
 # Unwanted files
 target
+.vscode
+*.code-workspace
 
 # Backup files
 .DS_Store
