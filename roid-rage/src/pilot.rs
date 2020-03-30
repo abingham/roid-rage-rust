@@ -47,10 +47,9 @@ pub struct Command {
     pub fire_bearing: f32,
 }
 
-pub fn query_pilot(address: &str, game_state: &GameState) -> Result<Command, String> {
-    let url = format!("http://{}/update", address);
+pub fn query_pilot(url: &str, game_state: &GameState) -> Result<Command, String> {
     let client = reqwest::blocking::Client::new();
-    let cmd = client.post(&url)
+    let cmd = client.post(url)
         .json(game_state)
         .send()
         .or_else(|e| Err(format!("{:?}", e)))?
