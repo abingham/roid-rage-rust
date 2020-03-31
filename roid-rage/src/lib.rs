@@ -8,10 +8,10 @@ use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
-    RepopulateSystem, WrapObjectsSystem,
+    RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 
-use crate::components::{Bullet, Fragment, Roid, TimeDelta, Transform};
+use crate::components::{Bullet, Fragment, Roid, Ship, TimeDelta, Transform};
 use crate::rendering::Render;
 use ggez::event::EventHandler;
 use ggez::timer;
@@ -46,8 +46,13 @@ impl RoidRage {
                 &[],
             )
             .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
+            .with(RespawnShipSystem, "respawn", &["cleanup_collisions"])
             .with(AgeFragmentsSystem, "age_fragments", &[])
-            .with(MoveObjectsSystem, "move_objects", &["repopulate"])
+            .with(
+                MoveObjectsSystem,
+                "move_objects",
+                &["repopulate", "respawn"],
+            )
             .with(
                 DetectCollisionsSystem,
                 "detect_collisions",
@@ -141,6 +146,15 @@ impl EventHandler for RoidRage {
             .join()
         {
             bullet.render(&transform, ctx)?;
+        }
+
+        for (transform, ship) in (
+            &self.world.read_storage::<Transform>(),
+            &self.world.read_storage::<Ship>(),
+        )
+            .join()
+        {
+            ship.render(&transform, ctx)?;
         }
 
         for (transform, fragment) in (
