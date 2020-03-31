@@ -61,20 +61,20 @@ impl<'s> System<'s> for QueryPilotSystem {
             .map(|(roid, linear_velocity, transform, entity)| pilot::Roid {
                 id: entity.id(),
                 radius: roid.radius,
-                position: pilot::Point::from(transform.0.translation.vector),
-                velocity: pilot::Point::from(linear_velocity.0),
+                position: Point2::<f32>::from(transform.0.translation.vector),
+                velocity: linear_velocity.0,
             })
             .collect();
 
         for (ship, transform, angular_velocity) in
             (&ships, &transforms, &mut angular_velocities).join()
         {
-            let ship_center = Point2::<f32>::new(
-                transform.0.translation.vector.x,
-                transform.0.translation.vector.y,
-            );
+            let ship_center = Point2::<f32>::from(transform.0.translation.vector);
+            // .x,
+            //     transform.0.translation.vector.y,
+            // );
 
-            let firing_position = pilot::Point::new(
+            let firing_position = Point2::<f32>::new(
                 ship_center.x + transform.0.rotation.cos_angle() * ship.length / 2.0,
                 ship_center.y + transform.0.rotation.sin_angle() * ship.length / 2.0,
             );

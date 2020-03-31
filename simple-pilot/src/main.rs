@@ -13,7 +13,7 @@ use roid_rage::core::pilot::{Command, GameState};
 #[post("/", format = "json", data = "<game_state>")]
 fn update(game_state: Json<GameState>) -> Json<Command> {
     let target = find_target(
-        &nalgebra::Point2::<f32>::new(game_state.firing_position.x, game_state.firing_position.y),
+        &game_state.firing_position,
         game_state.bullet_speed,
         &game_state.field,
         &game_state.roids,

@@ -1775,6 +1775,8 @@ dependencies = [
  "num-traits 0.2.11",
  "rand 0.7.3",
  "rand_distr",
+ "serde 1.0.105",
+ "serde_derive",
  "typenum",
 ]
 
@@ -1929,6 +1931,7 @@ checksum = "b6b19411a9719e753aff12e5187b74d60d3dc449ec3f4dc21e3989c3f554bc95"
 dependencies = [
  "autocfg 1.0.0",
  "num-traits 0.2.11",
+ "serde 1.0.105",
 ]
 
 [[package]]

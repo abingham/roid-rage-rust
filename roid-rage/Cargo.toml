@@ -7,12 +7,15 @@ edition = "2018"
 [dependencies]
 config = "0.9"
 ggez = "0.5"
-nalgebra = "0.19"
 ncollide2d = "0.21"
 num = "0.2.1"
 specs = "0.16"
 rand = "0.6.5"
 serde_derive = "1.0"
+
+[dependencies.nalgebra]
+version = "0.19"
+features = ["serde-serialize"]
 
 [dependencies.serde]
 version = "1.0"

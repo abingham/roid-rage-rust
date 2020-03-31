@@ -15,14 +15,7 @@ pub fn find_target(
     // Find all possible collisions
     let hits: Vec<(Point2<f32>, Vector2<f32>)> = objects
         .iter()
-        // .filter_map(|(id, position)| vmodel.velocity(id).map(|v| (position, v)))
-        .map(|roid| {
-            (
-                Point2::<f32>::new(roid.position.x, roid.position.y),
-                Vector2::<f32>::new(roid.velocity.x, roid.velocity.y),
-            )
-        })
-        .filter_map(|(pos, vel)| collision_vector(firing_position, bullet_speed, &pos, &vel))
+        .filter_map(|r| collision_vector(firing_position, bullet_speed, &r.position, &r.velocity))
         .filter(|(p, _v)| field.contains(p.x, p.y))
         .collect();
 
