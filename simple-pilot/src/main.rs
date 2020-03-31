@@ -20,13 +20,13 @@ fn update(game_state: Json<GameState>) -> Json<Command> {
     );
 
     let cmd = match target {
-        Some(bearing) => Command {
+        Some(_bearing) => Command {
             fire: true,
-            fire_bearing: bearing,
+            rotation: 0,
         },
         None => Command {
             fire: false,
-            fire_bearing: 0.0,
+            rotation: 0,
         },
     };
 
