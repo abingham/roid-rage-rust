@@ -16,7 +16,6 @@ impl<'s> System<'s> for RespawnShipSystem {
     );
 
     fn run(&mut self, (ships, entities, mut collision_world, settings, lazy): Self::SystemData) {
-
         if !ships.is_empty() {
             return;
         }

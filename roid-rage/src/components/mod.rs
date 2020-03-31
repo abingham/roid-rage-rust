@@ -5,10 +5,10 @@ pub use self::collision_handle::CollisionHandle;
 pub use self::fragment::{make_fragment, Fragment};
 pub use self::linear_velocity::LinearVelocity;
 pub use self::roid::{make_roid, Roid};
+pub use self::ship::{make_ship, Ship};
 pub use self::time_delta::TimeDelta;
 pub use self::transform::Transform;
 pub use self::wrapping::Wrapping;
-pub use self::ship::{make_ship, Ship};
 
 mod angular_velocity;
 mod bullet;

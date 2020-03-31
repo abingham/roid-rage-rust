@@ -8,8 +8,8 @@ pub use self::move_objects::MoveObjectsSystem;
 pub use self::query_pilot::QueryPilotSystem;
 pub use self::remove_out_of_bounds::RemoveOutOfBoundsSystem;
 pub use self::repopulate::RepopulateSystem;
-pub use self::wrap_objects::WrapObjectsSystem;
 pub use self::respawn_ship::RespawnShipSystem;
+pub use self::wrap_objects::WrapObjectsSystem;
 
 mod age_fragments;
 mod cleanup_collisions;
@@ -21,5 +21,5 @@ mod move_objects;
 mod query_pilot;
 mod remove_out_of_bounds;
 mod repopulate;
-mod wrap_objects;
 mod respawn_ship;
+mod wrap_objects;

@@ -7,7 +7,7 @@ use specs::{Component, VecStorage};
 pub struct Ship {
     pub heading: f32,
     pub length: f32,
-    pub width: f32
+    pub width: f32,
 }
 
 impl Ship {
