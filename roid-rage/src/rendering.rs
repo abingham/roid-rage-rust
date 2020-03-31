@@ -1,6 +1,6 @@
 use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
 use ggez::{graphics, Context, GameResult};
-use nalgebra::Point2;
+use nalgebra::{Point2, Vector2};
 use std::f32::consts::PI;
 
 use crate::components::{Bullet, Fragment, Roid, Ship, Transform};
@@ -75,20 +75,18 @@ impl Render for Fragment {
 impl Render for Ship {
     fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
-        let center = ggez::nalgebra::Point2::<f32>::new(
-            transform.0.translation.vector.x,
-            transform.0.translation.vector.y,
-        );
+        let center = Point2::<f32>::new(0.0, 0.0);
         let points = vec![
-            center + ggez::nalgebra::Vector2::<f32>::new(self.length / 2.0, 0.0),
-            center
-                + ggez::nalgebra::Vector2::<f32>::new(
-                    -1.0 * self.length / 2.0,
-                    -1.0 * self.width / 2.0,
-                ),
-            center
-                + ggez::nalgebra::Vector2::<f32>::new(-1.0 * self.length / 2.0, self.width / 2.0),
+            center + Vector2::<f32>::new(self.length / 2.0, 0.0),
+            center + Vector2::<f32>::new(-1.0 * self.length / 2.0, -1.0 * self.width / 2.0),
+            center + Vector2::<f32>::new(-1.0 * self.length / 2.0, self.width / 2.0),
         ];
+        let points: Vec<ggez::nalgebra::Point2<f32>> = points
+            .iter()
+            .map(|p| transform.0.transform_point(p))
+            .map(|p| ggez::nalgebra::Point2::<f32>::new(p.x, p.y))
+            .collect();
+
         mb.polygon(
             DrawMode::stroke(1.0),
             &points,

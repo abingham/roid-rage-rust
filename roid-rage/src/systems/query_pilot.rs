@@ -1,4 +1,6 @@
-use crate::components::{make_bullet, Bullet, LinearVelocity, Roid, Ship, TimeDelta, Transform};
+use crate::components::{
+    make_bullet, AngularVelocity, Bullet, LinearVelocity, Roid, Ship, TimeDelta, Transform,
+};
 use crate::core::field::Field;
 use crate::core::pilot;
 use crate::settings::Settings;
@@ -24,6 +26,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Ship>,
         ReadStorage<'s, LinearVelocity>,
+        WriteStorage<'s, AngularVelocity>,
         ReadStorage<'s, Transform>,
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
@@ -40,6 +43,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             roids,
             ships,
             linear_velocities,
+            mut angular_velocities,
             transforms,
             _bullets,
             field,
@@ -59,23 +63,26 @@ impl<'s> System<'s> for QueryPilotSystem {
                 radius: roid.radius,
                 position: pilot::Point::from(transform.0.translation.vector),
                 velocity: pilot::Point::from(linear_velocity.0),
-            }).collect();
+            })
+            .collect();
 
-        for (ship, transform) in (&ships, &transforms).join() {
+        for (ship, transform, angular_velocity) in
+            (&ships, &transforms, &mut angular_velocities).join()
+        {
             let ship_center = Point2::<f32>::new(
                 transform.0.translation.vector.x,
                 transform.0.translation.vector.y,
             );
 
             let firing_position = pilot::Point::new(
-                ship_center.x + ship.heading.cos() * ship.length / 2.0,
-                ship_center.y + ship.heading.sin() * ship.length / 2.0,
-            ); 
+                ship_center.x + transform.0.rotation.cos_angle() * ship.length / 2.0,
+                ship_center.y + transform.0.rotation.sin_angle() * ship.length / 2.0,
+            );
 
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_bearing: ship.heading,
+                firing_bearing: transform.0.rotation.angle(),
                 bullet_speed: settings.bullet_speed,
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
 
@@ -97,13 +104,14 @@ impl<'s> System<'s> for QueryPilotSystem {
                                 entity: new_entity,
                                 lazy: &*lazy,
                             },
-                            Point2::<f32>::new(
-                                firing_position.x,
-                                firing_position.y),
+                            Point2::<f32>::new(firing_position.x, firing_position.y),
                             settings.bullet_speed,
-                            ship.heading,
+                            transform.0.rotation.angle(),
                             &mut collision_world,
                         );
+
+                        // TODO: Angular velocity of ship should be in settings.
+                        angular_velocity.0 = (command.rotation as f32) * 0.01;
                     }
                 }
             }

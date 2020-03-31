@@ -5,15 +5,13 @@ use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
 
 pub struct Ship {
-    pub heading: f32,
     pub length: f32,
     pub width: f32,
 }
 
 impl Ship {
-    pub fn new(heading: f32, length: f32, width: f32) -> Self {
+    pub fn new(length: f32, width: f32) -> Self {
         Ship {
-            heading: heading,
             length: length,
             width: width,
         }
@@ -39,7 +37,7 @@ pub fn make_ship<B>(
 ) where
     B: specs::world::Builder,
 {
-    let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
+    let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), heading));
 
     // let mut collision_groups = CollisionGroups::new();
     // collision_groups.set_membership(&[ROID_GROUP]);
@@ -65,7 +63,7 @@ pub fn make_ship<B>(
         .with(transform)
         .with(Wrapping)
         // .with(CollisionHandle(collision_handle))
-        .with(Ship::new(heading, length, width))
+        .with(Ship::new(length, width))
         .build();
 
     // Annotate the collision object with the entity's ID

@@ -22,7 +22,7 @@ fn update(game_state: Json<GameState>) -> Json<Command> {
     let cmd = match target {
         Some(_bearing) => Command {
             fire: true,
-            rotation: 0,
+            rotation: 1,
         },
         None => Command {
             fire: false,
