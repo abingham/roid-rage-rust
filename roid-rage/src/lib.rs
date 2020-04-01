@@ -11,7 +11,7 @@ use crate::systems::{
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 
-use crate::components::{Bullet, Fragment, Roid, Ship, TimeDelta, Position, Rotation};
+use crate::components::{Bullet, Fragment, Position, Roid, Rotation, Ship, TimeDelta};
 use crate::rendering::Render;
 use ggez::event::EventHandler;
 use ggez::timer;

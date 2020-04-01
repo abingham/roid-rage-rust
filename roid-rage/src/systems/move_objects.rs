@@ -1,4 +1,4 @@
-use crate::components::{AngularVelocity, LinearVelocity, TimeDelta, Position, Rotation};
+use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, TimeDelta};
 use specs::{Join, Read, ReadStorage, System, WriteStorage};
 
 pub struct MoveObjectsSystem;

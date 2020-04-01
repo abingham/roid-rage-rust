@@ -1,4 +1,4 @@
-use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Roid, Position};
+use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Position, Roid};
 use crate::core::util::random_bearing;
 use crate::core::velocity::Velocity;
 use crate::settings::Settings;

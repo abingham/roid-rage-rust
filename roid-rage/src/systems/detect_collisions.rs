@@ -1,5 +1,5 @@
-use crate::components::{Position, Collision};
 use crate::components::CollisionHandle;
+use crate::components::{Collision, Position};
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent};
 use ncollide2d::world::CollisionWorld;

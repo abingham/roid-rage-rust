@@ -1,6 +1,6 @@
+use nalgebra::Point2;
 use specs::Component;
 use specs::DenseVecStorage;
-use nalgebra::Point2;
 
 // TODO: Perhaps this should be a vector? Many (all?) uses of position want it as a vector, not a point.
 #[derive(Clone)]

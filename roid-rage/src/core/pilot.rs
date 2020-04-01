@@ -1,7 +1,6 @@
 use nalgebra::{Point2, Vector2};
 use serde::{Deserialize, Serialize};
 
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Roid {
     pub id: u32,

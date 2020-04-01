@@ -1,7 +1,7 @@
 use crate::components::{Position, Wrapping};
 use crate::core::field::Field;
-use specs::{Join, ReadExpect, ReadStorage, System, WriteStorage};
 use nalgebra::Point2;
+use specs::{Join, ReadExpect, ReadStorage, System, WriteStorage};
 
 pub struct WrapObjectsSystem;
 

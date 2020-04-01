@@ -1,5 +1,5 @@
 use crate::components::{
-    make_bullet, AngularVelocity, Bullet, LinearVelocity, Roid, Ship, TimeDelta,Position, Rotation
+    make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
 };
 use crate::core::field::Field;
 use crate::core::pilot;
