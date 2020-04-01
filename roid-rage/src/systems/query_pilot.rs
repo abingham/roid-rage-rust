@@ -113,7 +113,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                         );
 
                         // TODO: Angular velocity of ship should be in settings.
-                        angular_velocity.0 = (command.rotation as f32) * 0.01;
+                        angular_velocity.0 = (command.rotation as f32) * 1.0;
                     }
                 }
             }
