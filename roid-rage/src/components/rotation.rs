@@ -1,5 +1,5 @@
 use specs::Component;
-use specs::DenseVecStorage;
+use specs::VecStorage;
 
 type Radians = f32;
 
@@ -7,5 +7,5 @@ type Radians = f32;
 pub struct Rotation(pub Radians);
 
 impl Component for Rotation {
-    type Storage = DenseVecStorage<Self>;
+    type Storage = VecStorage<Self>;
 }

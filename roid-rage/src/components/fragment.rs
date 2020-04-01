@@ -2,7 +2,7 @@ use crate::components::{LinearVelocity, Position};
 use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::Point2;
 use rand::prelude::*;
-use specs::{Component, VecStorage};
+use specs::{Component, HashMapStorage};
 use std::time::Duration;
 
 pub struct Fragment {
@@ -24,8 +24,7 @@ impl Fragment {
 }
 
 impl Component for Fragment {
-    // TODO: Is this the wrong storage type? Use something sparser?
-    type Storage = VecStorage<Self>;
+    type Storage = HashMapStorage<Self>;
 }
 
 // TODO: This should use the builder pattern from e.g. roid.

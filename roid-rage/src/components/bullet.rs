@@ -5,7 +5,7 @@ use nalgebra::{Isometry2, Point2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
-use specs::{Component, VecStorage};
+use specs::{Component, HashMapStorage};
 
 pub struct Bullet {}
 
@@ -20,8 +20,7 @@ impl Bullet {
 }
 
 impl Component for Bullet {
-    // TODO: Is this the wrong storage type? Use something sparser?
-    type Storage = VecStorage<Self>;
+    type Storage = HashMapStorage<Self>;
 }
 
 pub fn make_bullet<B>(

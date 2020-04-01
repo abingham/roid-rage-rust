@@ -2,7 +2,7 @@ use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wra
 use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::Point2;
 use ncollide2d::world::CollisionWorld;
-use specs::{Component, VecStorage};
+use specs::{Component, HashMapStorage};
 
 pub struct Ship {
     pub length: f32,
@@ -19,8 +19,7 @@ impl Ship {
 }
 
 impl Component for Ship {
-    // TODO: Is this the wrong storage type? Use something sparser?
-    type Storage = VecStorage<Self>;
+    type Storage = HashMapStorage<Self>;
 }
 
 pub fn make_ship<B>(

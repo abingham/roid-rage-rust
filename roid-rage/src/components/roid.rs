@@ -39,7 +39,6 @@ impl Roid {
 }
 
 impl Component for Roid {
-    // TODO: Is this the wrong storage type? Use something sparser?
     type Storage = VecStorage<Self>;
 }
 
