@@ -43,7 +43,7 @@ pub fn collision_point(
     speed: f32,
     target_position: &Vector2<f32>,
     target_velocity: &Vector2<f32>,
-) -> Option<Vector2::<f32>> {
+) -> Option<Vector2<f32>> {
     let delta_x = position[0] - target_position.x;
     let delta_y = position[1] - target_position.y;
 

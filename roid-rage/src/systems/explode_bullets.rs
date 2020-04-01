@@ -35,8 +35,9 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
                         lazy: &*lazy,
                     },
                     position.0.x,
-                    position.0.y, 
-                    random_bearing());
+                    position.0.y,
+                    random_bearing(),
+                );
             }
         }
     }

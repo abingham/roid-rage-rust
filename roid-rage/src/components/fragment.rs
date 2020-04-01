@@ -28,7 +28,8 @@ impl Component for Fragment {
 }
 
 pub fn make_fragment<B>(builder: B, x: f32, y: f32, bearing: f32)
-    where B: specs::world::Builder
+where
+    B: specs::world::Builder,
 {
     let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
 
