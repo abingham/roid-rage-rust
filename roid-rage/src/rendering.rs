@@ -1,16 +1,16 @@
 use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
 use ggez::{graphics, Context, GameResult};
-use nalgebra::{Point2, Vector2};
+use nalgebra::{Point2};
 use std::f32::consts::PI;
 
-use crate::components::{Bullet, Fragment, Roid, Ship, Transform};
+use crate::components::{Bullet, Fragment, Roid, Ship};
 
 pub trait Render {
-    fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()>;
+    fn render(&self, position: Point2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()>;
 }
 
 impl Render for Roid {
-    fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Point2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let angle_step = (PI * 2.0) / self.points.len() as f32;
         let line_points: Vec<ggez::nalgebra::Point2<f32>> = self
             .points
@@ -18,9 +18,9 @@ impl Render for Roid {
             .enumerate()
             .map(|(i, distance)| {
                 let angle = angle_step * i as f32;
-                let edge_point = Point2::<f32>::new(angle.cos(), angle.sin()) * *distance;
-                let transformed = transform.0.transform_point(&edge_point);
-                ggez::nalgebra::Point2::new(transformed.x, transformed.y)
+                ggez::nalgebra::Point2::<f32>::new(angle.cos(), angle.sin()) * *distance
+                // let transformed = transform.0.transform_point(&edge_point);
+                // ggez::nalgebra::Point2::new(transformed.x, transformed.y)
             })
             .collect();
 
@@ -32,19 +32,17 @@ impl Render for Roid {
         )?;
 
         let mesh = mb.build(ctx)?;
-        graphics::draw(ctx, &mesh, DrawParam::new())
+        let param = DrawParam::new().rotation(rotation).dest(ggez::nalgebra::Point2::new(position.x, position.y));
+        graphics::draw(ctx, &mesh, param)
     }
 }
 
 impl Render for Bullet {
-    fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Point2<f32>, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            ggez::nalgebra::Point2::<f32>::new(
-                transform.0.translation.vector.x,
-                transform.0.translation.vector.y,
-            ),
+            ggez::nalgebra::Point2::<f32>::new(position.x, position.y),
             Bullet::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
@@ -55,14 +53,11 @@ impl Render for Bullet {
 }
 
 impl Render for Fragment {
-    fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Point2<f32>, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            ggez::nalgebra::Point2::<f32>::new(
-                transform.0.translation.vector.x,
-                transform.0.translation.vector.y,
-            ),
+            ggez::nalgebra::Point2::<f32>::new(position.x, position.y),
             Fragment::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
@@ -73,19 +68,14 @@ impl Render for Fragment {
 }
 
 impl Render for Ship {
-    fn render(&self, transform: &Transform, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Point2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
-        let center = Point2::<f32>::new(0.0, 0.0);
+        // let center = Point2::<f32>::new(0.0, 0.0);
         let points = vec![
-            center + Vector2::<f32>::new(self.length / 2.0, 0.0),
-            center + Vector2::<f32>::new(-1.0 * self.length / 2.0, -1.0 * self.width / 2.0),
-            center + Vector2::<f32>::new(-1.0 * self.length / 2.0, self.width / 2.0),
+            ggez::nalgebra::Point2::<f32>::new(self.length / 2.0, 0.0),
+            ggez::nalgebra::Point2::<f32>::new(-1.0 * self.length / 2.0, -1.0 * self.width / 2.0),
+            ggez::nalgebra::Point2::<f32>::new(-1.0 * self.length / 2.0, self.width / 2.0),
         ];
-        let points: Vec<ggez::nalgebra::Point2<f32>> = points
-            .iter()
-            .map(|p| transform.0.transform_point(p))
-            .map(|p| ggez::nalgebra::Point2::<f32>::new(p.x, p.y))
-            .collect();
 
         mb.polygon(
             DrawMode::stroke(1.0),
@@ -93,6 +83,9 @@ impl Render for Ship {
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
         let mesh = mb.build(ctx)?;
-        graphics::draw(ctx, &mesh, DrawParam::new())
+        let param = DrawParam::new()
+            .rotation(rotation)
+            .dest(ggez::nalgebra::Point2::new(position.x, position.y));
+        graphics::draw(ctx, &mesh, param)
     }
 }

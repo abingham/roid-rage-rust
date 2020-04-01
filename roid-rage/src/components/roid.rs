@@ -1,7 +1,7 @@
 use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
-use crate::components::{AngularVelocity, CollisionHandle, LinearVelocity, Transform, Wrapping};
+    use crate::components::{AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping};
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::{zero, Isometry2, Vector2};
+use nalgebra::{zero, Isometry2, Vector2, Point2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
@@ -54,7 +54,8 @@ pub fn make_roid<B>(
 ) where
     B: specs::world::Builder,
 {
-    let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), 0.0f32));
+    let position = Position(Point2::<f32>::new(x, y));
+    let rotation = Rotation(0.0f32);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);
@@ -77,7 +78,8 @@ pub fn make_roid<B>(
     let entity = builder
         .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
         .with(AngularVelocity(angular_velocity))
-        .with(transform)
+        .with(position)
+        .with(rotation)
         .with(Wrapping)
         .with(CollisionHandle(collision_handle))
         .with(Roid::new(radius, bumpiness))

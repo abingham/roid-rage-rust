@@ -31,7 +31,7 @@ impl<'s> System<'s> for RepopulateSystem {
                 + settings.min_initial_roid_speed;
             let bearing = random_bearing();
             let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
-            let angular_velocity = rng.gen::<f32>() * 0.005 + 0.005;
+            let angular_velocity = rng.gen::<f32>() * 0.5;
             let new_entity = entities.create();
             make_roid(
                 specs::world::LazyBuilder {

@@ -7,8 +7,9 @@ pub use self::linear_velocity::LinearVelocity;
 pub use self::roid::{make_roid, Roid};
 pub use self::ship::{make_ship, Ship};
 pub use self::time_delta::TimeDelta;
-pub use self::transform::Transform;
 pub use self::wrapping::Wrapping;
+pub use self::position::Position;
+pub use self::rotation::Rotation;
 
 mod angular_velocity;
 mod bullet;
@@ -20,5 +21,6 @@ mod linear_velocity;
 mod roid;
 mod ship;
 mod time_delta;
-mod transform;
 mod wrapping;
+mod position;
+mod rotation;

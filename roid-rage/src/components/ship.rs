@@ -1,6 +1,6 @@
-use crate::components::{AngularVelocity, LinearVelocity, Transform, Wrapping};
+use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::{Isometry2, Vector2};
+use nalgebra::{Point2};
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, VecStorage};
 
@@ -37,7 +37,8 @@ pub fn make_ship<B>(
 ) where
     B: specs::world::Builder,
 {
-    let transform = Transform(Isometry2::new(Vector2::<f32>::new(x, y), heading));
+    let position = Position(Point2::<f32>::new(x, y));
+    let rotation = Rotation(heading);
 
     // let mut collision_groups = CollisionGroups::new();
     // collision_groups.set_membership(&[ROID_GROUP]);
@@ -60,7 +61,8 @@ pub fn make_ship<B>(
     let _entity = builder
         .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
         .with(AngularVelocity(angular_velocity))
-        .with(transform)
+        .with(position)
+        .with(rotation)
         .with(Wrapping)
         // .with(CollisionHandle(collision_handle))
         .with(Ship::new(length, width))

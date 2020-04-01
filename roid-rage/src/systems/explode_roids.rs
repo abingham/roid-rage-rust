@@ -1,4 +1,4 @@
-use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Roid, Transform};
+use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Roid, Position};
 use crate::core::util::random_bearing;
 use crate::core::velocity::Velocity;
 use crate::settings::Settings;
@@ -14,7 +14,7 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
         ReadStorage<'s, Roid>,
         ReadStorage<'s, LinearVelocity>,
         ReadStorage<'s, AngularVelocity>,
-        ReadStorage<'s, Transform>,
+        ReadStorage<'s, Position>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
         ReadExpect<'s, Settings>,
@@ -28,19 +28,19 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
             roids,
             linear_motions,
             angular_velocities,
-            transforms,
+            positions,
             entities,
             mut collision_world,
             settings,
             lazy,
         ): Self::SystemData,
     ) {
-        for (_, roid, lm, av, transform, entity) in (
+        for (_, roid, lm, av, position, entity) in (
             &collisions,
             &roids,
             &linear_motions,
             &angular_velocities,
-            &transforms,
+            &positions,
             &entities,
         )
             .join()
@@ -58,8 +58,8 @@ impl<'s> System<'s> for ExplodeRoidsSystem {
                             entity: new_entity,
                             lazy: &*lazy,
                         },
-                        transform.0.translation.x,
-                        transform.0.translation.y,
+                        position.0.x,
+                        position.0.y,
                         lm.0.speed() * 1.5,
                         random_bearing(),
                         av.0 * 2.0,

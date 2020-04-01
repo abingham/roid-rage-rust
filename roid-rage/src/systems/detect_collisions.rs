@@ -1,6 +1,5 @@
-use crate::components::Collision;
+use crate::components::{Position, Collision};
 use crate::components::CollisionHandle;
-use crate::components::Transform;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent};
 use ncollide2d::world::CollisionWorld;
@@ -11,7 +10,7 @@ pub struct DetectCollisionsSystem;
 
 impl<'s> System<'s> for DetectCollisionsSystem {
     type SystemData = (
-        ReadStorage<'s, Transform>,
+        ReadStorage<'s, Position>,
         ReadStorage<'s, CollisionHandle>,
         WriteStorage<'s, Collision>,
         Entities<'s>,
@@ -20,12 +19,12 @@ impl<'s> System<'s> for DetectCollisionsSystem {
 
     fn run(
         &mut self,
-        (transforms, collision_handles, mut collision_markers, entities, mut collision_world): Self::SystemData,
+        (positions, collision_handles, mut collision_markers, entities, mut collision_world): Self::SystemData,
     ) {
-        for (transform, handle) in (&transforms, &collision_handles).join() {
+        for (position, handle) in (&positions, &collision_handles).join() {
             if let Some(collision_object) = collision_world.get_mut(handle.0) {
                 collision_object.set_position(Isometry2::new(
-                    Vector2::new(transform.0.translation.x, transform.0.translation.y),
+                    Vector2::new(position.0.x, position.0.y),
                     zero(),
                 ));
             }

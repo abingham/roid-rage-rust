@@ -1,7 +1,7 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
-use crate::components::{CollisionHandle, LinearVelocity, Transform};
+use crate::components::{CollisionHandle, LinearVelocity, Position};
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::{zero, Isometry2, Point2, Vector2};
+use nalgebra::{Isometry2, Point2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
@@ -33,8 +33,7 @@ pub fn make_bullet<B>(
 ) where
     B: specs::world::Builder,
 {
-    let isometry = Isometry2::new(Vector2::new(pos.x, pos.y), zero());
-    let transform = Transform(isometry);
+    let position = Position(pos);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[WEAPON_GROUP]);
@@ -44,7 +43,7 @@ pub fn make_bullet<B>(
 
     // Put entry in collision world
     let (collision_handle, obj) = collision_world.add(
-        isometry,
+        Isometry2::new(Vector2::<f32>::new(pos.x, pos.y), 0.0f32),
         collision_shape,
         collision_groups,
         GeometricQueryType::Contacts(0.0, 0.0),
@@ -55,7 +54,7 @@ pub fn make_bullet<B>(
     let entity = builder
         .with(Bullet::new())
         .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
-        .with(transform)
+        .with(position)
         .with(CollisionHandle(collision_handle))
         .build();
 

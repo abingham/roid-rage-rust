@@ -1,10 +1,11 @@
-use nalgebra::Isometry2;
 use specs::Component;
 use specs::DenseVecStorage;
 
-#[derive(Clone)]
-pub struct Transform(pub Isometry2<f32>);
+type Radians = f32;
 
-impl Component for Transform {
+#[derive(Clone)]
+pub struct Rotation(pub Radians);
+
+impl Component for Rotation {
     type Storage = DenseVecStorage<Self>;
 }

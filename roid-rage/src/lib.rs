@@ -11,7 +11,7 @@ use crate::systems::{
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 
-use crate::components::{Bullet, Fragment, Roid, Ship, TimeDelta, Transform};
+use crate::components::{Bullet, Fragment, Roid, Ship, TimeDelta, Position, Rotation};
 use crate::rendering::Render;
 use ggez::event::EventHandler;
 use ggez::timer;
@@ -130,40 +130,44 @@ impl EventHandler for RoidRage {
         // TODO: Can we express the rendering as systems? This seems like the natural way to do things, but context
         // seems to get in the way.
 
-        for (transform, roid) in (
-            &self.world.read_storage::<Transform>(),
+        for (position, rotation, roid) in (
+            &self.world.read_storage::<Position>(),
+            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Roid>(),
         )
             .join()
         {
-            roid.render(&transform, ctx)?;
+            roid.render(position.0, rotation.0, ctx)?;
         }
 
-        for (transform, bullet) in (
-            &self.world.read_storage::<Transform>(),
+        for (position, rotation, bullet) in (
+            &self.world.read_storage::<Position>(),
+            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Bullet>(),
         )
             .join()
         {
-            bullet.render(&transform, ctx)?;
+            bullet.render(position.0, rotation.0, ctx)?;
         }
 
-        for (transform, ship) in (
-            &self.world.read_storage::<Transform>(),
+        for (position, rotation, ship) in (
+            &self.world.read_storage::<Position>(),
+            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Ship>(),
         )
             .join()
         {
-            ship.render(&transform, ctx)?;
+            ship.render(position.0, rotation.0, ctx)?;
         }
 
-        for (transform, fragment) in (
-            &self.world.read_storage::<Transform>(),
+        for (position, rotation, fragment) in (
+            &self.world.read_storage::<Position>(),
+            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Fragment>(),
         )
             .join()
         {
-            fragment.render(&transform, ctx)?;
+            fragment.render(position.0, rotation.0, ctx)?;
         }
 
         graphics::present(ctx)?;

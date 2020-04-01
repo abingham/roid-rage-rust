@@ -1,5 +1,5 @@
 use crate::components::{
-    make_bullet, AngularVelocity, Bullet, LinearVelocity, Roid, Ship, TimeDelta, Transform,
+    make_bullet, AngularVelocity, Bullet, LinearVelocity, Roid, Ship, TimeDelta,Position, Rotation
 };
 use crate::core::field::Field;
 use crate::core::pilot;
@@ -27,7 +27,8 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Ship>,
         ReadStorage<'s, LinearVelocity>,
         WriteStorage<'s, AngularVelocity>,
-        ReadStorage<'s, Transform>,
+        ReadStorage<'s, Position>,
+        ReadStorage<'s, Rotation>,
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
         Read<'s, TimeDelta>,
@@ -44,7 +45,8 @@ impl<'s> System<'s> for QueryPilotSystem {
             ships,
             linear_velocities,
             mut angular_velocities,
-            transforms,
+            positions,
+            rotations,
             _bullets,
             field,
             time_delta,
@@ -56,33 +58,33 @@ impl<'s> System<'s> for QueryPilotSystem {
     ) {
         self.fire_timer += time_delta.0.as_secs_f32();
 
-        let roids: Vec<pilot::Roid> = (&roids, &linear_velocities, &transforms, &entities)
+        let roids: Vec<pilot::Roid> = (&roids, &linear_velocities, &positions, &entities)
             .join()
-            .map(|(roid, linear_velocity, transform, entity)| pilot::Roid {
+            .map(|(roid, linear_velocity, position, entity)| pilot::Roid {
                 id: entity.id(),
                 radius: roid.radius,
-                position: Point2::<f32>::from(transform.0.translation.vector),
+                position: position.0,
                 velocity: linear_velocity.0,
             })
             .collect();
 
-        for (ship, transform, angular_velocity) in
-            (&ships, &transforms, &mut angular_velocities).join()
+        for (ship, position, rotation, angular_velocity) in
+            (&ships, &positions, &rotations, &mut angular_velocities).join()
         {
-            let ship_center = Point2::<f32>::from(transform.0.translation.vector);
+            let ship_center = position.0;
             // .x,
             //     transform.0.translation.vector.y,
             // );
 
             let firing_position = Point2::<f32>::new(
-                ship_center.x + transform.0.rotation.cos_angle() * ship.length / 2.0,
-                ship_center.y + transform.0.rotation.sin_angle() * ship.length / 2.0,
+                ship_center.x + rotation.0.cos() * ship.length / 2.0,
+                ship_center.y + rotation.0.sin() * ship.length / 2.0,
             );
 
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_bearing: transform.0.rotation.angle(),
+                firing_bearing: rotation.0,
                 bullet_speed: settings.bullet_speed,
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
 
@@ -106,7 +108,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                             },
                             Point2::<f32>::new(firing_position.x, firing_position.y),
                             settings.bullet_speed,
-                            transform.0.rotation.angle(),
+                            rotation.0,
                             &mut collision_world,
                         );
 
