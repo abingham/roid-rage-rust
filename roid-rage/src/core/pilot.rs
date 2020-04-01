@@ -17,12 +17,8 @@ pub struct GameState {
     /// The point from which a bullet will be fired
     pub firing_position: Vector2<f32>,
 
-    // TODO: Could just model bullet as velocity (bearing + speed)
-    /// The bearing from which a bullet will be fired
-    pub firing_bearing: f32,
-
-    /// The speed of the bullet    
-    pub bullet_speed: f32,
+    /// The bearing and speed of the bullet 
+    pub firing_velocity: Vector2<f32>,
 
     /// The time left until a bullet may be fired
     pub time_to_fire: f32,

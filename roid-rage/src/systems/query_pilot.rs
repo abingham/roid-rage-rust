@@ -3,6 +3,7 @@ use crate::components::{
 };
 use crate::core::field::Field;
 use crate::core::pilot;
+use crate::core::velocity::from_speed_and_bearing;
 use crate::settings::Settings;
 use nalgebra::Vector2;
 use ncollide2d::world::CollisionWorld;
@@ -84,8 +85,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_bearing: rotation.0,
-                bullet_speed: settings.bullet_speed,
+                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.0),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship_angular_velocity: settings.ship_angular_velocity

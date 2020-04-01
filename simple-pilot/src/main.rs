@@ -9,12 +9,13 @@ use rocket::{catch, catchers, post, routes};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
 use roid_rage::core::pilot::{Command, GameState};
+use roid_rage::core::velocity::Velocity;
 
 #[post("/", format = "json", data = "<game_state>")]
 fn update(game_state: Json<GameState>) -> Json<Command> {
     let target = find_target(
         &game_state.firing_position,
-        game_state.bullet_speed,
+        game_state.firing_velocity.speed(),
         &game_state.field,
         &game_state.roids,
     );
