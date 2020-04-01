@@ -27,14 +27,16 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
             }
 
             for _ in 0..(rng.next_u32() % 5 + 5) {
-                let (vel, xform, bullet) =
-                    make_fragment(position.0.x, position.0.y, random_bearing());
-
                 let new_entity = entities.create();
 
-                lazy.insert(new_entity, bullet);
-                lazy.insert(new_entity, vel);
-                lazy.insert(new_entity, xform);
+                make_fragment(
+                    specs::world::LazyBuilder {
+                        entity: new_entity,
+                        lazy: &*lazy,
+                    },
+                    position.0.x,
+                    position.0.y, 
+                    random_bearing());
             }
         }
     }

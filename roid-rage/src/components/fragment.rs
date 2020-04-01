@@ -27,12 +27,14 @@ impl Component for Fragment {
     type Storage = HashMapStorage<Self>;
 }
 
-// TODO: This should use the builder pattern from e.g. roid.
-pub fn make_fragment(x: f32, y: f32, bearing: f32) -> (LinearVelocity, Position, Fragment) {
+pub fn make_fragment<B>(builder: B, x: f32, y: f32, bearing: f32)
+    where B: specs::world::Builder
+{
     let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
-    (
-        LinearVelocity(from_speed_and_bearing(speed, bearing)),
-        Position(Vector2::<f32>::new(x, y)),
-        Fragment::new(),
-    )
+
+    builder
+        .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
+        .with(Position(Vector2::<f32>::new(x, y)))
+        .with(Fragment::new())
+        .build();
 }
