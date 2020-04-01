@@ -3,7 +3,7 @@ use crate::components::{
     AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping,
 };
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::{zero, Isometry2, Point2, Vector2};
+use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
@@ -55,14 +55,14 @@ pub fn make_roid<B>(
 ) where
     B: specs::world::Builder,
 {
-    let position = Position(Point2::<f32>::new(x, y));
+    let position = Position(Vector2::<f32>::new(x, y));
     let rotation = Rotation(0.0f32);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);
     collision_groups.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
 
-    let collision_isometry = Isometry2::new(Vector2::new(x, y), zero());
+    let collision_isometry = Isometry2::new(position.0, zero());
 
     let collision_shape = ShapeHandle::new(Ball::new(radius));
 

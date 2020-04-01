@@ -1,6 +1,6 @@
 use crate::components::{LinearVelocity, Position};
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::Point2;
+use nalgebra::Vector2;
 use rand::prelude::*;
 use specs::{Component, HashMapStorage};
 use std::time::Duration;
@@ -32,7 +32,7 @@ pub fn make_fragment(x: f32, y: f32, bearing: f32) -> (LinearVelocity, Position,
     let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
     (
         LinearVelocity(from_speed_and_bearing(speed, bearing)),
-        Position(Point2::<f32>::new(x, y)),
+        Position(Vector2::<f32>::new(x, y)),
         Fragment::new(),
     )
 }

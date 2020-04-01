@@ -1,11 +1,11 @@
-use nalgebra::{Point2, Vector2};
+use nalgebra::Vector2;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Roid {
     pub id: u32,
     pub radius: f32,
-    pub position: Point2<f32>,
+    pub position: Vector2<f32>,
     pub velocity: Vector2<f32>,
 }
 
@@ -15,7 +15,7 @@ pub struct GameState {
     pub field: crate::core::field::Field,
 
     /// The point from which a bullet will be fired
-    pub firing_position: Point2<f32>,
+    pub firing_position: Vector2<f32>,
 
     // TODO: Could just model bullet as velocity (bearing + speed)
     /// The bearing from which a bullet will be fired

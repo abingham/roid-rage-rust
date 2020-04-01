@@ -1,6 +1,6 @@
 use crate::components::{Position, Wrapping};
 use crate::core::field::Field;
-use nalgebra::Point2;
+use nalgebra::Vector2;
 use specs::{Join, ReadExpect, ReadStorage, System, WriteStorage};
 
 pub struct WrapObjectsSystem;
@@ -17,7 +17,7 @@ impl<'s> System<'s> for WrapObjectsSystem {
         for (position, _wrapping) in (&mut positions, &wrapping).join() {
             let (x, y) = field.wrap(position.0.x, position.0.y);
 
-            position.0 = Point2::<f32>::new(x, y);
+            position.0 = Vector2::<f32>::new(x, y);
         }
     }
 }

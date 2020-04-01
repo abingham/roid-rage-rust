@@ -1,7 +1,7 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
 use crate::components::{CollisionHandle, LinearVelocity, Position};
 use crate::core::velocity::from_speed_and_bearing;
-use nalgebra::{Isometry2, Point2, Vector2};
+use nalgebra::{Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
@@ -25,7 +25,7 @@ impl Component for Bullet {
 
 pub fn make_bullet<B>(
     builder: B,
-    pos: Point2<f32>,
+    pos: Vector2<f32>,
     speed: f32,
     bearing: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
@@ -42,7 +42,7 @@ pub fn make_bullet<B>(
 
     // Put entry in collision world
     let (collision_handle, obj) = collision_world.add(
-        Isometry2::new(Vector2::<f32>::new(pos.x, pos.y), 0.0f32),
+        Isometry2::new(pos, 0.0f32),
         collision_shape,
         collision_groups,
         GeometricQueryType::Contacts(0.0, 0.0),
