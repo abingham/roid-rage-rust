@@ -127,9 +127,6 @@ impl EventHandler for RoidRage {
 
         graphics::clear(ctx, graphics::BLACK);
 
-        // TODO: Can we express the rendering as systems? This seems like the natural way to do things, but context
-        // seems to get in the way.
-
         for (position, rotation, roid) in (
             &self.world.read_storage::<Position>(),
             &self.world.read_storage::<Rotation>(),
