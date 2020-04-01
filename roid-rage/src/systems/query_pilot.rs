@@ -87,8 +87,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                 firing_bearing: rotation.0,
                 bullet_speed: settings.bullet_speed,
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
-
                 roids: roids.clone(),
+                ship_angular_velocity: settings.ship_angular_velocity
             };
 
             // Pass game-state to pilot process
@@ -112,8 +112,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                             &mut collision_world,
                         );
 
-                        // TODO: Angular velocity of ship should be in settings.
-                        angular_velocity.0 = (command.rotation as f32) * 1.0;
+                        angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
                     }
                 }
             }

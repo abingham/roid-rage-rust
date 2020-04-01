@@ -29,6 +29,8 @@ pub struct GameState {
 
     /// All of the roids in the game
     pub roids: Vec<Roid>,
+
+    pub ship_angular_velocity: f32,
 }
 
 /// Firing and movement command returned by the pilot
