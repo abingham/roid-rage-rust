@@ -140,14 +140,13 @@ impl EventHandler for RoidRage {
             roid.render(position.0, rotation.0, ctx)?;
         }
 
-        for (position, rotation, bullet) in (
+        for (position, bullet) in (
             &self.world.read_storage::<Position>(),
-            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Bullet>(),
         )
             .join()
         {
-            bullet.render(position.0, rotation.0, ctx)?;
+            bullet.render(position.0, 0.0, ctx)?;
         }
 
         for (position, rotation, ship) in (
@@ -160,14 +159,13 @@ impl EventHandler for RoidRage {
             ship.render(position.0, rotation.0, ctx)?;
         }
 
-        for (position, rotation, fragment) in (
+        for (position, fragment) in (
             &self.world.read_storage::<Position>(),
-            &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<Fragment>(),
         )
             .join()
         {
-            fragment.render(position.0, rotation.0, ctx)?;
+            fragment.render(position.0, 0.0, ctx)?;
         }
 
         graphics::present(ctx)?;

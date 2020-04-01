@@ -19,8 +19,6 @@ impl Render for Roid {
             .map(|(i, distance)| {
                 let angle = angle_step * i as f32;
                 ggez::nalgebra::Point2::<f32>::new(angle.cos(), angle.sin()) * *distance
-                // let transformed = transform.0.transform_point(&edge_point);
-                // ggez::nalgebra::Point2::new(transformed.x, transformed.y)
             })
             .collect();
 
