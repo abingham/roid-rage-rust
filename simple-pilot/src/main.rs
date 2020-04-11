@@ -24,10 +24,12 @@ fn update(game_state: Json<GameState>) -> Json<Command> {
         Some(_bearing) => Command {
             fire: true,
             rotation: 1,
+            thrusters: false,
         },
         None => Command {
             fire: false,
             rotation: 0,
+            thrusters: false,
         },
     };
 

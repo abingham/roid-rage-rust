@@ -13,6 +13,7 @@ fn update(game_state: Json<GameState>) -> Json<Command> {
     let cmd = Command {
         fire: false,
         rotation: 0,
+        thrusters: false,
     };
 
     Json(cmd)

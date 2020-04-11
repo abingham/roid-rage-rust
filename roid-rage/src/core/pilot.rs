@@ -9,6 +9,15 @@ pub struct Roid {
     pub velocity: Vector2<f32>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Ship {
+    pub position: Vector2<f32>,
+    pub velocity: Vector2<f32>,
+    pub angular_velocity: f32,
+    pub heading: f32,
+    pub acceleration: f32,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct GameState {
     /// The field in which we're playing
@@ -26,7 +35,7 @@ pub struct GameState {
     /// All of the roids in the game
     pub roids: Vec<Roid>,
 
-    pub ship_angular_velocity: f32,
+    pub ship: Ship,
 }
 
 /// Firing and movement command returned by the pilot
@@ -37,6 +46,9 @@ pub struct Command {
 
     /// Rotation command: +1 = clockwise, 0 = none/stop, -1 = counterclockwise
     pub rotation: i8,
+
+    /// Whether to fire the thrusters (i.e. accelerate in current heading)
+    pub thrusters: bool
 }
 
 pub fn query_pilot(url: &str, game_state: &GameState) -> Result<Command, String> {

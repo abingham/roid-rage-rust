@@ -69,13 +69,10 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (ship, position, rotation, angular_velocity) in
-            (&ships, &positions, &rotations, &mut angular_velocities).join()
+        for (ship, position, rotation, angular_velocity, linear_velocity) in
+            (&ships, &positions, &rotations, &mut angular_velocities, &linear_velocities).join()
         {
             let ship_center = position.0;
-            // .x,
-            //     transform.0.translation.vector.y,
-            // );
 
             let firing_position = Vector2::<f32>::new(
                 ship_center.x + rotation.0.cos() * ship.length / 2.0,
@@ -88,7 +85,13 @@ impl<'s> System<'s> for QueryPilotSystem {
                 firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.0),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
-                ship_angular_velocity: settings.ship_angular_velocity,
+                ship: pilot::Ship {
+                    position: ship_center,
+                    velocity: linear_velocity.0, 
+                    angular_velocity: angular_velocity.0,
+                    heading: rotation.0,
+                    acceleration: 1.0, // TODO: This should come from settings
+                },
             };
 
             // Pass game-state to pilot process
@@ -113,6 +116,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                         );
                     }
                     angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
+                    // TODO: Process 'thrusters'
                 }
             }
         }
