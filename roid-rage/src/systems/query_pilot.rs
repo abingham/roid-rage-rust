@@ -111,10 +111,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                             rotation.0,
                             &mut collision_world,
                         );
-
-                        angular_velocity.0 =
-                            (command.rotation as f32) * settings.ship_angular_velocity;
                     }
+                    angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
                 }
             }
         }
