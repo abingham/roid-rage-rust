@@ -45,7 +45,6 @@ fn update(game_state: Json<GameState>, pilot_state: State<Mutex<PilotState>>) ->
         }
         Activity::Rotate(target) => {
             if game_state.ship.heading.approx_eq_ratio(target, 0.005) {
-                println!("target = {}, heading = {}", *target, game_state.ship.heading);
                 pilot_state.activity = Activity::Thrust(600);
             }
             else {
