@@ -37,7 +37,7 @@ pub fn make_ship<B>(
     B: specs::world::Builder,
 {
     let position = Position(Vector2::<f32>::new(x, y));
-    let rotation = Rotation(heading);
+    let rotation = Rotation::new(heading);
 
     // let mut collision_groups = CollisionGroups::new();
     // collision_groups.set_membership(&[ROID_GROUP]);

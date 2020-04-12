@@ -10,6 +10,7 @@ edition = "2018"
 nalgebra = "0.19"
 rocket="0.4"
 rocket_contrib="0.4"
+float-cmp = "0.6.0"
 
 [dependencies.roid_rage]
 path = "../roid-rage"

@@ -21,12 +21,14 @@ impl QueryPilotSystem {
     }
 }
 
+const SHIP_ACCELERATION: f32 = 10.0; // TODO: this should come from settings
+
 /// Identify target and shoot a bullet
 impl<'s> System<'s> for QueryPilotSystem {
     type SystemData = (
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Ship>,
-        ReadStorage<'s, LinearVelocity>,
+        WriteStorage<'s, LinearVelocity>,
         WriteStorage<'s, AngularVelocity>,
         ReadStorage<'s, Position>,
         ReadStorage<'s, Rotation>,
@@ -44,7 +46,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         (
             roids,
             ships,
-            linear_velocities,
+            mut linear_velocities,
             mut angular_velocities,
             positions,
             rotations,
@@ -70,27 +72,27 @@ impl<'s> System<'s> for QueryPilotSystem {
             .collect();
 
         for (ship, position, rotation, angular_velocity, linear_velocity) in
-            (&ships, &positions, &rotations, &mut angular_velocities, &linear_velocities).join()
+            (&ships, &positions, &rotations, &mut angular_velocities, &mut linear_velocities).join()
         {
             let ship_center = position.0;
 
             let firing_position = Vector2::<f32>::new(
-                ship_center.x + rotation.0.cos() * ship.length / 2.0,
-                ship_center.y + rotation.0.sin() * ship.length / 2.0,
+                ship_center.x + rotation.radians().cos() * ship.length / 2.0,
+                ship_center.y + rotation.radians().sin() * ship.length / 2.0,
             );
 
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.0),
+                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.radians()),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship: pilot::Ship {
                     position: ship_center,
                     velocity: linear_velocity.0, 
                     angular_velocity: angular_velocity.0,
-                    heading: rotation.0,
-                    acceleration: 1.0, // TODO: This should come from settings
+                    heading: rotation.radians(),
+                    acceleration: SHIP_ACCELERATION,
                 },
             };
 
@@ -111,12 +113,16 @@ impl<'s> System<'s> for QueryPilotSystem {
                             },
                             firing_position,
                             settings.bullet_speed,
-                            rotation.0,
+                            rotation.radians(),
                             &mut collision_world,
                         );
                     }
+
                     angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
-                    // TODO: Process 'thrusters'
+
+                    if command.thrusters {
+                        linear_velocity.0 = linear_velocity.0 + from_speed_and_bearing(SHIP_ACCELERATION, rotation.radians()) * time_delta.0.as_secs_f32();
+                    }
                 }
             }
         }
