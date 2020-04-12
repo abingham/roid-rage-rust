@@ -2,14 +2,11 @@
 
 extern crate nalgebra;
 
-use nalgebra::Vector2;
 use rocket::{catch, catchers, post, routes, State};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
 use roid_rage::core::pilot::{Command, GameState};
-use roid_rage::core::velocity::Velocity;
 use std::f32::consts::PI;
-use std::sync::atomic::Ordering;
 use std::sync::Mutex;
 use float_cmp::ApproxEqRatio;
 
