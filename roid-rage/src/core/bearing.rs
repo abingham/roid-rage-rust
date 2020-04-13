@@ -1,53 +1,61 @@
-use std::f32::consts::PI;
-
-type Angle = f32;
-
-const TAU: f32 = 2.0 * PI;
+use std::f64::consts::PI;
+use num::{Float, FromPrimitive, NumCast};
 
 /// A bearing is a direction between 0-2PI radians (0-360 degrees).
 #[derive(Copy, Clone)]
-pub struct Bearing {
-    a: Angle,
+pub struct Bearing<T: Float>
+{
+    a: T,
 }
 
-impl Bearing {
-    pub fn new(mut angle: Angle) -> Bearing {
-        while angle < 0.0 {
-            angle += TAU;
-        }
-        Bearing { a: angle % TAU }
+impl<T: Float + FromPrimitive> Bearing<T> {
+    fn tau() -> T {
+        let two = FromPrimitive::from_u8(2).unwrap();
+        Self::pi() * two
     }
 
-    pub fn radians(&self) -> f32 {
+    fn pi() -> T {
+        FromPrimitive::from_f64(PI).unwrap()
+    }
+
+    pub fn new(mut angle: T) -> Bearing<T> {
+        while angle < FromPrimitive::from_u8(0).unwrap() {
+            angle = angle + Self::tau();
+        }
+        Bearing { a: angle % Self::tau() }
+    }
+
+    pub fn radians(&self) -> T {
         self.a
     }
 
     /// Shortest angular distance between this bearing and another.
-    pub fn distance(&self, other: &Bearing) -> Angle {
+    pub fn distance(&self, other: &Bearing<T>) -> T {
+        let n1: T = FromPrimitive::from_i8(-1).unwrap();
         let d = other.a - self.a;
-        if d > PI {
-            d - TAU
-        } else if d < -PI {
-            d + TAU
+        if d > Self::pi() {
+            d - Self::tau() 
+        } else if d < n1 * Self::pi() {
+            d + Self::tau() 
         } else {
             d
         }
     }
 }
 
-impl std::ops::Add<Angle> for Bearing {
-    type Output = Bearing;
+impl<T: Float + FromPrimitive> std::ops::Add<T> for Bearing<T> {
+    type Output = Bearing<T>;
 
-    fn add(self, rhs: Angle) -> Self::Output {
-        Bearing::new(self.a + rhs)
+    fn add(self, rhs: T) -> Self::Output {
+        Bearing::<T>::new(self.a + rhs)
     }
 }
 
-impl std::ops::Sub<Angle> for Bearing {
-    type Output = Bearing;
+impl<T: Float + FromPrimitive> std::ops::Sub<T> for Bearing<T> {
+    type Output = Bearing<T>;
 
-    fn sub(self, rhs: f32) -> Self::Output {
-        Bearing::new(self.a - rhs)
+    fn sub(self, rhs: T) -> Self::Output {
+        Bearing::<T>::new(self.a - rhs)
     }
 }
 

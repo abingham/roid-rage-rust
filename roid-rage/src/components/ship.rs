@@ -25,13 +25,13 @@ impl Component for Ship {
 
 pub fn make_ship<B>(
     builder: B,
-    heading: Bearing,
+    heading: Bearing<f32>,
     length: f32,
     width: f32,
     x: f32,
     y: f32,
     speed: f32,
-    course: Bearing,
+    course: Bearing<f32>,
     angular_velocity: f32,
     _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
