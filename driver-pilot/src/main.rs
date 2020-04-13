@@ -6,17 +6,49 @@ use float_cmp::ApproxEqRatio;
 use rocket::{catch, catchers, post, routes, State};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::core::pilot::{Command, GameState};
+use roid_rage::core::pilot::{Command, GameState, Rotation};
 use std::f32::consts::PI;
 use std::sync::Mutex;
+use roid_rage::core::bearing::Bearing;
+use roid_rage::core::velocity::Velocity;
 
 enum Activity {
-    Thrust(usize),
-    Rotate(f32),
+    Accelerate(usize),
+    Stop
 }
 
 struct PilotState {
     activity: Activity,
+}
+
+fn stop_ship(game_state: &GameState) -> Command {
+    let heading = Bearing::new(game_state.ship.heading);
+    let bearing = Bearing::new(game_state.ship.velocity.bearing());        
+    let diff = heading.distance(&bearing);
+
+    let mut cmd = Command {
+        fire: false,
+        rotation: Rotation::None,
+        thrusters: false
+    };
+
+
+    // If we're not facing opposite to our motion, keep rotating to get there.
+    if !diff.approx_eq_ratio(&PI, 0.01) {
+        cmd.rotation = if diff.signum() as i8 > 0 {
+            Rotation::Counterclockwise
+        }
+        else {
+            Rotation::Clockwise
+        };
+    }
+
+    // If we're still moving, fire thrusters
+    else {
+        cmd.thrusters = true;
+    }
+
+    cmd
 }
 
 // Note:
@@ -27,27 +59,27 @@ struct PilotState {
 fn update(game_state: Json<GameState>, pilot_state: State<Mutex<PilotState>>) -> Json<Command> {
     let mut cmd = Command {
         fire: false,
-        rotation: 0,
+        rotation: Rotation::None,
         thrusters: false,
     };
 
     let mut pilot_state = pilot_state.lock().unwrap();
 
     match &pilot_state.activity {
-        Activity::Thrust(counter) => {
+        Activity::Accelerate(counter) => {
             if *counter == 0 {
-                let new_heading = (game_state.ship.heading + PI) % (PI * 2.0);
-                pilot_state.activity = Activity::Rotate(new_heading);
+                pilot_state.activity = Activity::Stop;
             } else {
-                pilot_state.activity = Activity::Thrust(counter - 1);
+                pilot_state.activity = Activity::Accelerate(counter - 1);
                 cmd.thrusters = true;
             }
-        }
-        Activity::Rotate(target) => {
-            if game_state.ship.heading.approx_eq_ratio(target, 0.005) {
-                pilot_state.activity = Activity::Thrust(600);
-            } else {
-                cmd.rotation = 1;
+        },
+        Activity::Stop => {
+            if game_state.ship.velocity.speed() < 0.1 {
+                pilot_state.activity = Activity::Accelerate(180);
+            }
+            else {
+                cmd = stop_ship(&*game_state);
             }
         }
     }
@@ -68,7 +100,7 @@ fn rocket() -> rocket::Rocket {
         .mount("/", routes![update])
         .register(catchers![not_found])
         .manage(Mutex::<PilotState>::new(PilotState {
-            activity: Activity::Thrust(600),
+            activity: Activity::Accelerate(90),
         }))
 }
 

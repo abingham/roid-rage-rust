@@ -127,7 +127,13 @@ impl<'s> System<'s> for QueryPilotSystem {
                         );
                     }
 
-                    angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
+                    let rotation_direction = match command.rotation {
+                        pilot::Rotation::Clockwise => 1.0,
+                        pilot::Rotation::Counterclockwise => -1.0,
+                        pilot::Rotation::None => 0.0,
+                    };
+
+                    angular_velocity.0 = rotation_direction * settings.ship_angular_velocity;
 
                     if command.thrusters {
                         linear_velocity.0 = linear_velocity.0

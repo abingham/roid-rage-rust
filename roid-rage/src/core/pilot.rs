@@ -14,7 +14,7 @@ pub struct Ship {
     pub position: Vector2<f32>,
     pub velocity: Vector2<f32>,
     pub angular_velocity: f32,
-    pub heading: f32,
+    pub heading: f32, // TODO: Express this as a Bearing. Will need some JSON work, I guess.
     pub acceleration: f32,
 }
 
@@ -38,14 +38,21 @@ pub struct GameState {
     pub ship: Ship,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub enum Rotation {
+    Clockwise,
+    Counterclockwise,
+    None,
+}
+
 /// Firing and movement command returned by the pilot
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Command {
     /// Whether or not to fire
     pub fire: bool,
 
-    /// Rotation command: +1 = clockwise, 0 = none/stop, -1 = counterclockwise
-    pub rotation: i8,
+    /// How to rotate
+    pub rotation: Rotation,
 
     /// Whether to fire the thrusters (i.e. accelerate in current heading)
     pub thrusters: bool,

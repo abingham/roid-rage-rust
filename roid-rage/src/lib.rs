@@ -5,15 +5,19 @@ pub mod settings;
 mod systems;
 
 use crate::core::field::Field;
+use crate::core::velocity::Velocity;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 
-use crate::components::{Bullet, Fragment, Position, Roid, Rotation, Ship, TimeDelta};
+use crate::components::{
+    Bullet, Fragment, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
+};
 use crate::rendering::Render;
 use ggez::event::EventHandler;
+use ggez::nalgebra::Point2;
 use ggez::timer;
 use ggez::{graphics, Context, GameResult};
 use ncollide2d::world::CollisionWorld;
@@ -21,13 +25,26 @@ use specs::prelude::*;
 use specs::Join;
 use std::time::Duration;
 
+struct Assets {
+    font: graphics::Font,
+}
+
+impl Assets {
+    pub fn new(ctx: &mut Context) -> GameResult<Assets> {
+        Ok(Assets {
+            font: graphics::Font::new(ctx, "/DejaVuSansMono.ttf")?,
+        })
+    }
+}
+
 pub struct RoidRage {
     world: World,
     dispatcher: Dispatcher<'static, 'static>,
+    assets: Assets,
 }
 
 impl RoidRage {
-    pub fn new(_ctx: &mut Context, settings: settings::Settings) -> RoidRage {
+    pub fn new(ctx: &mut Context, settings: settings::Settings) -> GameResult<RoidRage> {
         let mut world = World::new();
 
         world.insert(Field::new(
@@ -89,11 +106,14 @@ impl RoidRage {
 
         dispatcher.setup(&mut world);
 
+        let assets = Assets::new(ctx)?;
+
         // Load/create resources such as images here.
-        RoidRage {
+        Ok(RoidRage {
             world: world,
             dispatcher: dispatcher,
-        }
+            assets: assets,
+        })
     }
 }
 
@@ -154,6 +174,54 @@ impl EventHandler for RoidRage {
             .join()
         {
             ship.render(position.0, rotation.0.radians(), ctx)?;
+        }
+
+        for (rotation, linear_velocity, _ship) in (
+            &self.world.read_storage::<Rotation>(),
+            &self.world.read_storage::<LinearVelocity>(),
+            &self.world.read_storage::<Ship>(),
+        )
+            .join()
+        {
+            // HUD
+            let hud_font_size = 20.0;
+            let hud_x = settings.maximum_roid_radius + 10.0;
+            let hud_y = settings.maximum_roid_radius + 10.0;
+
+            let heading_text = graphics::Text::new((
+                format!("heading: {}", rotation.0.radians()),
+                self.assets.font,
+                hud_font_size,
+            ));
+            graphics::draw(
+                ctx,
+                &heading_text,
+                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+            )?;
+
+            let hud_y = hud_y + hud_font_size;
+            let bearing_text = graphics::Text::new((
+                format!("bearing: {}", linear_velocity.0.bearing()),
+                self.assets.font,
+                hud_font_size,
+            ));
+            graphics::draw(
+                ctx,
+                &bearing_text,
+                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+            )?;
+
+            let hud_y = hud_y + hud_font_size;
+            let speed_text = graphics::Text::new((
+                format!("speed: {}", linear_velocity.0.speed()),
+                self.assets.font,
+                hud_font_size,
+            ));
+            graphics::draw(
+                ctx,
+                &speed_text,
+                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+            )?;
         }
 
         for (position, fragment) in (
