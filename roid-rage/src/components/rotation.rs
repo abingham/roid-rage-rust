@@ -1,4 +1,4 @@
-use crate::core::bearing::Bearing;
+use sted::Bearing;
 use specs::Component;
 use specs::VecStorage;
 

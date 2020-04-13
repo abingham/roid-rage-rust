@@ -1,6 +1,6 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
-use crate::core::bearing::Bearing;
-use crate::core::velocity::from_speed_and_bearing;
+use sted::Bearing;
+use crate::core::util::from_speed_and_bearing;
 use nalgebra::Vector2;
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, HashMapStorage};

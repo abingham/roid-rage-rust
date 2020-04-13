@@ -11,3 +11,6 @@ rocket_contrib="0.4"
 
 [dependencies.roid_rage]
 path = "../roid-rage"
+
+[dependencies.sted]
+path = "../sted"

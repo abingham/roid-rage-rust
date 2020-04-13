@@ -5,7 +5,7 @@ pub mod settings;
 mod systems;
 
 use crate::core::field::Field;
-use crate::core::velocity::Velocity;
+use sted::Velocity;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,

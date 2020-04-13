@@ -9,7 +9,7 @@ use rocket::{catch, catchers, post, routes};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
 use roid_rage::core::pilot::{Command, GameState, Rotation};
-use roid_rage::core::velocity::Velocity;
+use sted::Velocity;
 
 #[post("/", format = "json", data = "<game_state>")]
 fn update(game_state: Json<GameState>) -> Json<Command> {

@@ -1,6 +1,6 @@
 use crate::components::{make_roid, AngularVelocity, Collision, LinearVelocity, Position, Roid};
 use crate::core::util::random_bearing;
-use crate::core::velocity::Velocity;
+use sted::Velocity;
 use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};

@@ -1,5 +1,5 @@
 use crate::components::{LinearVelocity, Position};
-use crate::core::velocity::from_speed_and_bearing;
+use crate::core::util::from_speed_and_bearing;
 use nalgebra::Vector2;
 use rand::prelude::*;
 use specs::{Component, HashMapStorage};

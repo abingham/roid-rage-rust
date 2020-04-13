@@ -2,7 +2,7 @@ use nalgebra::{Point2, Vector2};
 use roid_rage::core::collide::collision_vector;
 use roid_rage::core::field::Field;
 use roid_rage::core::pilot::Roid;
-use roid_rage::core::velocity::Velocity;
+use sted::Velocity;
 use std::cmp::Ordering;
 
 /// Return the bearing of the shot to make, if any.

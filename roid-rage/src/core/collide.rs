@@ -1,4 +1,4 @@
-use crate::core::velocity::Velocity;
+use sted::Velocity;
 use nalgebra::*;
 use std::cmp::Ordering;
 

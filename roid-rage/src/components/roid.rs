@@ -2,8 +2,8 @@ use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
 use crate::components::{
     AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping,
 };
-use crate::core::bearing::Bearing;
-use crate::core::velocity::from_speed_and_bearing;
+use sted::Bearing;
+use crate::core::util::from_speed_and_bearing;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};

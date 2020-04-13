@@ -7,9 +7,9 @@ use rand::prelude::*;
 use rocket::{catch, catchers, post, routes, State};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::core::bearing::Bearing;
+use sted::Bearing;
 use roid_rage::core::pilot::{Command, GameState, Rotation};
-use roid_rage::core::velocity::Velocity;
+use sted::Velocity;
 use std::f32::consts::PI;
 use std::sync::Mutex;
 

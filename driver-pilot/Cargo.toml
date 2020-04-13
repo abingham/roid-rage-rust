@@ -15,3 +15,6 @@ rand = "0.6.5"
 
 [dependencies.roid_rage]
 path = "../roid-rage"
+
+[dependencies.sted]
+path = "../sted"

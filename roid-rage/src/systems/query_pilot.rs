@@ -3,7 +3,7 @@ use crate::components::{
 };
 use crate::core::field::Field;
 use crate::core::pilot;
-use crate::core::velocity::from_speed_and_bearing;
+use crate::core::util::from_speed_and_bearing;
 use crate::settings::Settings;
 use nalgebra::Vector2;
 use ncollide2d::world::CollisionWorld;

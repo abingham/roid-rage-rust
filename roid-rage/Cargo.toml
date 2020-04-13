@@ -27,3 +27,6 @@ features = ["blocking", "json"]
 
 [dev-dependencies]
 float-cmp = "0.6.0"
+
+[dependencies.sted]
+path = "../sted"
