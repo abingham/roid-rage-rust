@@ -652,6 +652,7 @@ version = "0.1.0"
 dependencies = [
  "float-cmp",
  "nalgebra 0.19.0",
+ "rand 0.6.5",
  "rocket",
  "rocket_contrib",
  "roid_rage",

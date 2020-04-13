@@ -1,10 +1,9 @@
-use std::f64::consts::PI;
 use num::{Float, FromPrimitive, NumCast};
+use std::f64::consts::PI;
 
 /// A bearing is a direction between 0-2PI radians (0-360 degrees).
 #[derive(Copy, Clone)]
-pub struct Bearing<T: Float>
-{
+pub struct Bearing<T: Float> {
     a: T,
 }
 
@@ -22,7 +21,9 @@ impl<T: Float + FromPrimitive> Bearing<T> {
         while angle < FromPrimitive::from_u8(0).unwrap() {
             angle = angle + Self::tau();
         }
-        Bearing { a: angle % Self::tau() }
+        Bearing {
+            a: angle % Self::tau(),
+        }
     }
 
     pub fn radians(&self) -> T {
@@ -34,9 +35,9 @@ impl<T: Float + FromPrimitive> Bearing<T> {
         let n1: T = FromPrimitive::from_i8(-1).unwrap();
         let d = other.a - self.a;
         if d > Self::pi() {
-            d - Self::tau() 
+            d - Self::tau()
         } else if d < n1 * Self::pi() {
-            d + Self::tau() 
+            d + Self::tau()
         } else {
             d
         }

@@ -3,18 +3,19 @@
 extern crate nalgebra;
 
 use float_cmp::ApproxEqRatio;
+use rand::prelude::*;
 use rocket::{catch, catchers, post, routes, State};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
+use roid_rage::core::bearing::Bearing;
 use roid_rage::core::pilot::{Command, GameState, Rotation};
+use roid_rage::core::velocity::Velocity;
 use std::f32::consts::PI;
 use std::sync::Mutex;
-use roid_rage::core::bearing::Bearing;
-use roid_rage::core::velocity::Velocity;
 
 enum Activity {
     Accelerate(usize),
-    Stop
+    Stop,
 }
 
 struct PilotState {
@@ -23,26 +24,23 @@ struct PilotState {
 
 fn stop_ship(game_state: &GameState) -> Command {
     let heading = Bearing::new(game_state.ship.heading);
-    let course = Bearing::new(game_state.ship.velocity.bearing());        
+    let course = Bearing::new(game_state.ship.velocity.bearing());
     let diff = heading.distance(&course);
 
     let mut cmd = Command {
         fire: false,
         rotation: Rotation::None,
-        thrusters: false
+        thrusters: false,
     };
-
 
     // If we're not facing opposite to our motion, keep rotating to get there.
     if !diff.approx_eq_ratio(&PI, 0.01) {
         cmd.rotation = if diff.signum() as i8 > 0 {
             Rotation::Counterclockwise
-        }
-        else {
+        } else {
             Rotation::Clockwise
         };
     }
-
     // If we're still moving, fire thrusters
     else {
         cmd.thrusters = true;
@@ -73,12 +71,13 @@ fn update(game_state: Json<GameState>, pilot_state: State<Mutex<PilotState>>) ->
                 pilot_state.activity = Activity::Accelerate(counter - 1);
                 cmd.thrusters = true;
             }
-        },
+        }
         Activity::Stop => {
             if game_state.ship.velocity.speed() < 0.1 {
-                pilot_state.activity = Activity::Accelerate(180);
-            }
-            else {
+                let mut rng = rand::thread_rng();
+                let num_frames = rng.next_u32() % 300 + 300;
+                pilot_state.activity = Activity::Accelerate(num_frames as usize);
+            } else {
                 cmd = stop_ship(&*game_state);
             }
         }

@@ -1,6 +1,6 @@
 use ggez::conf;
 use ggez::event;
-use ggez::{GameResult, ContextBuilder};
+use ggez::{ContextBuilder, GameResult};
 use std::path;
 
 fn main() -> GameResult {

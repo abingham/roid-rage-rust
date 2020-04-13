@@ -8,7 +8,7 @@ use crate::targeting::find_target;
 use rocket::{catch, catchers, post, routes};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::core::pilot::{Rotation, Command, GameState};
+use roid_rage::core::pilot::{Command, GameState, Rotation};
 use roid_rage::core::velocity::Velocity;
 
 #[post("/", format = "json", data = "<game_state>")]
