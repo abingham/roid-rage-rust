@@ -656,6 +656,7 @@ dependencies = [
  "rocket",
  "rocket_contrib",
  "roid_rage",
+ "sted",
 ]
 
 [[package]]
@@ -2697,6 +2698,7 @@ dependencies = [
  "serde 1.0.105",
  "serde_derive",
  "specs",
+ "sted",
 ]
 
 [[package]]
@@ -2981,6 +2983,7 @@ dependencies = [
  "rocket",
  "rocket_contrib",
  "roid_rage",
+ "sted",
 ]
 
 [[package]]
@@ -3152,6 +3155,14 @@ name = "stdweb-internal-runtime"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "213701ba3370744dcd1a12960caa4843b3d68b4d1c0a5d575e0d65b2ee9d16c0"
+
+[[package]]
+name = "sted"
+version = "0.1.0"
+dependencies = [
+ "nalgebra 0.19.0",
+ "num",
+]
 
 [[package]]
 name = "syn"
