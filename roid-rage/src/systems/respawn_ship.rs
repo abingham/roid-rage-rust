@@ -24,7 +24,7 @@ impl<'s> System<'s> for RespawnShipSystem {
         let x = settings.screen_width / 2.0;
         let y = settings.screen_height / 2.0;
         let speed = 0.0;
-        let bearing = Bearing::new(0.0);
+        let course = Bearing::new(0.0);
         let heading = Bearing::new(0.0);
         let angular_velocity = 0.0;
         let new_entity = entities.create();
@@ -41,7 +41,7 @@ impl<'s> System<'s> for RespawnShipSystem {
             x,
             y,
             speed,
-            bearing,
+            course,
             angular_velocity,
             &mut collision_world,
         );

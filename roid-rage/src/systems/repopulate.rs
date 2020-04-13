@@ -29,7 +29,7 @@ impl<'s> System<'s> for RepopulateSystem {
             let speed = rng.gen::<f32>()
                 * (settings.max_initial_roid_speed - settings.min_initial_roid_speed)
                 + settings.min_initial_roid_speed;
-            let bearing = random_bearing();
+            let course = random_bearing();
             let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
             let angular_velocity = rng.gen::<f32>() * 0.5;
             let new_entity = entities.create();
@@ -41,7 +41,7 @@ impl<'s> System<'s> for RepopulateSystem {
                 x,
                 y,
                 speed,
-                bearing,
+                course,
                 angular_velocity,
                 radius,
                 settings.roid_bumpiness,

@@ -27,7 +27,7 @@ pub fn make_bullet<B>(
     builder: B,
     pos: Vector2<f32>,
     speed: f32,
-    bearing: f32,
+    course: f32,
     collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
     B: specs::world::Builder,
@@ -52,7 +52,7 @@ pub fn make_bullet<B>(
     // Create the entity
     let entity = builder
         .with(Bullet::new())
-        .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
+        .with(LinearVelocity(from_speed_and_bearing(speed, course)))
         .with(position)
         .with(CollisionHandle(collision_handle))
         .build();

@@ -48,7 +48,7 @@ pub fn make_roid<B>(
     x: f32,
     y: f32,
     speed: f32,
-    bearing: f32,
+    course: f32,
     angular_velocity: f32,
     radius: f32,
     bumpiness: f32,
@@ -78,7 +78,7 @@ pub fn make_roid<B>(
 
     // Create the entity
     let entity = builder
-        .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
+        .with(LinearVelocity(from_speed_and_bearing(speed, course)))
         .with(AngularVelocity(angular_velocity))
         .with(position)
         .with(rotation)

@@ -23,8 +23,8 @@ struct PilotState {
 
 fn stop_ship(game_state: &GameState) -> Command {
     let heading = Bearing::new(game_state.ship.heading);
-    let bearing = Bearing::new(game_state.ship.velocity.bearing());        
-    let diff = heading.distance(&bearing);
+    let course = Bearing::new(game_state.ship.velocity.bearing());        
+    let diff = heading.distance(&course);
 
     let mut cmd = Command {
         fire: false,

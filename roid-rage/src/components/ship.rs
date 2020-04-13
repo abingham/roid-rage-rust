@@ -31,7 +31,7 @@ pub fn make_ship<B>(
     x: f32,
     y: f32,
     speed: f32,
-    bearing: Bearing,
+    course: Bearing,
     angular_velocity: f32,
     _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
@@ -61,7 +61,7 @@ pub fn make_ship<B>(
     let _entity = builder
         .with(LinearVelocity(from_speed_and_bearing(
             speed,
-            bearing.radians(),
+            course.radians(),
         )))
         .with(AngularVelocity(angular_velocity))
         .with(position)
