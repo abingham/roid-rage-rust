@@ -2,6 +2,7 @@ use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
 use crate::components::{
     AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping,
 };
+use crate::core::bearing::Bearing;
 use crate::core::velocity::from_speed_and_bearing;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
@@ -56,7 +57,7 @@ pub fn make_roid<B>(
     B: specs::world::Builder,
 {
     let position = Position(Vector2::<f32>::new(x, y));
-    let rotation = Rotation::new(0.0f32);
+    let rotation = Rotation(Bearing::new(0.0f32));
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);

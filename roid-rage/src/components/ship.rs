@@ -1,5 +1,6 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
 use crate::core::velocity::from_speed_and_bearing;
+use crate::core::bearing::Bearing;
 use nalgebra::Vector2;
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, HashMapStorage};
@@ -24,20 +25,20 @@ impl Component for Ship {
 
 pub fn make_ship<B>(
     builder: B,
-    heading: f32,
+    heading: Bearing,
     length: f32,
     width: f32,
     x: f32,
     y: f32,
     speed: f32,
-    bearing: f32,
+    bearing: Bearing,
     angular_velocity: f32,
     _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
     B: specs::world::Builder,
 {
     let position = Position(Vector2::<f32>::new(x, y));
-    let rotation = Rotation::new(heading);
+    let rotation = Rotation(heading);
 
     // let mut collision_groups = CollisionGroups::new();
     // collision_groups.set_membership(&[ROID_GROUP]);
@@ -58,7 +59,7 @@ pub fn make_ship<B>(
 
     // Create the entity
     let _entity = builder
-        .with(LinearVelocity(from_speed_and_bearing(speed, bearing)))
+        .with(LinearVelocity(from_speed_and_bearing(speed, bearing.radians())))
         .with(AngularVelocity(angular_velocity))
         .with(position)
         .with(rotation)

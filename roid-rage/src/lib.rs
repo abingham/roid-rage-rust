@@ -134,7 +134,7 @@ impl EventHandler for RoidRage {
         )
             .join()
         {
-            roid.render(position.0, rotation.radians(), ctx)?;
+            roid.render(position.0, rotation.0.radians(), ctx)?;
         }
 
         for (position, bullet) in (
@@ -153,7 +153,7 @@ impl EventHandler for RoidRage {
         )
             .join()
         {
-            ship.render(position.0, rotation.radians(), ctx)?;
+            ship.render(position.0, rotation.0.radians(), ctx)?;
         }
 
         for (position, fragment) in (

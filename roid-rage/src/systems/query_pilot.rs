@@ -77,21 +77,21 @@ impl<'s> System<'s> for QueryPilotSystem {
             let ship_center = position.0;
 
             let firing_position = Vector2::<f32>::new(
-                ship_center.x + rotation.radians().cos() * ship.length / 2.0,
-                ship_center.y + rotation.radians().sin() * ship.length / 2.0,
+                ship_center.x + rotation.0.radians().cos() * ship.length / 2.0,
+                ship_center.y + rotation.0.radians().sin() * ship.length / 2.0,
             );
 
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.radians()),
+                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.0.radians()),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship: pilot::Ship {
                     position: ship_center,
                     velocity: linear_velocity.0, 
                     angular_velocity: angular_velocity.0,
-                    heading: rotation.radians(),
+                    heading: rotation.0.radians(),
                     acceleration: SHIP_ACCELERATION,
                 },
             };
@@ -113,7 +113,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                             },
                             firing_position,
                             settings.bullet_speed,
-                            rotation.radians(),
+                            rotation.0.radians(),
                             &mut collision_world,
                         );
                     }
@@ -121,7 +121,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                     angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
 
                     if command.thrusters {
-                        linear_velocity.0 = linear_velocity.0 + from_speed_and_bearing(SHIP_ACCELERATION, rotation.radians()) * time_delta.0.as_secs_f32();
+                        linear_velocity.0 = linear_velocity.0 + from_speed_and_bearing(SHIP_ACCELERATION, rotation.0.radians()) * time_delta.0.as_secs_f32();
                     }
                 }
             }

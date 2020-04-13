@@ -2,6 +2,7 @@ use std::f32::consts::PI;
 
 type Angle = f32;
 
+/// A bearing is a direction between 0-2PI radians (0-360 degrees).
 #[derive(Copy, Clone)]
 pub struct Bearing {
     a: Angle,

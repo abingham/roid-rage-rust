@@ -1,3 +1,4 @@
+use crate::core::bearing::Bearing;
 use crate::components::{make_ship, Ship};
 use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
@@ -23,8 +24,8 @@ impl<'s> System<'s> for RespawnShipSystem {
         let x = settings.screen_width / 2.0;
         let y = settings.screen_height / 2.0;
         let speed = 0.0;
-        let bearing = 0.0;
-        let heading = 0.0;
+        let bearing = Bearing::new(0.0);
+        let heading = Bearing::new(0.0);
         let angular_velocity = 0.0;
         let new_entity = entities.create();
         let length = 10.0;
