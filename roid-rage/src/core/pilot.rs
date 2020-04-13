@@ -48,7 +48,7 @@ pub struct Command {
     pub rotation: i8,
 
     /// Whether to fire the thrusters (i.e. accelerate in current heading)
-    pub thrusters: bool
+    pub thrusters: bool,
 }
 
 pub fn query_pilot(url: &str, game_state: &GameState) -> Result<Command, String> {

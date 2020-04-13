@@ -2,13 +2,13 @@
 
 extern crate nalgebra;
 
+use float_cmp::ApproxEqRatio;
 use rocket::{catch, catchers, post, routes, State};
 use rocket_contrib::json;
 use rocket_contrib::json::{Json, JsonValue};
 use roid_rage::core::pilot::{Command, GameState};
 use std::f32::consts::PI;
 use std::sync::Mutex;
-use float_cmp::ApproxEqRatio;
 
 enum Activity {
     Thrust(usize),
@@ -46,8 +46,7 @@ fn update(game_state: Json<GameState>, pilot_state: State<Mutex<PilotState>>) ->
         Activity::Rotate(target) => {
             if game_state.ship.heading.approx_eq_ratio(target, 0.005) {
                 pilot_state.activity = Activity::Thrust(600);
-            }
-            else {
+            } else {
                 cmd.rotation = 1;
             }
         }

@@ -2,6 +2,8 @@ use std::f32::consts::PI;
 
 type Angle = f32;
 
+const TAU: f32 = 2.0 * PI;
+
 /// A bearing is a direction between 0-2PI radians (0-360 degrees).
 #[derive(Copy, Clone)]
 pub struct Bearing {
@@ -11,11 +13,9 @@ pub struct Bearing {
 impl Bearing {
     pub fn new(mut angle: Angle) -> Bearing {
         while angle < 0.0 {
-            angle += 2.0 * PI;
+            angle += TAU;
         }
-        Bearing {
-            a: angle % (2.0 * PI),
-        }
+        Bearing { a: angle % TAU }
     }
 
     pub fn radians(&self) -> f32 {
@@ -26,15 +26,12 @@ impl Bearing {
     pub fn distance(&self, other: &Bearing) -> Angle {
         let d = other.a - self.a;
         if d > PI {
-            d - 2.0 * PI
-        }
-        else if d < -1.0 * PI {
-            d + 2.0 * PI
-        }
-        else {
+            d - TAU
+        } else if d < -PI {
+            d + TAU
+        } else {
             d
         }
-        
     }
 }
 
@@ -64,14 +61,14 @@ mod tests {
 
         #[test]
         fn test_constructor_clamp_positive() {
-            let a = Bearing::new(2.0 * PI + 1.234);
+            let a = Bearing::new(TAU + 1.234);
             assert!(approx_eq!(f32, a.radians(), 1.234));
         }
 
         #[test]
         fn test_constructor_clamp_negative() {
             let a = Bearing::new(-1.234);
-            assert!(approx_eq!(f32, a.radians(), -1.234 + 2.0 * PI));
+            assert!(approx_eq!(f32, a.radians(), -1.234 + TAU));
         }
     }
 
@@ -88,7 +85,7 @@ mod tests {
         fn test_add_positive_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 + 12.0;
-            assert!(approx_eq!(f32, a2.radians(), 13.0 % (2.0 * PI)));
+            assert!(approx_eq!(f32, a2.radians(), 13.0 % TAU));
         }
 
         #[test]
@@ -112,7 +109,7 @@ mod tests {
         fn test_subtract_positive_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 - -12.0;
-            assert!(approx_eq!(f32, a2.radians(), 13.0 % (2.0 * PI)));
+            assert!(approx_eq!(f32, a2.radians(), 13.0 % TAU));
         }
 
         #[test]
@@ -144,14 +141,14 @@ mod tests {
         fn test_negative_wrap() {
             let a1 = Bearing::new(0.1);
             let a2 = Bearing::new(6.0);
-            assert!(approx_eq!(f32, a1.distance(&a2), -2.0 * PI + 5.9))
+            assert!(approx_eq!(f32, a1.distance(&a2), -TAU + 5.9))
         }
 
         #[test]
         fn test_positive_wrap() {
             let a1 = Bearing::new(6.0);
             let a2 = Bearing::new(0.1);
-            assert!(approx_eq!(f32, a1.distance(&a2), (2.0 * PI - 6.0) + 0.1))
+            assert!(approx_eq!(f32, a1.distance(&a2), (TAU - 6.0) + 0.1))
         }
     }
 }

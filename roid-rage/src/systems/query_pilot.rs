@@ -71,8 +71,14 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (ship, position, rotation, angular_velocity, linear_velocity) in
-            (&ships, &positions, &rotations, &mut angular_velocities, &mut linear_velocities).join()
+        for (ship, position, rotation, angular_velocity, linear_velocity) in (
+            &ships,
+            &positions,
+            &rotations,
+            &mut angular_velocities,
+            &mut linear_velocities,
+        )
+            .join()
         {
             let ship_center = position.0;
 
@@ -84,12 +90,15 @@ impl<'s> System<'s> for QueryPilotSystem {
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_velocity: from_speed_and_bearing(settings.bullet_speed, rotation.0.radians()),
+                firing_velocity: from_speed_and_bearing(
+                    settings.bullet_speed,
+                    rotation.0.radians(),
+                ),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship: pilot::Ship {
                     position: ship_center,
-                    velocity: linear_velocity.0, 
+                    velocity: linear_velocity.0,
                     angular_velocity: angular_velocity.0,
                     heading: rotation.0.radians(),
                     acceleration: SHIP_ACCELERATION,
@@ -121,7 +130,9 @@ impl<'s> System<'s> for QueryPilotSystem {
                     angular_velocity.0 = (command.rotation as f32) * settings.ship_angular_velocity;
 
                     if command.thrusters {
-                        linear_velocity.0 = linear_velocity.0 + from_speed_and_bearing(SHIP_ACCELERATION, rotation.0.radians()) * time_delta.0.as_secs_f32();
+                        linear_velocity.0 = linear_velocity.0
+                            + from_speed_and_bearing(SHIP_ACCELERATION, rotation.0.radians())
+                                * time_delta.0.as_secs_f32();
                     }
                 }
             }

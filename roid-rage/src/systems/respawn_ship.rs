@@ -1,5 +1,5 @@
-use crate::core::bearing::Bearing;
 use crate::components::{make_ship, Ship};
+use crate::core::bearing::Bearing;
 use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
