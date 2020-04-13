@@ -73,9 +73,9 @@ fn update(game_state: Json<GameState>, pilot_state: State<Mutex<PilotState>>) ->
             }
         }
         Activity::Stop => {
-            if game_state.ship.velocity.speed() < 0.1 {
+            if game_state.ship.velocity.speed() < 0.5 {
                 let mut rng = rand::thread_rng();
-                let num_frames = rng.next_u32() % 300 + 300;
+                let num_frames = rng.next_u32() % 100 + 100;
                 pilot_state.activity = Activity::Accelerate(num_frames as usize);
             } else {
                 cmd = stop_ship(&*game_state);
@@ -99,7 +99,7 @@ fn rocket() -> rocket::Rocket {
         .mount("/", routes![update])
         .register(catchers![not_found])
         .manage(Mutex::<PilotState>::new(PilotState {
-            activity: Activity::Accelerate(90),
+            activity: Activity::Accelerate(20),
         }))
 }
 

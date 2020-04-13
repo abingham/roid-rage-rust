@@ -21,7 +21,7 @@ impl QueryPilotSystem {
     }
 }
 
-const SHIP_ACCELERATION: f32 = 10.0; // TODO: this should come from settings
+const SHIP_ACCELERATION: f32 = 50.0; // TODO: this should come from settings
 
 /// Identify target and shoot a bullet
 impl<'s> System<'s> for QueryPilotSystem {
