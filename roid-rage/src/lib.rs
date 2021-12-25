@@ -17,13 +17,15 @@ use crate::components::{
 };
 use crate::rendering::Render;
 use ggez::event::EventHandler;
-use ggez::nalgebra::Point2;
 use ggez::timer;
 use ggez::{graphics, Context, GameResult};
+use glam;
 use ncollide2d::world::CollisionWorld;
 use specs::prelude::*;
 use specs::Join;
 use std::time::Duration;
+
+type Point2 = glam::Vec2;
 
 struct Assets {
     font: graphics::Font,
@@ -116,9 +118,8 @@ impl RoidRage {
         })
     }
 }
-
-impl EventHandler for RoidRage {
-    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+impl EventHandler<ggez::GameError> for RoidRage {
+    fn update(&mut self, ctx: &mut Context) -> GameResult {
         const DESIRED_FPS: u32 = 60;
 
         while timer::check_update_time(ctx, DESIRED_FPS as u32) {
@@ -132,7 +133,7 @@ impl EventHandler for RoidRage {
         Ok(())
     }
 
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context) -> GameResult {
         // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
         let settings = self.world.read_resource::<settings::Settings>();
         graphics::set_screen_coordinates(

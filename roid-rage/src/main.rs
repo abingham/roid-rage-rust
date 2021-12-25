@@ -20,8 +20,8 @@ fn main() -> GameResult {
 
     // Create an instance of your event handler. Usually, you should provide it with the Context object to use when
     // setting your game up.
-    let mut my_game = roid_rage::RoidRage::new(&mut ctx, settings)?;
+    let my_game = roid_rage::RoidRage::new(&mut ctx, settings)?;
 
     // Run!
-    event::run(&mut ctx, &mut event_loop, &mut my_game)
+    event::run(ctx, event_loop, my_game)
 }
