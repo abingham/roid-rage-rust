@@ -8,7 +8,7 @@ fn main() -> GameResult {
         roid_rage::settings::Settings::load().expect("Unable to load Roid Rage settings!");
 
     // Make a Context.
-    let (mut ctx, mut event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
+    let (mut ctx, event_loop) = ContextBuilder::new("Roid Rage!", "Austin Bingham")
         .window_setup(conf::WindowSetup::default().title("Roid Rage!"))
         .window_mode(conf::WindowMode::default().dimensions(
             settings.screen_width + settings.maximum_roid_radius * 2.0,
