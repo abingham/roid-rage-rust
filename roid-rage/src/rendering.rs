@@ -49,7 +49,7 @@ impl Render for Bullet {
             Bullet::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
-        );
+        )?;
         let mesh = mb.build(ctx)?;
         graphics::draw(ctx, &mesh, DrawParam::new())
     }
@@ -64,7 +64,7 @@ impl Render for Fragment {
             Fragment::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
-        );
+        )?;
         let mesh = mb.build(ctx)?;
         graphics::draw(ctx, &mesh, DrawParam::new())
     }
