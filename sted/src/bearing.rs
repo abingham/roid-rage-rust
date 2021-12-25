@@ -71,14 +71,14 @@ mod tests {
 
         #[test]
         fn test_constructor_clamp_positive() {
-            let a = Bearing::new(TAU + 1.234);
+            let a = Bearing::new(Bearing::<f32>::tau() + 1.234);
             assert!(approx_eq!(f32, a.radians(), 1.234));
         }
 
         #[test]
         fn test_constructor_clamp_negative() {
             let a = Bearing::new(-1.234);
-            assert!(approx_eq!(f32, a.radians(), -1.234 + TAU));
+            assert!(approx_eq!(f32, a.radians(), -1.234 + Bearing::<f32>::tau()));
         }
     }
 
@@ -95,14 +95,14 @@ mod tests {
         fn test_add_positive_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 + 12.0;
-            assert!(approx_eq!(f32, a2.radians(), 13.0 % TAU));
+            assert!(approx_eq!(f32, a2.radians(), 13.0 % Bearing::<f32>::tau()));
         }
 
         #[test]
         fn test_add_negative_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 + -12.0;
-            assert!(approx_eq!(f32, a2.radians(), -11.0 + 4.0 * PI));
+            assert!(approx_eq!(f64, a2.radians(), -11.0 + 4.0 * PI));
         }
     }
 
@@ -119,14 +119,14 @@ mod tests {
         fn test_subtract_positive_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 - -12.0;
-            assert!(approx_eq!(f32, a2.radians(), 13.0 % TAU));
+            assert!(approx_eq!(f32, a2.radians(), 13.0 % Bearing::<f32>::tau()));
         }
 
         #[test]
         fn test_subtract_negative_clamp() {
             let a1 = Bearing::new(1.0);
             let a2 = a1 - 12.0;
-            assert!(approx_eq!(f32, a2.radians(), -11.0 + 4.0 * PI));
+            assert!(approx_eq!(f64, a2.radians(), -11.0 + 4.0 * PI));
         }
     }
 
@@ -151,14 +151,14 @@ mod tests {
         fn test_negative_wrap() {
             let a1 = Bearing::new(0.1);
             let a2 = Bearing::new(6.0);
-            assert!(approx_eq!(f32, a1.distance(&a2), -TAU + 5.9))
+            assert!(approx_eq!(f32, a1.distance(&a2), -Bearing::<f32>::tau() + 5.9))
         }
 
         #[test]
         fn test_positive_wrap() {
             let a1 = Bearing::new(6.0);
             let a2 = Bearing::new(0.1);
-            assert!(approx_eq!(f32, a1.distance(&a2), (TAU - 6.0) + 0.1))
+            assert!(approx_eq!(f32, a1.distance(&a2), (Bearing::<f32>::tau() - 6.0) + 0.1))
         }
     }
 }
