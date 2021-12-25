@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 config = "0.9"
-ggez = "0.5"
+ggez = "0.7"
 ncollide2d = "0.21"
 num = "0.2.1"
 specs = "0.16"

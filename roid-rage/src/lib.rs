@@ -145,7 +145,7 @@ impl EventHandler for RoidRage {
             ),
         )?;
 
-        graphics::clear(ctx, graphics::BLACK);
+        graphics::clear(ctx, graphics::Color::BLACK);
 
         for (position, rotation, roid) in (
             &self.world.read_storage::<Position>(),
@@ -196,7 +196,7 @@ impl EventHandler for RoidRage {
             graphics::draw(
                 ctx,
                 &heading_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
             )?;
 
             let hud_y = hud_y + hud_font_size;
@@ -208,7 +208,7 @@ impl EventHandler for RoidRage {
             graphics::draw(
                 ctx,
                 &bearing_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
             )?;
 
             let hud_y = hud_y + hud_font_size;
@@ -220,7 +220,7 @@ impl EventHandler for RoidRage {
             graphics::draw(
                 ctx,
                 &speed_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::WHITE),
+                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
             )?;
         }
 
