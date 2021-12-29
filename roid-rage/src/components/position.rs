@@ -1,9 +1,9 @@
-use nalgebra::Vector2;
+use glam::Vec2;
 use specs::Component;
 use specs::VecStorage;
 
 #[derive(Clone)]
-pub struct Position(pub Vector2<f32>);
+pub struct Position(pub Vec2);
 
 impl Component for Position {
     type Storage = VecStorage<Self>;

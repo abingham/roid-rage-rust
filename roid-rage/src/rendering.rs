@@ -1,19 +1,18 @@
 use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
 use ggez::{graphics, Context, GameResult};
-use glam;
-use nalgebra::Vector2;
+use glam::Vec2;
 use std::f32::consts::PI;
 
-type Point2 = glam::Vec2;
+type Point2 = Vec2;
 
 use crate::components::{Bullet, Fragment, Roid, Ship};
 
 pub trait Render {
-    fn render(&self, position: Vector2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()>;
+    fn render(&self, position: Point2, rotation: f32, ctx: &mut Context) -> GameResult<()>;
 }
 
 impl Render for Roid {
-    fn render(&self, position: Vector2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Vec2, rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let angle_step = (PI * 2.0) / self.points.len() as f32;
         let line_points: Vec<Point2> = self
             .points
@@ -41,7 +40,7 @@ impl Render for Roid {
 }
 
 impl Render for Bullet {
-    fn render(&self, position: Vector2<f32>, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Vec2, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
@@ -56,7 +55,7 @@ impl Render for Bullet {
 }
 
 impl Render for Fragment {
-    fn render(&self, position: Vector2<f32>, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Vec2, _rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
@@ -71,7 +70,7 @@ impl Render for Fragment {
 }
 
 impl Render for Ship {
-    fn render(&self, position: Vector2<f32>, rotation: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(&self, position: Vec2, rotation: f32, ctx: &mut Context) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         // let center = Point2::new(0.0, 0.0);
         let points = vec![

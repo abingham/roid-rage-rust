@@ -2,14 +2,15 @@ use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
 use crate::components::{
     AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping,
 };
-use sted::Bearing;
 use crate::core::util::from_speed_and_bearing;
+use glam::Vec2;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use rand::prelude::*;
 use specs::{Component, VecStorage};
+use sted::Bearing;
 
 pub struct Roid {
     pub radius: f32,
@@ -56,14 +57,15 @@ pub fn make_roid<B>(
 ) where
     B: specs::world::Builder,
 {
-    let position = Position(Vector2::<f32>::new(x, y));
+    let position = Position(Vec2::new(x, y));
     let rotation = Rotation(Bearing::new(0.0f32));
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);
     collision_groups.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
 
-    let collision_isometry = Isometry2::new(position.0, zero());
+    let collision_isometry =
+        Isometry2::new(Vector2::<f32>::new(position.0.x, position.0.y), zero());
 
     let collision_shape = ShapeHandle::new(Ball::new(radius));
 

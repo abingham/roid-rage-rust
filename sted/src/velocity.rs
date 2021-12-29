@@ -1,4 +1,4 @@
-use nalgebra::Vector2;
+use glam::Vec2;
 use num::{Float, FromPrimitive};
 
 pub trait Velocity<T: Float + FromPrimitive> {
@@ -16,15 +16,13 @@ pub trait Velocity<T: Float + FromPrimitive> {
     }
 }
 
-impl<T> Velocity<T> for Vector2<T>
-where
-    T: Float + FromPrimitive + std::fmt::Debug + 'static,
+impl Velocity<f32> for Vec2
 {
-    fn dx(&self) -> T {
+    fn dx(&self) -> f32 {
         self.x
     }
 
-    fn dy(&self) -> T {
+    fn dy(&self) -> f32 {
         self.y
     }
 }

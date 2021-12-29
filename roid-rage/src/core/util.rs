@@ -1,6 +1,6 @@
+use glam::Vec2;
 use rand::prelude::*;
 use std::f32::consts::PI;
-use nalgebra::Vector2;
 
 pub fn random_bearing() -> f32 {
     let mut rng = thread_rng();
@@ -8,6 +8,6 @@ pub fn random_bearing() -> f32 {
 }
 
 /// Create a velocity vector from speed and bearing.
-pub fn from_speed_and_bearing(speed: f32, bearing: f32) -> Vector2<f32> {
-    Vector2::<f32>::new(bearing.cos(), bearing.sin()) * speed
+pub fn from_speed_and_bearing(speed: f32, bearing: f32) -> Vec2 {
+    Vec2::new(bearing.cos(), bearing.sin()) * speed
 }

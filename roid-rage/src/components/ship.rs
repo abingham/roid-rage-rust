@@ -1,7 +1,7 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
 use sted::Bearing;
+use glam::Vec2;
 use crate::core::util::from_speed_and_bearing;
-use nalgebra::Vector2;
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, HashMapStorage};
 
@@ -37,7 +37,7 @@ pub fn make_ship<B>(
 ) where
     B: specs::world::Builder,
 {
-    let position = Position(Vector2::<f32>::new(x, y));
+    let position = Position(Vec2::new(x, y));
     let rotation = Rotation(heading);
 
     // let mut collision_groups = CollisionGroups::new();

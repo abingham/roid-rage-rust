@@ -5,12 +5,12 @@ pub mod settings;
 mod systems;
 
 use crate::core::field::Field;
-use sted::Velocity;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
     ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
+use sted::Velocity;
 
 use crate::components::{
     Bullet, Fragment, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,

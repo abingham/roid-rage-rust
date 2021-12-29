@@ -8,6 +8,7 @@ edition = "2018"
 nalgebra = "0.19"
 rocket="0.4.10"
 rocket_contrib="0.4"
+glam = "*"
 
 [dependencies.roid_rage]
 path = "../roid-rage"

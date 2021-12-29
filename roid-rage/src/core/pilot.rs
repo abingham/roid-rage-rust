@@ -1,18 +1,18 @@
-use nalgebra::Vector2;
+use glam::Vec2;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Roid {
     pub id: u32,
     pub radius: f32,
-    pub position: Vector2<f32>,
-    pub velocity: Vector2<f32>,
+    pub position: Vec2,
+    pub velocity: Vec2,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Ship {
-    pub position: Vector2<f32>,
-    pub velocity: Vector2<f32>,
+    pub position: Vec2,
+    pub velocity: Vec2,
     pub angular_velocity: f32,
     pub heading: f32, // TODO: Express this as a Bearing. Will need some JSON work, I guess.
     pub acceleration: f32,
@@ -24,10 +24,10 @@ pub struct GameState {
     pub field: crate::core::field::Field,
 
     /// The point from which a bullet will be fired
-    pub firing_position: Vector2<f32>,
+    pub firing_position: Vec2,
 
     /// The bearing and speed of the bullet
-    pub firing_velocity: Vector2<f32>,
+    pub firing_velocity: Vec2,
 
     /// The time left until a bullet may be fired
     pub time_to_fire: f32,

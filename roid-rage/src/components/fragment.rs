@@ -1,6 +1,6 @@
 use crate::components::{LinearVelocity, Position};
 use crate::core::util::from_speed_and_bearing;
-use nalgebra::Vector2;
+use glam::Vec2;
 use rand::prelude::*;
 use specs::{Component, HashMapStorage};
 use std::time::Duration;
@@ -35,7 +35,7 @@ where
 
     builder
         .with(LinearVelocity(from_speed_and_bearing(speed, course)))
-        .with(Position(Vector2::<f32>::new(x, y)))
+        .with(Position(Vec2::new(x, y)))
         .with(Fragment::new())
         .build();
 }

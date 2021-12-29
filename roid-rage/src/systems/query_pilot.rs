@@ -5,7 +5,7 @@ use crate::core::field::Field;
 use crate::core::pilot;
 use crate::core::util::from_speed_and_bearing;
 use crate::settings::Settings;
-use nalgebra::Vector2;
+use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
 use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
@@ -82,7 +82,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         {
             let ship_center = position.0;
 
-            let firing_position = Vector2::<f32>::new(
+            let firing_position = Vec2::new(
                 ship_center.x + rotation.0.radians().cos() * ship.length / 2.0,
                 ship_center.y + rotation.0.radians().sin() * ship.length / 2.0,
             );

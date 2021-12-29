@@ -1,6 +1,6 @@
-use sted::Velocity;
-use nalgebra::*;
+use glam::Vec2;
 use std::cmp::Ordering;
+use sted::Velocity;
 
 // TODO: I'd like this to be generic on the float type, but I ran into hairy
 // issues with collision_vector. Try again sometime.
@@ -39,11 +39,11 @@ fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
 /// same. This results in a quadratic equation which we solve. If this gives results, we choose the closest time, figure
 /// out where the target will be at that time, and return that.
 pub fn collision_point(
-    launch_position: &Vector2<f32>,
+    launch_position: &Vec2,
     projectile_speed: f32,
-    target_position: &Vector2<f32>,
-    target_velocity: &Vector2<f32>,
-) -> Option<Vector2<f32>> {
+    target_position: &Vec2,
+    target_velocity: &Vec2,
+) -> Option<Vec2> {
     let delta_x = launch_position.x - target_position.x;
     let delta_y = launch_position.y - target_position.y;
 
@@ -66,7 +66,7 @@ pub fn collision_point(
                 + target_position.x;
             let coll_y = *dt * target_velocity.speed() * f32::sin(target_velocity.bearing())
                 + target_position.y;
-            Vector2::new(coll_x, coll_y)
+            Vec2::new(coll_x, coll_y)
         })
 }
 
@@ -81,12 +81,13 @@ pub fn collision_point(
 ///
 /// Returns a tuple (collision-position, collision-vector) if one.
 pub fn collision_vector(
-    position: &Vector2<f32>,
+    position: &Vec2,
     speed: f32,
-    target_position: &Vector2<f32>,
-    target_velocity: &Vector2<f32>,
-) -> Option<(Vector2<f32>, Vector2<f32>)> {
-    collision_point(position, speed, target_position, target_velocity).map(|p| (p, p - position))
+    target_position: &Vec2,
+    target_velocity: &Vec2,
+) -> Option<(Vec2, Vec2)> {
+    collision_point(position, speed, target_position, target_velocity)
+        .map(|p| (p, p - *position))
 }
 
 #[cfg(test)]
