@@ -39,19 +39,19 @@ fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
 /// same. This results in a quadratic equation which we solve. If this gives results, we choose the closest time, figure
 /// out where the target will be at that time, and return that.
 pub fn collision_point(
-    position: &Vector2<f32>,
-    speed: f32,
+    launch_position: &Vector2<f32>,
+    projectile_speed: f32,
     target_position: &Vector2<f32>,
     target_velocity: &Vector2<f32>,
 ) -> Option<Vector2<f32>> {
-    let delta_x = position[0] - target_position.x;
-    let delta_y = position[1] - target_position.y;
+    let delta_x = launch_position.x - target_position.x;
+    let delta_y = launch_position.y - target_position.y;
 
     let cos_target_bearing = f32::cos(target_velocity.bearing());
     let sin_target_bearing = f32::sin(target_velocity.bearing());
     let a = target_velocity.speed().powf(2.0) * cos_target_bearing.powf(2.0)
         + target_velocity.speed().powf(2.0) * sin_target_bearing.powf(2.0)
-        - speed.powf(2.0);
+        - projectile_speed.powf(2.0);
     let b = -1.0
         * (2.0 * delta_x * target_velocity.speed() * cos_target_bearing
             + 2.0 * delta_y * target_velocity.speed() * sin_target_bearing);
