@@ -1,9 +1,9 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
-use sted::Bearing;
+use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
-use crate::core::util::from_speed_and_bearing;
 use ncollide2d::world::CollisionWorld;
 use specs::{Component, HashMapStorage};
+use sted::Bearing;
 
 // TODO: Should this also include bullet speed, rate of fire, etc.? Maybe a "gun" class?
 pub struct Ship {
@@ -11,7 +11,7 @@ pub struct Ship {
     pub width: f32,
     pub mass: f32,
     pub thrust: f32,
-    pub rotational_speed: f32
+    pub rotational_speed: f32,
 }
 
 impl Ship {
@@ -21,7 +21,7 @@ impl Ship {
             width: width,
             mass: mass,
             thrust: thrust,
-            rotational_speed: rotational_speed
+            rotational_speed: rotational_speed,
         }
     }
 }
@@ -62,14 +62,14 @@ pub fn make_ship<B>(
     // let (collision_handle, obj) = collision_world.add(
     //     collision_isometry,
     //     collision_shape,
-    //     collision_groups,
+    //     collision_groups,from_quantity_and_bearing
     //     GeometricQueryType::Contacts(0.0, 0.0),
     //     0,
     // );
 
     // Create the entity
     let _entity = builder
-        .with(LinearVelocity(from_speed_and_bearing(
+        .with(LinearVelocity(from_quantity_and_bearing(
             speed,
             course.radians(),
         )))

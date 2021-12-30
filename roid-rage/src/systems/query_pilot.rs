@@ -3,7 +3,7 @@ use crate::components::{
 };
 use crate::core::field::Field;
 use crate::core::pilot;
-use crate::core::util::from_speed_and_bearing;
+use crate::core::util::from_quantity_and_bearing;
 use crate::settings::Settings;
 use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
@@ -20,8 +20,6 @@ impl QueryPilotSystem {
         QueryPilotSystem { fire_timer: 0.0 }
     }
 }
-
-const SHIP_ACCELERATION: f32 = 50.0; // TODO: this should come from settings
 
 /// Identify target and shoot a bullet
 impl<'s> System<'s> for QueryPilotSystem {
@@ -90,9 +88,9 @@ impl<'s> System<'s> for QueryPilotSystem {
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_velocity: from_speed_and_bearing(
+                firing_velocity: from_quantity_and_bearing(
                     settings.bullet_speed,
-                    rotation.0.radians(),
+                    rotation.0.radians()
                 ),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
@@ -101,9 +99,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                     thrust: ship.thrust,
                     position: ship_center,
                     velocity: linear_velocity.0,
-                    angular_velocity: angular_velocity.0,
+                    angular_velocity: angular_velocity.0, // TODO: Ship should not have angular velocity. This is instantaneous.
                     heading: rotation.0.radians(),
-                    acceleration: SHIP_ACCELERATION,
                 },
             };
 
@@ -135,12 +132,13 @@ impl<'s> System<'s> for QueryPilotSystem {
                         pilot::Rotation::None => 0.0,
                     };
 
+                    // TODO: Ship should not have angular velocity. Rotation is an instantaneous update for it.
                     angular_velocity.0 = rotation_direction * settings.ship_angular_velocity;
 
                     if command.thrusters {
-                        linear_velocity.0 = linear_velocity.0
-                            + from_speed_and_bearing(SHIP_ACCELERATION, rotation.0.radians())
-                                * time_delta.0.as_secs_f32();
+                        let steering_force = from_quantity_and_bearing(ship.thrust, rotation.0.radians());
+                        let accel = steering_force / ship.mass;
+                        linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }
                 }
             }

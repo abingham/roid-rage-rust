@@ -1,5 +1,5 @@
 use crate::components::{LinearVelocity, Position};
-use crate::core::util::from_speed_and_bearing;
+use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use rand::prelude::*;
 use specs::{Component, HashMapStorage};
@@ -34,7 +34,7 @@ where
     let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
 
     builder
-        .with(LinearVelocity(from_speed_and_bearing(speed, course)))
+        .with(LinearVelocity(from_quantity_and_bearing(speed, course)))
         .with(Position(Vec2::new(x, y)))
         .with(Fragment::new())
         .build();

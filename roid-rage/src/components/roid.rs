@@ -2,7 +2,7 @@ use super::collision_groups::{ROID_GROUP, SHIP_GROUP, WEAPON_GROUP};
 use crate::components::{
     AngularVelocity, CollisionHandle, LinearVelocity, Position, Rotation, Wrapping,
 };
-use crate::core::util::from_speed_and_bearing;
+use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use nalgebra::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
@@ -80,7 +80,7 @@ pub fn make_roid<B>(
 
     // Create the entity
     let entity = builder
-        .with(LinearVelocity(from_speed_and_bearing(speed, course)))
+        .with(LinearVelocity(from_quantity_and_bearing(speed, course)))
         .with(AngularVelocity(angular_velocity))
         .with(position)
         .with(rotation)

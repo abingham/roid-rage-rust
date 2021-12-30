@@ -7,7 +7,7 @@ pub fn random_bearing() -> f32 {
     (rng.gen::<f32>() * 2.0 - 1.0) * PI
 }
 
-/// Create a velocity vector from speed and bearing.
-pub fn from_speed_and_bearing(speed: f32, bearing: f32) -> Vec2 {
-    Vec2::new(bearing.cos(), bearing.sin()) * speed
+/// Create a vector from quantity (e.g. speed) and bearing.
+pub fn from_quantity_and_bearing(quantity: f32, bearing: f32) -> Vec2 {
+    Vec2::new(bearing.cos(), bearing.sin()) * quantity
 }

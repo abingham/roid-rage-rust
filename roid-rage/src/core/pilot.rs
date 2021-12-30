@@ -17,7 +17,6 @@ pub struct Ship {
     pub velocity: Vec2,
     pub angular_velocity: f32,
     pub heading: f32, // TODO: Express this as a Bearing. Will need some JSON work, I guess.
-    pub acceleration: f32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
