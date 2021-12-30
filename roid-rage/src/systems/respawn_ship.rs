@@ -31,7 +31,7 @@ impl<'s> System<'s> for RespawnShipSystem {
         let width = 5.0;
         let mass = 1.0;
         let thrust = 50.0;
-        let rotational_speed = settings.ship_angular_velocity; // TODO: Normalize the naming here.
+        let rotational_speed = settings.ship_rotational_speed;
         // TODO: Get things like ship size, mass, and thrust from settings?
         make_ship(
             specs::world::LazyBuilder {

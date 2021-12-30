@@ -56,5 +56,5 @@ initialize_settings!(
     (max_initial_roid_speed, f32, 100.0),
     (initial_roid_count, u32, 10),
     (pilot_url, String, String::from("http://localhost:8000/")),
-    (ship_angular_velocity, f32, 1.0)
+    (ship_rotational_speed, f32, 1.0)
 );
