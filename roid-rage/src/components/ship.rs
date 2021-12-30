@@ -8,13 +8,17 @@ use specs::{Component, HashMapStorage};
 pub struct Ship {
     pub length: f32,
     pub width: f32,
+    pub mass: f32,
+    pub thrust: f32
 }
 
 impl Ship {
-    pub fn new(length: f32, width: f32) -> Self {
+    pub fn new(length: f32, width: f32, mass: f32, thrust: f32) -> Self {
         Ship {
             length: length,
             width: width,
+            mass: mass,
+            thrust: thrust
         }
     }
 }
@@ -28,6 +32,8 @@ pub fn make_ship<B>(
     heading: Bearing<f32>,
     length: f32,
     width: f32,
+    mass: f32,
+    thrust: f32,
     x: f32,
     y: f32,
     speed: f32,
@@ -68,7 +74,7 @@ pub fn make_ship<B>(
         .with(rotation)
         .with(Wrapping)
         // .with(CollisionHandle(collision_handle))
-        .with(Ship::new(length, width))
+        .with(Ship::new(length, width, mass, thrust))
         .build();
 
     // Annotate the collision object with the entity's ID

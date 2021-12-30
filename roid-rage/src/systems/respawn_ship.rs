@@ -30,6 +30,8 @@ impl<'s> System<'s> for RespawnShipSystem {
         let new_entity = entities.create();
         let length = 10.0;
         let width = 5.0;
+        let mass = 1000.0;
+        let thrust = 50.0;
         make_ship(
             specs::world::LazyBuilder {
                 entity: new_entity,
@@ -38,6 +40,8 @@ impl<'s> System<'s> for RespawnShipSystem {
             heading,
             length,
             width,
+            mass,
+            thrust,
             x,
             y,
             speed,
