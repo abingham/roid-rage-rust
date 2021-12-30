@@ -21,8 +21,8 @@ impl<'s> System<'s> for RespawnShipSystem {
             return;
         }
 
-        let x = settings.screen_width / 2.0;
-        let y = settings.screen_height / 2.0;
+        let position_x = settings.screen_width / 2.0;
+        let position_y = settings.screen_height / 2.0;
         let speed = 0.0;
         let course = Bearing::new(0.0);
         let heading = Bearing::new(0.0);
@@ -38,8 +38,8 @@ impl<'s> System<'s> for RespawnShipSystem {
             settings.ship_mass,
             settings.ship_thrust,
             settings.ship_rotational_speed,
-            x,
-            y,
+            position_x,
+            position_y,
             speed,
             course,
             &mut collision_world,
