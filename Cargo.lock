@@ -975,7 +975,7 @@ dependencies = [
  "rand 0.6.5",
  "rocket",
  "rocket_contrib",
- "roid_rage",
+ "roid-rage",
  "sted",
 ]
 
@@ -3376,7 +3376,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "roid_rage"
+name = "roid-rage"
 version = "0.1.0"
 dependencies = [
  "config",
@@ -3679,7 +3679,7 @@ dependencies = [
  "nalgebra",
  "rocket",
  "rocket_contrib",
- "roid_rage",
+ "roid-rage",
  "sted",
 ]
 

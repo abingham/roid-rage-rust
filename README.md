@@ -15,7 +15,7 @@ This is the part that calculates where to fire.
 Then, you need to start the game engine:
 
 ```
-cargo run --bin roid_rage
+cargo run --bin roid-rage
 ```
 
 This renders everything, manages most of the data, and asks the pilot how to fire.

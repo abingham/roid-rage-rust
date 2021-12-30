@@ -10,7 +10,7 @@ rocket="0.4.10"
 rocket_contrib="0.4"
 glam = "*"
 
-[dependencies.roid_rage]
+[dependencies.roid-rage]
 path = "../roid-rage"
 
 [dependencies.sted]

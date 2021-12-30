@@ -13,7 +13,7 @@ rocket_contrib="0.4"
 float-cmp = "0.6.0"
 rand = "0.6.5"
 
-[dependencies.roid_rage]
+[dependencies.roid-rage]
 path = "../roid-rage"
 
 [dependencies.sted]
