@@ -11,6 +11,8 @@ pub struct Roid {
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Ship {
+    pub mass: f32,
+    pub thrust: f32,
     pub position: Vec2,
     pub velocity: Vec2,
     pub angular_velocity: f32,

@@ -97,6 +97,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship: pilot::Ship {
+                    mass: ship.mass,
+                    thrust: ship.thrust,
                     position: ship_center,
                     velocity: linear_velocity.0,
                     angular_velocity: angular_velocity.0,
