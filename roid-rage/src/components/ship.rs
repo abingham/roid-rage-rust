@@ -1,4 +1,4 @@
-use crate::components::{LinearVelocity, Position, Rotation, Wrapping};
+use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
 use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
@@ -72,6 +72,7 @@ pub fn make_ship<B>(
             speed,
             course.radians(),
         )))
+        .with(AngularVelocity(0.0))
         .with(position)
         .with(rotation)
         .with(Wrapping)

@@ -1,5 +1,5 @@
 use crate::components::{
-    make_bullet, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
+    make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
 };
 use crate::core::field::Field;
 use crate::core::pilot;
@@ -27,8 +27,9 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Ship>,
         WriteStorage<'s, LinearVelocity>,
+        WriteStorage<'s, AngularVelocity>,
         ReadStorage<'s, Position>,
-        WriteStorage<'s, Rotation>,
+        ReadStorage<'s, Rotation>,
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
         Read<'s, TimeDelta>,
@@ -44,8 +45,9 @@ impl<'s> System<'s> for QueryPilotSystem {
             roids,
             ships,
             mut linear_velocities,
+            mut angular_velocities,
             positions,
-            mut rotations,
+            rotations,
             _bullets,
             field,
             time_delta,
@@ -67,13 +69,8 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (ship, position, rotation, linear_velocity) in (
-            &ships,
-            &positions,
-            &mut rotations,
-            &mut linear_velocities,
-        )
-            .join()
+        for (ship, position, rotation, linear_velocity, angular_velocity) in
+            (&ships, &positions, &rotations, &mut linear_velocities, &mut angular_velocities).join()
         {
             let ship_center = position.0;
 
@@ -87,7 +84,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                 firing_position: firing_position.clone(),
                 firing_velocity: from_quantity_and_bearing(
                     settings.bullet_speed,
-                    rotation.0.radians()
+                    rotation.0.radians(),
                 ),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
@@ -128,10 +125,11 @@ impl<'s> System<'s> for QueryPilotSystem {
                         pilot::Rotation::None => 0.0,
                     };
 
-                    rotation.0 = rotation.0 + rotation_direction * ship.rotational_speed * time_delta.0.as_secs_f32();
+                    angular_velocity.0 = rotation_direction * ship.rotational_speed;
 
                     if command.thrusters {
-                        let steering_force = from_quantity_and_bearing(ship.thrust, rotation.0.radians());
+                        let steering_force =
+                            from_quantity_and_bearing(ship.thrust, rotation.0.radians());
                         let accel = steering_force / ship.mass;
                         linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }
