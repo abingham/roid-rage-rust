@@ -26,11 +26,10 @@ impl<'s> System<'s> for RespawnShipSystem {
         let speed = 0.0;
         let course = Bearing::new(0.0);
         let heading = Bearing::new(0.0);
-        let angular_velocity = 0.0;
         let new_entity = entities.create();
         let length = 10.0;
         let width = 5.0;
-        let mass = 1000.0;
+        let mass = 1.0;
         let thrust = 50.0;
         let rotational_speed = settings.ship_angular_velocity; // TODO: Normalize the naming here.
         // TODO: Get things like ship size, mass, and thrust from settings?
@@ -49,7 +48,6 @@ impl<'s> System<'s> for RespawnShipSystem {
             y,
             speed,
             course,
-            angular_velocity,
             &mut collision_world,
         );
     }

@@ -1,5 +1,5 @@
 use crate::components::{
-    make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
+    make_bullet, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
 };
 use crate::core::field::Field;
 use crate::core::pilot;
@@ -27,9 +27,8 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Roid>,
         ReadStorage<'s, Ship>,
         WriteStorage<'s, LinearVelocity>,
-        WriteStorage<'s, AngularVelocity>,
         ReadStorage<'s, Position>,
-        ReadStorage<'s, Rotation>,
+        WriteStorage<'s, Rotation>,
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
         Read<'s, TimeDelta>,
@@ -45,9 +44,8 @@ impl<'s> System<'s> for QueryPilotSystem {
             roids,
             ships,
             mut linear_velocities,
-            mut angular_velocities,
             positions,
-            rotations,
+            mut rotations,
             _bullets,
             field,
             time_delta,
@@ -69,11 +67,10 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (ship, position, rotation, angular_velocity, linear_velocity) in (
+        for (ship, position, rotation, linear_velocity) in (
             &ships,
             &positions,
-            &rotations,
-            &mut angular_velocities,
+            &mut rotations,
             &mut linear_velocities,
         )
             .join()
@@ -99,7 +96,6 @@ impl<'s> System<'s> for QueryPilotSystem {
                     thrust: ship.thrust,
                     position: ship_center,
                     velocity: linear_velocity.0,
-                    angular_velocity: angular_velocity.0, // TODO: Ship should not have angular velocity. This is instantaneous.
                     heading: rotation.0.radians(),
                 },
             };
@@ -132,8 +128,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                         pilot::Rotation::None => 0.0,
                     };
 
-                    // TODO: Ship should not have angular velocity. Rotation is an instantaneous update for it.
-                    angular_velocity.0 = rotation_direction * settings.ship_angular_velocity;
+                    rotation.0 = rotation.0 + rotation_direction * ship.rotational_speed * time_delta.0.as_secs_f32();
 
                     if command.thrusters {
                         let steering_force = from_quantity_and_bearing(ship.thrust, rotation.0.radians());

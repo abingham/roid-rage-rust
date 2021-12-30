@@ -1,4 +1,4 @@
-use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
+use crate::components::{LinearVelocity, Position, Rotation, Wrapping};
 use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
@@ -42,7 +42,6 @@ pub fn make_ship<B>(
     y: f32,
     speed: f32,
     course: Bearing<f32>,
-    angular_velocity: f32,
     _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) where
     B: specs::world::Builder,
@@ -73,7 +72,6 @@ pub fn make_ship<B>(
             speed,
             course.radians(),
         )))
-        .with(AngularVelocity(angular_velocity))
         .with(position)
         .with(rotation)
         .with(Wrapping)

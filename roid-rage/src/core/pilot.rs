@@ -15,7 +15,6 @@ pub struct Ship {
     pub thrust: f32,
     pub position: Vec2,
     pub velocity: Vec2,
-    pub angular_velocity: f32,
     pub heading: f32, // TODO: Express this as a Bearing. Will need some JSON work, I guess.
 }
 
