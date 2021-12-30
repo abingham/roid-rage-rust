@@ -82,10 +82,6 @@ impl<'s> System<'s> for QueryPilotSystem {
             let game_state = pilot::GameState {
                 field: field.clone(),
                 firing_position: firing_position.clone(),
-                firing_velocity: from_quantity_and_bearing(
-                    settings.bullet_speed,
-                    rotation.0.radians(),
-                ),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
                 roids: roids.clone(),
                 ship: pilot::Ship {
@@ -94,6 +90,10 @@ impl<'s> System<'s> for QueryPilotSystem {
                     position: ship_center,
                     velocity: linear_velocity.0,
                     heading: rotation.0.radians(),
+                    cannon: pilot::Cannon {
+                        bullet_speed: ship.cannon.bullet_speed,
+                        rate_of_fire: ship.cannon.rate_of_fire
+                    }
                 },
             };
 

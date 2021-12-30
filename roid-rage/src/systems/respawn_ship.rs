@@ -1,8 +1,8 @@
-use crate::components::{make_ship, Ship};
-use sted::Bearing;
+use crate::components::{make_ship, Cannon, Ship};
 use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
+use sted::Bearing;
 
 /// Respawn the ship if needed
 pub struct RespawnShipSystem;
@@ -38,6 +38,10 @@ impl<'s> System<'s> for RespawnShipSystem {
             settings.ship_mass,
             settings.ship_thrust,
             settings.ship_rotational_speed,
+            Cannon {
+                bullet_speed: settings.bullet_speed,
+                rate_of_fire: settings.rate_of_fire,
+            },
             position_x,
             position_y,
             speed,

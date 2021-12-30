@@ -7,7 +7,7 @@ pub use self::linear_velocity::LinearVelocity;
 pub use self::position::Position;
 pub use self::roid::{make_roid, Roid};
 pub use self::rotation::Rotation;
-pub use self::ship::{make_ship, Ship};
+pub use self::ship::{make_ship, Ship, Cannon};
 pub use self::time_delta::TimeDelta;
 pub use self::wrapping::Wrapping;
 

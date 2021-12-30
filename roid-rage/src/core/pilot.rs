@@ -1,6 +1,9 @@
 use glam::Vec2;
 use serde::{Deserialize, Serialize};
 
+// TODO: Can we avoid this duplication of structs and just let the core
+// ship, cannon, etc. structs be serializable?
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Roid {
     pub id: u32,
@@ -10,12 +13,19 @@ pub struct Roid {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Cannon {
+    pub bullet_speed: f32,
+    pub rate_of_fire: f32,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Ship {
     pub mass: f32,
     pub thrust: f32,
     pub position: Vec2,
     pub velocity: Vec2,
     pub heading: f32, // TODO: Express this as a Bearing. Will need some JSON work, I guess.
+    pub cannon: Cannon
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -23,12 +33,11 @@ pub struct GameState {
     /// The field in which we're playing
     pub field: crate::core::field::Field,
 
+    // TODO: I don't like this. Shouldn't firing_position be part of the ship/cannon struct?
     /// The point from which a bullet will be fired
     pub firing_position: Vec2,
 
-    /// The bearing and speed of the bullet
-    pub firing_velocity: Vec2,
-
+    // TODO: Should this be intrinsic to the cannon itself?
     /// The time left until a bullet may be fired
     pub time_to_fire: f32,
 
