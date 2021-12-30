@@ -27,23 +27,17 @@ impl<'s> System<'s> for RespawnShipSystem {
         let course = Bearing::new(0.0);
         let heading = Bearing::new(0.0);
         let new_entity = entities.create();
-        let length = 10.0;
-        let width = 5.0;
-        let mass = 1.0;
-        let thrust = 50.0;
-        let rotational_speed = settings.ship_rotational_speed;
-        // TODO: Get things like ship size, mass, and thrust from settings?
         make_ship(
             specs::world::LazyBuilder {
                 entity: new_entity,
                 lazy: &*lazy,
             },
             heading,
-            length,
-            width,
-            mass,
-            thrust,
-            rotational_speed,
+            settings.ship_length,
+            settings.ship_width,
+            settings.ship_mass,
+            settings.ship_thrust,
+            settings.ship_rotational_speed,
             x,
             y,
             speed,
