@@ -13,6 +13,7 @@ specs = "0.16"
 rand = "0.6.5"
 roid-rage-grpc = { path = "../roid-rage-grpc" }
 tokio = "1.15.0"
+tonic = "0.6.2"
 
 [dependencies.glam]
 version = "*"

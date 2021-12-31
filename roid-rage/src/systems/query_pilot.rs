@@ -182,17 +182,9 @@ async fn query_pilot(
 ) -> Result<rpc::Command, Box<dyn std::error::Error>> {
     let mut client = rpc::pilot_client::PilotClient::connect(url).await?;
 
-    // let request = tonic::Request::new(HelloRequest {
-    //     name: "Tonic".into(),
-    // });
+    let request = tonic::Request::new(game_state);
 
-    // let response = client.say_hello(request).await?;
+    let response = client.get_command(request).await?;
 
-    // println!("RESPONSE={:?}", response);
-
-    Ok(rpc::Command {
-        fire: false,
-        rotation: 0, // TODO: Use enum somehow!
-        thrusters: false,
-    })
+    Ok(response.get_ref().clone())
 }

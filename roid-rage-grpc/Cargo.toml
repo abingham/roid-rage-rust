@@ -7,6 +7,7 @@ edition = "2021"
 tonic = "0.6.2"
 prost = "0.9.0"
 prost-types = "0.9.0"
+sted = {path = "../sted"}
 
 [build-dependencies]
 tonic-build = "0.6.2"
