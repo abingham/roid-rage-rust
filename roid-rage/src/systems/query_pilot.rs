@@ -1,3 +1,5 @@
+/// This queries the pilot process using grpc to figure out
+/// what it wants to do, e.g. shoot, turn, etc.
 use crate::components::{
     make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
 };
@@ -7,6 +9,7 @@ use crate::core::util::from_quantity_and_bearing;
 use crate::settings::Settings;
 use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
+use roid_rage_grpc::roid_rage as rpc;
 use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
@@ -59,18 +62,29 @@ impl<'s> System<'s> for QueryPilotSystem {
     ) {
         self.fire_timer += time_delta.0.as_secs_f32();
 
-        let roids: Vec<pilot::Roid> = (&roids, &linear_velocities, &positions, &entities)
+        let roids: Vec<rpc::Roid> = (&roids, &linear_velocities, &positions, &entities)
             .join()
-            .map(|(roid, linear_velocity, position, entity)| pilot::Roid {
-                id: entity.id(),
+            .map(|(roid, linear_velocity, position, entity)| rpc::Roid {
                 radius: roid.radius,
-                position: position.0,
-                velocity: linear_velocity.0,
+                position: Some(rpc::Position {
+                    x: position.0.x,
+                    y: position.0.y,
+                }),
+                velocity: Some(rpc::Velocity {
+                    x: linear_velocity.0.x,
+                    y: linear_velocity.0.y,
+                }),
             })
             .collect();
 
-        for (ship, position, rotation, linear_velocity, angular_velocity) in
-            (&ships, &positions, &rotations, &mut linear_velocities, &mut angular_velocities).join()
+        for (ship, position, rotation, linear_velocity, angular_velocity) in (
+            &ships,
+            &positions,
+            &rotations,
+            &mut linear_velocities,
+            &mut angular_velocities,
+        )
+            .join()
         {
             let ship_center = position.0;
 
@@ -79,22 +93,34 @@ impl<'s> System<'s> for QueryPilotSystem {
                 ship_center.y + rotation.0.radians().sin() * ship.length / 2.0,
             );
 
-            let game_state = pilot::GameState {
-                field: field.clone(),
-                firing_position: firing_position.clone(),
+            let game_state = rpc::GameState {
+                field: Some(rpc::Field {
+                    width: field.width() as i32,
+                    height: field.height() as i32,
+                }),
+                firing_position: Some(rpc::Position {
+                    x: firing_position.x,
+                    y: firing_position.y
+                }),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
-                roids: roids.clone(),
-                ship: pilot::Ship {
+                roids: roids,
+                ship: Some(rpc::Ship {
                     mass: ship.mass,
                     thrust: ship.thrust,
-                    position: ship_center,
-                    velocity: linear_velocity.0,
+                    position: Some(rpc::Position {
+                        x: position.0.x,
+                        y: position.0.y
+                    }),
+                    velocity: Some(rpc::Velocity {
+                        x: linear_velocity.0.x,
+                        y: linear_velocity.0.y
+                    }),
                     heading: rotation.0.radians(),
-                    cannon: pilot::Cannon {
+                    cannon: Some(rpc::Cannon {
                         bullet_speed: ship.cannon.bullet_speed,
                         rate_of_fire: ship.cannon.rate_of_fire
-                    }
-                },
+                    })
+                })
             };
 
             // Pass game-state to pilot process
