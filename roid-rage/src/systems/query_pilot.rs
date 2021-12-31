@@ -4,7 +4,6 @@ use crate::components::{
     make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
 };
 use crate::core::field::Field;
-use crate::core::pilot;
 use crate::core::util::from_quantity_and_bearing;
 use crate::settings::Settings;
 use glam::Vec2;
@@ -103,7 +102,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                     y: firing_position.y
                 }),
                 time_to_fire: settings.rate_of_fire - self.fire_timer,
-                roids: roids,
+                roids: roids.clone(),
                 ship: Some(rpc::Ship {
                     mass: ship.mass,
                     thrust: ship.thrust,
@@ -123,44 +122,63 @@ impl<'s> System<'s> for QueryPilotSystem {
                 })
             };
 
+            // TODO: We need to sort out async execution (e.g. with tokio) to do this.
             // Pass game-state to pilot process
-            let result = pilot::query_pilot(&settings.pilot_url, &game_state);
+            // let res = query_pilot(settings.pilot_url, game_state);
 
-            match result {
-                Err(msg) => println!("Error communicating with pilot: {:?}", msg),
-                Ok(command) => {
-                    if command.fire && self.fire_timer >= settings.rate_of_fire {
-                        self.fire_timer = 0.0;
+            // match res {
+            //     Err(msg) => println!("Error communicating with pilot: {:?}", msg),
+            //     Ok(command) => {
+            //         if command.fire && self.fire_timer >= settings.rate_of_fire {
+            //             self.fire_timer = 0.0;
 
-                        let new_entity = entities.create();
-                        make_bullet(
-                            specs::world::LazyBuilder {
-                                entity: new_entity,
-                                lazy: &*lazy,
-                            },
-                            firing_position,
-                            settings.bullet_speed,
-                            rotation.0.radians(),
-                            &mut collision_world,
-                        );
-                    }
+            //             let new_entity = entities.create();
+            //             make_bullet(
+            //                 specs::world::LazyBuilder {
+            //                     entity: new_entity,
+            //                     lazy: &*lazy,
+            //                 },
+            //                 firing_position,
+            //                 settings.bullet_speed,
+            //                 rotation.0.radians(),
+            //                 &mut collision_world,
+            //             );
+            //         }
 
-                    let rotation_direction = match command.rotation {
-                        pilot::Rotation::Clockwise => 1.0,
-                        pilot::Rotation::Counterclockwise => -1.0,
-                        pilot::Rotation::None => 0.0,
-                    };
+            //         let rotation_direction = match command.rotation {
+            //             pilot::Rotation::Clockwise => 1.0,
+            //             pilot::Rotation::Counterclockwise => -1.0,
+            //             pilot::Rotation::None => 0.0,
+            //         };
 
-                    angular_velocity.0 = rotation_direction * ship.rotational_speed;
+            //         angular_velocity.0 = rotation_direction * ship.rotational_speed;
 
-                    if command.thrusters {
-                        let steering_force =
-                            from_quantity_and_bearing(ship.thrust, rotation.0.radians());
-                        let accel = steering_force / ship.mass;
-                        linear_velocity.0 += accel * time_delta.0.as_secs_f32();
-                    }
-                }
-            }
+            //         if command.thrusters {
+            //             let steering_force =
+            //                 from_quantity_and_bearing(ship.thrust, rotation.0.radians());
+            //             let accel = steering_force / ship.mass;
+            //             linear_velocity.0 += accel * time_delta.0.as_secs_f32();
+            //         }
+            //     }
+            // }
         }
     }
+}
+
+async fn query_pilot(url: String, game_state: rpc::GameState) -> Result<rpc::Command, Box<dyn std::error::Error>> {
+    let mut client = rpc::pilot_client::PilotClient::connect(url).await?;
+
+    // let request = tonic::Request::new(HelloRequest {
+    //     name: "Tonic".into(),
+    // });
+
+    // let response = client.say_hello(request).await?;
+
+    // println!("RESPONSE={:?}", response);
+
+    Ok(rpc::Command {
+        fire: false,
+        rotation: 0, // TODO: Use enum somehow!    
+        thrusters: false
+    })
 }

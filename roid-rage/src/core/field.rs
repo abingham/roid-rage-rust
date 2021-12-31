@@ -1,13 +1,10 @@
-use serde::{Deserialize, Serialize};
-
-// TODO: This serializeation stuff can be removed now.
-// TODO: Can we remove serde, too?
-#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Field {
     width: usize,
     height: usize,
 }
 
+// TODO: Does Field need to be a trait, e.g. for use with both
+// our Field struct as well as for the grpc one?
 impl Field {
     pub fn new(width: usize, height: usize) -> Self {
         Field {

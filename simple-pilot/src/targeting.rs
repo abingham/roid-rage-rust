@@ -1,9 +1,10 @@
 use glam::Vec2;
 use roid_rage::core::collide::collision_vector;
 use roid_rage::core::field::Field;
-use roid_rage::core::pilot::Roid;
 use std::cmp::Ordering;
 use sted::Velocity;
+
+use roid_rage_grpc::roid_rage as rpc;
 
 // type Point2 = Vec2;
 
@@ -12,17 +13,18 @@ pub fn find_target(
     firing_position: &Vec2,
     bullet_speed: f32,
     field: &Field,
-    objects: &[Roid],
+    objects: &[rpc::Roid],
 ) -> Option<f32> {
-    // Find all possible collisions
-    let hits: Vec<(Vec2, Vec2)> = objects
-        .iter()
-        .filter_map(|r| collision_vector(firing_position, bullet_speed, &r.position, &r.velocity))
-        .filter(|(p, _v)| field.contains(p.x, p.y))
-        .collect();
+    None
+    // // Find all possible collisions
+    // let hits: Vec<(Vec2, Vec2)> = objects
+    //     .iter()
+    //     .filter_map(|r| collision_vector(firing_position, bullet_speed, &r.position, &r.velocity))
+    //     .filter(|(p, _v)| field.contains(p.x, p.y))
+    //     .collect();
 
-    // Return the bearing to the furthest collision, if any
-    closest(firing_position, &hits).map(|(_p, v)| v.bearing())
+    // // Return the bearing to the furthest collision, if any
+    // closest(firing_position, &hits).map(|(_p, v)| v.bearing())
 }
 
 // /// Find the furthest away possible hit in a group.
