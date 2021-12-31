@@ -27,7 +27,6 @@ struct PilotState {
 #[tonic::async_trait]
 impl Pilot for PilotState {
     async fn get_command(&self, request: Request<GameState>) -> Result<Response<Command>, Status> {
-        println!("Handling request");
         let mut cmd = Command {
             fire: false,
             rotation: Rotation::None as i32,
