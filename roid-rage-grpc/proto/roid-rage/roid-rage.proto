@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package roid_rage;
+
+service Pilot {
+  rpc GetCommand (GameState) returns (Command);
+}
+
+message Position {
+  float x = 1;
+  float y = 2;
+}
+
+message Velocity {
+  float x = 1;
+  float y = 2;
+}
+
+message Roid {
+  float radius = 1;
+  Position position = 2;
+  Velocity velocity = 3;
+}
+
+message Cannon {
+  float bullet_speed = 1;
+  float rate_of_fire = 2;
+}
+
+message Ship {
+  float mass = 1;
+  float thrust = 2;
+  Position position = 3;
+  Velocity velocity = 4;
+  float heading = 5;
+  Cannon cannon = 6;
+}
+
+message Field {
+  int32 width = 1;
+  int32 height = 2;
+}
+
+message GameState {
+  Field field = 1;
+  Position firing_position = 2;
+  float time_to_fire = 3;
+  repeated Roid roids = 4;
+  Ship ship = 5;
+}
+
+// Direction in which to rotate
+enum Rotation {
+  Clockwise = 0;
+  Counterclockwise = 1;
+  None = 2;
+}
+
+// The command from the pilot
+message Command {
+  bool fire = 1;
+  Rotation rotation = 2;
+  bool thrusters = 3;
+}
+

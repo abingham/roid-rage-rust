@@ -5,50 +5,75 @@ mod targeting;
 extern crate nalgebra;
 
 use crate::targeting::find_target;
-use rocket::{catch, catchers, post, routes};
-use rocket_contrib::json;
-use rocket_contrib::json::{Json, JsonValue};
-use roid_rage::core::pilot::{Command, GameState, Rotation};
+use tonic::{transport::Server, Request, Response, Status};
 
-#[post("/", format = "json", data = "<game_state>")]
-fn update(game_state: Json<GameState>) -> Json<Command> {
-    let target = find_target(
-        &game_state.firing_position,
-        game_state.ship.cannon.bullet_speed,
-        &game_state.field,
-        &game_state.roids,
-    );
+use roid_rage_grpc::roid_rage::pilot_server::{
+    Pilot, PilotServer
+};
 
-    let cmd = match target {
-        Some(_bearing) => Command {
-            fire: true,
-            rotation: Rotation::Clockwise,
-            thrusters: false,
-        },
-        None => Command {
+use roid_rage_grpc::roid_rage::{
+  Command, GameState, Rotation
+};
+
+// #[post("/", format = "json", data = "<game_state>")]
+// fn update(game_state: Json<GameState>) -> Json<Command> {
+//     let target = find_target(
+//         &game_state.firing_position,
+//         game_state.ship.cannon.bullet_speed,
+//         &game_state.field,
+//         &game_state.roids,
+//     );
+
+//     let cmd = match target {
+//         Some(_bearing) => Command {
+//             fire: true,
+//             rotation: Rotation::Clockwise,
+//             thrusters: false,
+//         },
+//         None => Command {
+//             fire: false,
+//             rotation: Rotation::None,
+//             thrusters: false,
+//         },
+//     };
+
+//     Json(cmd)
+// }
+
+#[derive(Default)]
+struct SimplePilot {}
+
+#[tonic::async_trait]
+impl Pilot for SimplePilot {
+    async fn get_command(
+        &self,
+        request: Request<GameState>,
+    ) -> Result<Response<Command>, Status>
+    {
+        let command = Command {
             fire: false,
-            rotation: Rotation::None,
-            thrusters: false,
-        },
-    };
-
-    Json(cmd)
+            rotation: 0, // TODO: Rotation::None.,
+            thrusters: false
+        };
+        Ok(Response::new(command))
+    }
 }
 
-#[catch(404)]
-fn not_found() -> JsonValue {
-    json!({
-        "status": "error",
-        "reason": "Resource was not found."
-    })
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // dotenv().ok();
+    // env_logger::init();
+
+    // info!("Starting simple-pilot");
+
+    let addr = "[::1]:50051".parse().unwrap();
+    // let addr = std::env::var("GRPC_SERVER_ADDRESS")?.parse()?;
+
+    let pilot = SimplePilot::default();
+    let svc = PilotServer::new(pilot);
+
+    Server::builder().add_service(svc).serve(addr).await?;
+
+    Ok(())
 }
 
-fn rocket() -> rocket::Rocket {
-    rocket::ignite()
-        .mount("/", routes![update])
-        .register(catchers![not_found])
-}
-
-fn main() {
-    rocket().launch();
-}

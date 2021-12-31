@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+// TODO: This serializeation stuff can be removed now.
+// TODO: Can we remove serde, too?
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct Field {
     width: usize,
@@ -26,7 +28,7 @@ impl Field {
         x >= 0.0 && x <= self.width() as f32 && y >= 0.0 && y <= self.height() as f32
     }
 
-    // TODO: This should accept and number type
+    // TODO: This should accept any number type
     pub fn wrap(&self, x: f32, y: f32) -> (f32, f32) {
         let x = if x < 0.0 {
             self.width() as f32
