@@ -57,6 +57,8 @@ impl RoidRage {
         world.insert(TimeDelta(Duration::from_secs(0)));
         world.insert(settings);
 
+        let query_pilot_system = QueryPilotSystem::new()?;
+
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
             .with(
@@ -99,7 +101,7 @@ impl RoidRage {
             //     &["remove_out_of_bounds"],
             // )
             .with(
-                QueryPilotSystem::new(),
+                query_pilot_system,
                 "query_pilot",
                 &["remove_out_of_bounds"],
             )
