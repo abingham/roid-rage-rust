@@ -10,4 +10,13 @@ pub mod roid_rage {
             self.y
         }
     }
+
+    impl Ship {
+        pub fn velocity(&self) -> &Velocity {
+            match &self.velocity {
+                None => &Velocity { x: 0.0, y: 0.0},
+                Some(v) => v
+            }
+        }
+    }
 }
