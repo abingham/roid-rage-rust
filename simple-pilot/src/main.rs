@@ -15,31 +15,6 @@ use roid_rage_grpc::roid_rage::{
   Command, GameState, Rotation
 };
 
-// #[post("/", format = "json", data = "<game_state>")]
-// fn update(game_state: Json<GameState>) -> Json<Command> {
-//     let target = find_target(
-//         &game_state.firing_position,
-//         game_state.ship.cannon.bullet_speed,
-//         &game_state.field,
-//         &game_state.roids,
-//     );
-
-//     let cmd = match target {
-//         Some(_bearing) => Command {
-//             fire: true,
-//             rotation: Rotation::Clockwise,
-//             thrusters: false,
-//         },
-//         None => Command {
-//             fire: false,
-//             rotation: Rotation::None,
-//             thrusters: false,
-//         },
-//     };
-
-//     Json(cmd)
-// }
-
 #[derive(Default)]
 struct SimplePilot {}
 
@@ -52,7 +27,7 @@ impl Pilot for SimplePilot {
     {
         let command = Command {
             fire: false,
-            rotation: 0, // TODO: Rotation::None.,
+            rotation: Rotation::None as i32,
             thrusters: false
         };
         Ok(Response::new(command))
