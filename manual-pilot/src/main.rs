@@ -7,7 +7,7 @@ struct PilotState {}
 
 #[tonic::async_trait]
 impl Pilot for PilotState {
-    async fn get_command(&self, request: Request<rpc::GameState>) -> Result<Response<rpc::Command>, Status> {
+    async fn get_command(&self, _request: Request<rpc::GameState>) -> Result<Response<rpc::Command>, Status> {
         let mut cmd = rpc::Command::null();
 
         // TODO: Should the device-state be constructed only once?
