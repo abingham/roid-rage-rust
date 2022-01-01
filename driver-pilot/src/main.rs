@@ -13,8 +13,9 @@ use tonic::{transport::Server, Request, Response, Status};
 
 use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
 
-use roid_rage_grpc::roid_rage::{Command, GameState, Rotation};
+use roid_rage_grpc::roid_rage::{Command, GameState, Rotation, Ship};
 
+/// Activity state for the pilot, i.e. what is it "doing"
 enum Activity {
     Accelerate(usize),
     Stop,
@@ -24,16 +25,11 @@ struct PilotState {
     activity: Arc<Mutex<Activity>>,
 }
 
-#[tonic::async_trait]
-impl Pilot for PilotState {
-    async fn get_command(&self, request: Request<GameState>) -> Result<Response<Command>, Status> {
-        let mut cmd = Command {
-            fire: false,
-            rotation: Rotation::None as i32,
-            thrusters: false,
-        };
-
-        let game_state = request.get_ref();
+impl PilotState {
+    /// Update internal state based on game state and calculate a 
+    /// new Command.
+    fn update(&self, ship: &Ship) -> Command {
+        let mut cmd = Command::null();
         let mut activity = self.activity.lock().unwrap();
         match *activity {
             Activity::Accelerate(counter) => {
@@ -45,54 +41,62 @@ impl Pilot for PilotState {
                 }
             }
             Activity::Stop => {
-                let speed = game_state.ship.as_ref()
-                    .and_then(|s| s.velocity.as_ref())
-                    .map_or(0.0, |v| v.speed());
+                let speed = ship.velocity().speed();
 
                 if speed < 0.5 {
                     let mut rng = rand::thread_rng();
                     let num_frames = rng.next_u32() % 100 + 100;
                     *activity = Activity::Accelerate(num_frames as usize);
                 } else {
-                    cmd = stop_ship(&game_state);
+                    cmd = PilotState::stop_ship(ship);
                 }
             }
         }
 
-        Ok(Response::new(cmd))
+        cmd
+    }
+
+    /// Take action to stop the ship.
+    fn stop_ship(ship: &Ship) -> Command {
+        let heading = Bearing::new(ship.heading);
+        let course = Bearing::new(ship.velocity().bearing());
+        let diff = heading.distance(&course);
+
+        let mut cmd = Command {
+            fire: false,
+            rotation: Rotation::None as i32,
+            thrusters: false,
+        };
+
+        // If we're not facing opposite to our motion, keep rotating to get there.
+        if !diff.approx_eq_ratio(&PI, 0.01) {
+            cmd.rotation = if diff.signum() as i8 > 0 {
+                Rotation::Counterclockwise as i32
+            } else {
+                Rotation::Clockwise as i32
+            };
+        }
+        // If we're still moving, fire thrusters
+        else {
+            cmd.thrusters = true;
+        }
+
+        cmd
     }
 }
 
-fn stop_ship(game_state: &GameState) -> Command {
-    let heading = Bearing::new(game_state.ship.as_ref().map_or(0.0, |s| s.heading));
-    let course = Bearing::new(
-        game_state
-            .ship.as_ref()
-            .and_then(|s| s.velocity.as_ref())
-            .map_or(0.0, |v| v.bearing()),
-    );
-    let diff = heading.distance(&course);
+#[tonic::async_trait]
+impl Pilot for PilotState {
+    async fn get_command(&self, request: Request<GameState>) -> Result<Response<Command>, Status> {
+        let game_state = request.get_ref();
 
-    let mut cmd = Command {
-        fire: false,
-        rotation: Rotation::None as i32,
-        thrusters: false,
-    };
-
-    // If we're not facing opposite to our motion, keep rotating to get there.
-    if !diff.approx_eq_ratio(&PI, 0.01) {
-        cmd.rotation = if diff.signum() as i8 > 0 {
-            Rotation::Counterclockwise as i32
-        } else {
-            Rotation::Clockwise as i32
+        let cmd = match &game_state.ship {
+            None => Command::null(),
+            Some(ship) => self.update(&ship),
         };
-    }
-    // If we're still moving, fire thrusters
-    else {
-        cmd.thrusters = true;
-    }
 
-    cmd
+        Ok(Response::new(cmd))
+    }
 }
 
 // Note:
