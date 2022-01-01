@@ -50,8 +50,8 @@ initialize_settings!(
     (minimum_roid_radius, f32, 15.0),
     (maximum_roid_radius, f32, 42.5),
     (roid_bumpiness, f32, 0.1),
-    (rate_of_fire, f32, 1.0),
-    (bullet_speed, f32, 500.0),
+    (rate_of_fire, f32, 0.5),
+    (bullet_speed, f32, 1000.0),
     (min_initial_roid_speed, f32, 50.0),
     (max_initial_roid_speed, f32, 100.0),
     (initial_roid_count, u32, 10),
@@ -59,6 +59,6 @@ initialize_settings!(
     (ship_length, f32, 10.0),
     (ship_width, f32, 5.0),
     (ship_mass, f32, 1.0),
-    (ship_thrust, f32, 50.0),
-    (ship_rotational_speed, f32, 1.0)
+    (ship_thrust, f32, 300.0),
+    (ship_rotational_speed, f32, 6.0)
 );
