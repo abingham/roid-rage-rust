@@ -1,10 +1,10 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
-mod targeting;
+// mod targeting;
 
 extern crate nalgebra;
 
-use crate::targeting::find_target;
+// use crate::targeting::find_target;
 use tonic::{transport::Server, Request, Response, Status};
 
 use roid_rage_grpc::roid_rage::pilot_server::{
@@ -22,7 +22,7 @@ struct SimplePilot {}
 impl Pilot for SimplePilot {
     async fn get_command(
         &self,
-        request: Request<GameState>,
+        _request: Request<GameState>,
     ) -> Result<Response<Command>, Status>
     {
         let command = Command {

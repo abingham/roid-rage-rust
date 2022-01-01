@@ -1,8 +1,8 @@
 use glam::Vec2;
-use roid_rage::core::collide::collision_vector;
+// use roid_rage::core::collide::collision_vector;
 use roid_rage::core::field::Field;
 use std::cmp::Ordering;
-use sted::Velocity;
+// use sted::Velocity;
 
 use roid_rage_grpc::roid_rage as rpc;
 

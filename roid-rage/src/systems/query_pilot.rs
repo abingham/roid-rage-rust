@@ -70,9 +70,9 @@ impl<'s> System<'s> for QueryPilotSystem {
     ) {
         self.fire_timer += time_delta.0.as_secs_f32();
 
-        let roids: Vec<rpc::Roid> = (&roids, &linear_velocities, &positions, &entities)
+        let roids: Vec<rpc::Roid> = (&roids, &linear_velocities, &positions)
             .join()
-            .map(|(roid, linear_velocity, position, entity)| rpc::Roid {
+            .map(|(roid, linear_velocity, position)| rpc::Roid {
                 radius: roid.radius,
                 position: Some(rpc::Position {
                     x: position.0.x,
