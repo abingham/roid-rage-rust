@@ -3,16 +3,25 @@ use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
 use tonic::{transport::Server, Request, Response, Status};
 use device_query::{DeviceQuery, DeviceState, Keycode};
 
-struct PilotState {}
+struct PilotState {
+    device_state: DeviceState
+}
+
+impl PilotState {
+    fn new() -> PilotState {
+        PilotState {
+            device_state: DeviceState::new()
+        }
+    }
+}
+
 
 #[tonic::async_trait]
 impl Pilot for PilotState {
     async fn get_command(&self, _request: Request<rpc::GameState>) -> Result<Response<rpc::Command>, Status> {
         let mut cmd = rpc::Command::null();
 
-        // TODO: Should the device-state be constructed only once?
-        let device_state = DeviceState::new();
-        let keys: Vec<Keycode> = device_state.get_keys();
+        let keys: Vec<Keycode> = self.device_state.get_keys();
 
         for key in keys {
             cmd = match key {
@@ -38,7 +47,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "[::1]:50051".parse().unwrap();
     // let addr = std::env::var("GRPC_SERVER_ADDRESS")?.parse()?;
 
-    let pilot = PilotState {};
+    let pilot = PilotState::new();
     let svc = PilotServer::new(pilot);
 
     Server::builder().add_service(svc).serve(addr).await?;
