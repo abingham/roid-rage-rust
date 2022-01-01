@@ -2,18 +2,15 @@
 
 extern crate nalgebra;
 
-use float_cmp::ApproxEqRatio;
 use rand::prelude::*;
-use std::f32::consts::PI;
 use std::sync::Arc;
 use std::sync::Mutex;
-use sted::Bearing;
 use sted::Velocity;
 use tonic::{transport::Server, Request, Response, Status};
 
 use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
 
-use roid_rage_grpc::roid_rage::{Command, GameState, Rotation, Ship};
+use roid_rage_grpc::roid_rage::{Command, GameState, Ship};
 
 /// Activity state for the pilot, i.e. what is it "doing"
 enum Activity {
@@ -48,37 +45,9 @@ impl PilotState {
                     let num_frames = rng.next_u32() % 100 + 100;
                     *activity = Activity::Accelerate(num_frames as usize);
                 } else {
-                    cmd = PilotState::stop_ship(ship);
+                    cmd = steering::stop(ship);
                 }
             }
-        }
-
-        cmd
-    }
-
-    /// Take action to stop the ship.
-    fn stop_ship(ship: &Ship) -> Command {
-        let heading = Bearing::new(ship.heading);
-        let course = Bearing::new(ship.velocity().bearing());
-        let diff = heading.distance(&course);
-
-        let mut cmd = Command {
-            fire: false,
-            rotation: Rotation::None as i32,
-            thrusters: false,
-        };
-
-        // If we're not facing opposite to our motion, keep rotating to get there.
-        if !diff.approx_eq_ratio(&PI, 0.01) {
-            cmd.rotation = if diff.signum() as i8 > 0 {
-                Rotation::Counterclockwise as i32
-            } else {
-                Rotation::Clockwise as i32
-            };
-        }
-        // If we're still moving, fire thrusters
-        else {
-            cmd.thrusters = true;
         }
 
         cmd

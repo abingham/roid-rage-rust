@@ -832,12 +832,12 @@ dependencies = [
 name = "driver-pilot"
 version = "0.1.0"
 dependencies = [
- "float-cmp 0.6.0",
  "nalgebra",
  "rand 0.6.5",
  "roid-rage",
  "roid-rage-grpc",
  "sted",
+ "steering",
  "tokio",
  "tonic",
 ]
@@ -3248,6 +3248,15 @@ dependencies = [
  "float-cmp 0.9.0",
  "glam",
  "num",
+]
+
+[[package]]
+name = "steering"
+version = "0.1.0"
+dependencies = [
+ "float-cmp 0.6.0",
+ "roid-rage-grpc",
+ "sted",
 ]
 
 [[package]]
