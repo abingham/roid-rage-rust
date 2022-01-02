@@ -1,6 +1,6 @@
+/// System responsible for creating ships for pilots with no ships.
 use crate::components::{make_ship, Cannon, Pilot, Ship};
 use crate::settings::Settings;
-use ncollide2d::world::CollisionWorld;
 use specs::{Builder, Entities, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
 use sted::Bearing;
 
@@ -11,12 +11,11 @@ impl<'s> System<'s> for RespawnShipSystem {
     type SystemData = (
         ReadStorage<'s, Ship>,
         Entities<'s>,
-        WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
         ReadExpect<'s, Settings>,
         Read<'s, LazyUpdate>,
     );
 
-    fn run(&mut self, (ships, entities, mut collision_world, settings, lazy): Self::SystemData) {
+    fn run(&mut self, (ships, entities, settings, lazy): Self::SystemData) {
         if !ships.is_empty() {
             return;
         }
@@ -48,7 +47,6 @@ impl<'s> System<'s> for RespawnShipSystem {
             position_y,
             speed,
             course,
-            &mut collision_world,
         )
         .with(Pilot::new())
         .build();
