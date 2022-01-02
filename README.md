@@ -5,30 +5,35 @@ A silly asteroids game.
 ## How to run
 
 Roid Rage runs as two processes, a *game* process and a *pilot* process. You can start them in
-any order.
+any order, though it normally makes sense to start the pilot first.
 
-If you want to actually play the game yourself, you'll want to use the `manual-pilot` pilot 
-program:
+### The "manual" pilot
+
+The `manual-pilot` pilot process lets you actually play the game yourself. It accepts keyboard input
+and uses that to determine how the ship moves. Start it like this:
+
 ```
 cargo run --bin manual-pilot
 ```
 
-Then you can start the game process:
-```
-cargo run --bin roid-rage
-```
-
-This second command will create a new window and you should see 'roids floating around the screen with your
-ship in the middle.
-
 The terminal you ran `manual-pilot` in is the program that will take your input for piloting
-the ship. Focus on that terminal (while keeping the `roid-rage` window visible!) and control the ship
+the ship. Focus on that terminal and control the ship
 as follows:
 
 * Left arrow - rotate counterclockwise
 * Right arrow - rotate clockwise
 * Up arrow - engage thrusters
 * Space bar - fire cannon
+
+### The game process
+
+Then you can start the game process:
+```
+cargo run --bin roid-rage
+```
+
+This command will create a new window and you should see 'roids floating around the screen with your
+ship in the middle.
 
 ### Other pilots
 
