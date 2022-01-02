@@ -50,7 +50,8 @@ pub fn make_ship<B>(
     speed: f32,
     course: Bearing<f32>,
     _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
-) where
+) -> B
+where
     B: specs::world::Builder,
 {
     let position = Position(Vec2::new(x, y));
@@ -74,7 +75,7 @@ pub fn make_ship<B>(
     // );
 
     // Create the entity
-    let _entity = builder
+    builder
         .with(LinearVelocity(from_quantity_and_bearing(
             speed,
             course.radians(),
@@ -85,7 +86,6 @@ pub fn make_ship<B>(
         .with(Wrapping)
         // .with(CollisionHandle(collision_handle))
         .with(Ship::new(length, width, mass, thrust, rotational_speed, cannon))
-        .build();
 
     // Annotate the collision object with the entity's ID
     // *obj.data_mut() = entity.id();

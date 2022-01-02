@@ -1,7 +1,7 @@
-use crate::components::{make_ship, Cannon, Ship};
+use crate::components::{make_ship, Cannon, Pilot, Ship};
 use crate::settings::Settings;
 use ncollide2d::world::CollisionWorld;
-use specs::{Entities, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
+use specs::{Builder, Entities, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect};
 use sted::Bearing;
 
 /// Respawn the ship if needed
@@ -27,6 +27,8 @@ impl<'s> System<'s> for RespawnShipSystem {
         let course = Bearing::new(0.0);
         let heading = Bearing::new(0.0);
         let new_entity = entities.create();
+
+        // Arrange for this ship to be created.
         make_ship(
             specs::world::LazyBuilder {
                 entity: new_entity,
@@ -47,6 +49,8 @@ impl<'s> System<'s> for RespawnShipSystem {
             speed,
             course,
             &mut collision_world,
-        );
+        )
+        .with(Pilot::new())
+        .build();
     }
 }

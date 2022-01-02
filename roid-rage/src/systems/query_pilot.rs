@@ -1,7 +1,8 @@
 /// This queries the pilot process using grpc to figure out
 /// what it wants to do, e.g. shoot, turn, etc.
 use crate::components::{
-    make_bullet, AngularVelocity, Bullet, LinearVelocity, Position, Roid, Rotation, Ship, TimeDelta,
+    make_bullet, AngularVelocity, Bullet, LinearVelocity, Pilot, Position, Roid, Rotation, Ship,
+    TimeDelta,
 };
 use crate::core::field::Field;
 use crate::core::util::from_quantity_and_bearing;
@@ -36,6 +37,7 @@ impl QueryPilotSystem {
 impl<'s> System<'s> for QueryPilotSystem {
     type SystemData = (
         ReadStorage<'s, Roid>,
+        ReadStorage<'s, Pilot>,
         ReadStorage<'s, Ship>,
         WriteStorage<'s, LinearVelocity>,
         WriteStorage<'s, AngularVelocity>,
@@ -54,6 +56,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         &mut self,
         (
             roids,
+            pilots,
             ships,
             mut linear_velocities,
             mut angular_velocities,
@@ -85,7 +88,8 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (ship, position, rotation, linear_velocity, angular_velocity) in (
+        for (pilot, ship, position, rotation, linear_velocity, angular_velocity) in (
+            &pilots,
             &ships,
             &positions,
             &rotations,
@@ -134,7 +138,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             // Pass game-state to pilot process
             let res = self
                 .rt
-                .block_on(query_pilot(settings.pilot_url.to_string(), game_state));
+                .block_on(query_pilot(pilot.url.to_string(), game_state));
 
             match res {
                 Err(msg) => println!("Error communicating with pilot: {:?}", msg),
