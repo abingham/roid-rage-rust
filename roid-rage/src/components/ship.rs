@@ -7,7 +7,7 @@ use sted::Bearing;
 
 pub struct Cannon {
     pub bullet_speed: f32,
-    pub rate_of_fire: f32
+    pub rate_of_fire: f32,
 }
 
 pub struct Ship {
@@ -16,18 +16,25 @@ pub struct Ship {
     pub mass: f32,
     pub thrust: f32,
     pub rotational_speed: f32,
-    pub cannon: Cannon 
+    pub cannon: Cannon,
 }
 
 impl Ship {
-    pub fn new(length: f32, width: f32, mass: f32, thrust: f32, rotational_speed: f32, cannon: Cannon) -> Self {
+    pub fn new(
+        length: f32,
+        width: f32,
+        mass: f32,
+        thrust: f32,
+        rotational_speed: f32,
+        cannon: Cannon,
+    ) -> Self {
         Ship {
             length: length,
             width: width,
             mass: mass,
             thrust: thrust,
             rotational_speed: rotational_speed,
-            cannon: cannon
+            cannon: cannon,
         }
     }
 }
@@ -49,30 +56,12 @@ pub fn make_ship<B>(
     y: f32,
     speed: f32,
     course: Bearing<f32>,
-    _collision_world: &mut CollisionWorld<f32, specs::world::Index>,
 ) -> B
 where
     B: specs::world::Builder,
 {
     let position = Position(Vec2::new(x, y));
     let rotation = Rotation(heading);
-
-    // let mut collision_groups = CollisionGroups::new();
-    // collision_groups.set_membership(&[ROID_GROUP]);
-    // collision_groups.set_whitelist(&[SHIP_GROUP, WEAPON_GROUP]);
-
-    // let collision_isometry = Isometry2::new(Vector2::new(x, y), zero());
-
-    // let collision_shape = ShapeHandle::new(Ball::new(radius));
-
-    // Put entry in collision world
-    // let (collision_handle, obj) = collision_world.add(
-    //     collision_isometry,
-    //     collision_shape,
-    //     collision_groups,from_quantity_and_bearing
-    //     GeometricQueryType::Contacts(0.0, 0.0),
-    //     0,
-    // );
 
     // Create the entity
     builder
@@ -84,9 +73,12 @@ where
         .with(position)
         .with(rotation)
         .with(Wrapping)
-        // .with(CollisionHandle(collision_handle))
-        .with(Ship::new(length, width, mass, thrust, rotational_speed, cannon))
-
-    // Annotate the collision object with the entity's ID
-    // *obj.data_mut() = entity.id();
+        .with(Ship::new(
+            length,
+            width,
+            mass,
+            thrust,
+            rotational_speed,
+            cannon,
+        ))
 }
