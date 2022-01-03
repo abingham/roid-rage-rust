@@ -1,6 +1,7 @@
 use device_query::{DeviceQuery, DeviceState, Keycode};
 use roid_rage_grpc::roid_rage as rpc;
 use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
+use structopt::StructOpt;
 use tonic::{transport::Server, Request, Response, Status};
 
 struct PilotState {
@@ -48,10 +49,23 @@ impl Pilot for PilotState {
     }
 }
 
+#[derive(StructOpt, Debug)]
+#[structopt(name = "basic")]
+struct Opt {
+    /// The address on which the pilot will listen
+    pilot_address: String,
+
+    // An argument of type float, with a default value.
+    #[structopt(short, long, default_value = "[::1]:50051", name="address")]
+    server: String
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let opt = Opt::from_args();
+
     // TODO: The address of this pilot should be a command line option or something.
-    let pilot_address = "[::1]:50052";
+    let pilot_address = opt.pilot_address;
     let pilot_url = format!("http://{}", pilot_address);
 
     let pilot = PilotState::new();
@@ -65,14 +79,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
 
     // TODO: The address of the server should be a command line option or something.
-    let server_address = "http://[::1]:50051";
+    let server_address = format!("http://{}", opt.server);
 
-    // First, register with game
+    // Register with game
     let mut client =
         rpc::pilot_registrar_client::PilotRegistrarClient::connect(server_address).await?;
-    let request = rpc::RegistrationRequest {
-        url: pilot_url
-    };
+    let request = rpc::RegistrationRequest { url: pilot_url };
     client.register(request).await?;
 
     // dotenv().ok();
@@ -81,6 +93,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // info!("Starting simple-pilot");
 
     handle.await?;
-
     Ok(())
 }

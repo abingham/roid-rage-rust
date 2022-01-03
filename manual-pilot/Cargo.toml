@@ -11,3 +11,4 @@ roid-rage-grpc = { path = "../roid-rage-grpc" }
 tonic = "0.6.2"
 tokio = { version = "1.15.0", features = ["macros"] }
 device_query = "0.2.8"
+structopt = "0.3"
