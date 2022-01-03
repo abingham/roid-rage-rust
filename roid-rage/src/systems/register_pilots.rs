@@ -19,7 +19,7 @@ pub struct RegisterPilotsSystem {
 impl RegisterPilotsSystem {
     pub fn new(url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
         // TODO: Should this be a resource in the world?
-        let rt = tokio::runtime::Builder::new_current_thread()
+        let rt = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
             .build()?;
 
@@ -28,6 +28,7 @@ impl RegisterPilotsSystem {
         let system = RegisterPilotsSystem { rt: rt, rx: rx };
 
         // Launch the registrar listener.
+        println!("new pilot reg system");
         system.rt.spawn(listen(String::from(url), tx));
 
         Ok(system)
@@ -62,10 +63,13 @@ async fn listen(url: String, tx: Sender<String>) -> Result<(), tonic::transport:
     let registrar = Registrar { tx: Mutex::new(tx) };
     let svc = PilotRegistrarServer::new(registrar);
     // TODO: This parse().unwrap() call is bad. Callers should pass in a SocketAddr.
-    Server::builder()
+    println!("Listening for pilot registration on {:?}", url);
+    let result = Server::builder()
         .add_service(svc)
         .serve(url.parse().unwrap())
-        .await
+        .await?;
+    println!("Registration listener closing");
+    Ok(result)
 }
 
 /// Stores new registrations from pilots.
