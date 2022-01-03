@@ -6,9 +6,9 @@ use rand::prelude::*;
 use std::sync::Arc;
 use std::sync::Mutex;
 use sted::Velocity;
-use tonic::{transport::Server, Request, Response, Status};
+use tonic::{Request, Response, Status};
 
-use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
+use roid_rage_grpc::roid_rage::pilot_server::Pilot;
 
 use roid_rage_grpc::roid_rage::{Command, GameState, Ship};
 
@@ -23,7 +23,7 @@ struct PilotState {
 }
 
 impl PilotState {
-    /// Update internal state based on game state and calculate a 
+    /// Update internal state based on game state and calculate a
     /// new Command.
     fn update(&self, ship: &Ship) -> Command {
         let mut cmd = Command::null();
@@ -74,20 +74,9 @@ impl Pilot for PilotState {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // dotenv().ok();
-    // env_logger::init();
-
-    // info!("Starting simple-pilot");
-
-    let addr = "[::1]:50051".parse().unwrap();
-    // let addr = std::env::var("GRPC_SERVER_ADDRESS")?.parse()?;
-
     let pilot = PilotState {
         activity: Arc::new(Mutex::new(Activity::Stop)),
     };
-    let svc = PilotServer::new(pilot);
 
-    Server::builder().add_service(svc).serve(addr).await?;
-
-    Ok(())
+    roid_rage::pilot_base::pilot_main(pilot).await
 }
