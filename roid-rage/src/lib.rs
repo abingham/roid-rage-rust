@@ -7,7 +7,7 @@ mod systems;
 use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, MoveObjectsSystem, PilotsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
+    ExplodeRoidsSystem, MoveObjectsSystem, RegisterPilotsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 use sted::Velocity;
@@ -59,7 +59,7 @@ impl RoidRage {
         world.insert(settings);
 
         let query_pilot_system = QueryPilotSystem::new()?;
-        let pilot_registration_system = PilotsSystem::new(&pilot_registration_url)?;
+        let pilot_registration_system = RegisterPilotsSystem::new(&pilot_registration_url)?;
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something

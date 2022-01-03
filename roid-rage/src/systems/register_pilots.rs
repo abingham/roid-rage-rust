@@ -11,13 +11,13 @@ use tonic::{transport::Server, Code, Request, Response, Status};
 // 1. A task/thread for listening for pilot registrations
 
 // TODO: Consider renaming to PilotRegistration or something like that.
-pub struct PilotsSystem {
+pub struct RegisterPilotsSystem {
     rt: Runtime,
     rx: Receiver<String>,
 }
 
-impl PilotsSystem {
-    pub fn new(url: &str) -> Result<PilotsSystem, std::io::Error> {
+impl RegisterPilotsSystem {
+    pub fn new(url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
         // TODO: Should this be a resource in the world?
         let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
@@ -25,7 +25,7 @@ impl PilotsSystem {
 
         let (tx, rx) = channel();
 
-        let system = PilotsSystem { rt: rt, rx: rx };
+        let system = RegisterPilotsSystem { rt: rt, rx: rx };
 
         // Launch the registrar listener.
         system.rt.spawn(listen(String::from(url), tx));
@@ -34,18 +34,14 @@ impl PilotsSystem {
     }
 }
 
-impl<'s> System<'s> for PilotsSystem {
+impl<'s> System<'s> for RegisterPilotsSystem {
     type SystemData = (
         WriteStorage<'s, Pilot>,
-        // WriteStorage<'s, Ship>,
         Entities<'s>,
-        // ReadExpect<'s, Settings>,
-        // Read<'s, LazyUpdate>,
     );
 
     fn run(&mut self, (mut pilots, entities): Self::SystemData) {
-        // TODO: Check self.rx for new registrations, constructing new
-        // pilot components when they're found.
+        // TODO: What if the URL is already registered? Ignore it.
         loop {
             match self.rx.try_recv() {
                 Err(_) => break,
