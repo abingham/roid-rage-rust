@@ -6,6 +6,16 @@ service Pilot {
   rpc GetCommand (GameState) returns (Command);
 }
 
+service PilotRegistrar {
+  rpc Register(RegistrationRequest) returns (RegistrationResponse);
+}
+
+message RegistrationRequest {
+  string url = 1;
+}
+
+message RegistrationResponse {}
+
 message Position {
   float x = 1;
   float y = 2;

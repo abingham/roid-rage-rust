@@ -59,5 +59,6 @@ initialize_settings!(
     (ship_width, f32, 5.0),
     (ship_mass, f32, 1.0),
     (ship_thrust, f32, 300.0),
-    (ship_rotational_speed, f32, 6.0)
+    (ship_rotational_speed, f32, 6.0),
+    (pilot_registration_url, String, String::from("http://[::1]:50051"))
 );

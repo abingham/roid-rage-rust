@@ -141,6 +141,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                 .block_on(query_pilot(pilot.url.to_string(), game_state));
 
             match res {
+                // TODO: If we fail to reach a pilot after some time, we should remove it and its ship.
                 Err(msg) => println!("Error communicating with pilot: {:?}", msg),
                 Ok(command) => {
                     if command.fire && self.fire_timer >= settings.rate_of_fire {

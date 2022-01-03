@@ -7,7 +7,7 @@ mod systems;
 use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
+    ExplodeRoidsSystem, MoveObjectsSystem, PilotsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
     RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 use sted::Velocity;
@@ -48,6 +48,7 @@ pub struct RoidRage {
 impl RoidRage {
     pub fn new(ctx: &mut Context, settings: settings::Settings) -> GameResult<RoidRage> {
         let mut world = World::new();
+        let pilot_registration_url = settings.pilot_registration_url.clone();
 
         world.insert(Field::new(
             settings.screen_width as usize,
@@ -58,9 +59,11 @@ impl RoidRage {
         world.insert(settings);
 
         let query_pilot_system = QueryPilotSystem::new()?;
+        let pilot_registration_system = PilotsSystem::new(&pilot_registration_url)?;
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
+            .with(pilot_registration_system, "pilot-registration", &[])
             .with(
                 CleanupCollisionsSystem::default(),
                 "cleanup_collisions",
@@ -100,11 +103,7 @@ impl RoidRage {
             //     "fire_on_targets",
             //     &["remove_out_of_bounds"],
             // )
-            .with(
-                query_pilot_system,
-                "query_pilot",
-                &["remove_out_of_bounds"],
-            )
+            .with(query_pilot_system, "query_pilot", &["remove_out_of_bounds"])
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
