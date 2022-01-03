@@ -34,6 +34,7 @@ the ship. Focus on that terminal and control the ship as follows:
 * Right arrow - rotate clockwise
 * Up arrow - engage thrusters
 * Space bar - fire cannon
+* S - bring the ship to a stop
 
 ### Other pilots
 

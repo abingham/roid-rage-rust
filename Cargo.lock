@@ -1747,6 +1747,7 @@ dependencies = [
  "device_query",
  "roid-rage",
  "roid-rage-grpc",
+ "steering",
  "tokio",
  "tonic",
 ]

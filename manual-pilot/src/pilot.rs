@@ -19,7 +19,7 @@ impl PilotState {
 impl Pilot for PilotState {
     async fn get_command(
         &self,
-        _request: Request<rpc::GameState>,
+        request: Request<rpc::GameState>,
     ) -> Result<Response<rpc::Command>, Status> {
         let mut cmd = rpc::Command::null();
 
@@ -40,6 +40,13 @@ impl Pilot for PilotState {
                     ..cmd
                 },
                 Keycode::Space => rpc::Command { fire: true, ..cmd },
+                Keycode::S => {
+                    let game_state = request.get_ref();
+                    match &game_state.ship {
+                        None => cmd,
+                        Some(ship) => steering::stop(ship)
+                    }
+                },
                 _ => cmd,
             }
         }
