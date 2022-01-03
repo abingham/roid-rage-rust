@@ -1745,8 +1745,8 @@ name = "manual-pilot"
 version = "0.1.0"
 dependencies = [
  "device_query",
+ "roid-rage",
  "roid-rage-grpc",
- "structopt",
  "tokio",
  "tonic",
 ]
@@ -2888,6 +2888,7 @@ dependencies = [
  "roid-rage-grpc",
  "specs",
  "sted",
+ "structopt",
  "tokio",
  "tonic",
 ]

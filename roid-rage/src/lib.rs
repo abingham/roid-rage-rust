@@ -1,5 +1,6 @@
 mod components;
 pub mod core;
+pub mod pilot_base;
 mod rendering;
 pub mod settings;
 mod systems;
@@ -7,8 +8,8 @@ mod systems;
 use crate::core::field::Field;
 use crate::systems::{
     AgeFragmentsSystem, CleanupCollisionsSystem, DetectCollisionsSystem, ExplodeBulletsSystem,
-    ExplodeRoidsSystem, MoveObjectsSystem, RegisterPilotsSystem, QueryPilotSystem, RemoveOutOfBoundsSystem,
-    RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
+    ExplodeRoidsSystem, MoveObjectsSystem, QueryPilotSystem, RegisterPilotsSystem,
+    RemoveOutOfBoundsSystem, RepopulateSystem, RespawnShipSystem, WrapObjectsSystem,
 };
 use sted::Velocity;
 
@@ -70,7 +71,11 @@ impl RoidRage {
                 &[],
             )
             .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
-            .with(RespawnShipSystem, "respawn", &["pilot-registration", "cleanup_collisions"])
+            .with(
+                RespawnShipSystem,
+                "respawn",
+                &["pilot-registration", "cleanup_collisions"],
+            )
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(
                 MoveObjectsSystem,

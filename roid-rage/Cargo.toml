@@ -1,17 +1,18 @@
 [package]
-name = "roid-rage"
-version = "0.1.0"
 authors = []
 edition = "2018"
+name = "roid-rage"
+version = "0.1.0"
 
 [dependencies]
 config = "0.9"
 ggez = "0.7"
 ncollide2d = "0.21"
 num = "0.2.1"
-specs = "0.16"
 rand = "0.6.5"
-roid-rage-grpc = { path = "../roid-rage-grpc" }
+roid-rage-grpc = {path = "../roid-rage-grpc"}
+specs = "0.16"
+structopt = "0.3"
 tokio = "1.15.0"
 tonic = "0.6.2"
 
