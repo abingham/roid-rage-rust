@@ -70,7 +70,7 @@ impl RoidRage {
                 &[],
             )
             .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
-            .with(RespawnShipSystem, "respawn", &["cleanup_collisions"])
+            .with(RespawnShipSystem, "respawn", &["pilot-registration", "cleanup_collisions"])
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(
                 MoveObjectsSystem,
