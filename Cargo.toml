@@ -1,3 +1,2 @@
 [workspace]
-members = ["driver-pilot", "manual-pilot", "roid-rage", "roid-rage-grpc", "simple-pilot", "sted", "steering"]
-
+members = ["driver-pilot", "manual-pilot", "roid-rage", "roid-rage-grpc", "simple-pilot", "sted", "pilot-lib"]

@@ -44,7 +44,7 @@ impl Pilot for PilotState {
                     let game_state = request.get_ref();
                     match &game_state.ship {
                         None => cmd,
-                        Some(ship) => steering::stop(ship)
+                        Some(ship) => pilot_lib::stop(ship)
                     }
                 },
                 _ => cmd,

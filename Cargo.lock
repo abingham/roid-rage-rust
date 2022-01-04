@@ -868,11 +868,11 @@ name = "driver-pilot"
 version = "0.1.0"
 dependencies = [
  "nalgebra",
+ "pilot-lib",
  "rand 0.6.5",
  "roid-rage",
  "roid-rage-grpc",
  "sted",
- "steering",
  "tokio",
  "tonic",
 ]
@@ -1745,9 +1745,9 @@ name = "manual-pilot"
 version = "0.1.0"
 dependencies = [
  "device_query",
+ "pilot-lib",
  "roid-rage",
  "roid-rage-grpc",
- "steering",
  "tokio",
  "tonic",
 ]
@@ -2366,6 +2366,15 @@ checksum = "4a13a2fa9d0b63e5f22328828741e523766fff0ee9e779316902290dff3f824f"
 dependencies = [
  "fixedbitset 0.4.0",
  "indexmap",
+]
+
+[[package]]
+name = "pilot-lib"
+version = "0.1.0"
+dependencies = [
+ "float-cmp 0.6.0",
+ "roid-rage-grpc",
+ "sted",
 ]
 
 [[package]]
@@ -3310,15 +3319,6 @@ dependencies = [
  "float-cmp 0.9.0",
  "glam",
  "num",
-]
-
-[[package]]
-name = "steering"
-version = "0.1.0"
-dependencies = [
- "float-cmp 0.6.0",
- "roid-rage-grpc",
- "sted",
 ]
 
 [[package]]

@@ -10,6 +10,6 @@ version = "0.1.0"
 device_query = "0.2.8"
 roid-rage = {path = "../roid-rage"}
 roid-rage-grpc = {path = "../roid-rage-grpc"}
-steering = {path = "../steering"}
+pilot-lib = {path = "../pilot-lib"}
 tokio = {version = "1.15.0", features = ["macros"]}
 tonic = "0.6.2"
