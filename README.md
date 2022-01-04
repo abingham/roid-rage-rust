@@ -60,6 +60,9 @@ include information about the ship, it's location, and the 'roids on the board. 
 instructions about how to pilot the ship, whether to fire, etc. Communication takes place
 using [grpc](grpc.io).
 
+The `pilot-lib` module is designed to simplify development of new pilots. In particular, it implements a `main()` function
+that most pilots should be able to use. 
+
 Currently the best example of how to implement a pilot is `manual-pilot`. You can use
 this as a rough guide of how to write a pilot.
 

@@ -1,3 +1,4 @@
+//! Boilerplate for common pilot implementations
 use roid_rage_grpc::roid_rage as rpc;
 use roid_rage_grpc::roid_rage::pilot_server::{Pilot, PilotServer};
 use structopt::StructOpt;
@@ -14,6 +15,26 @@ struct Opt {
 	server: String,
 }
 
+/// Implementation of main() for Pilots.
+///
+/// This main implementation will give you a program that accepts
+/// arguments for the pilot address and the game address.
+/// 
+/// # Example
+/// 
+/// ```
+/// use roid_rage_grpc::roid_rage::pilot_server::Pilot;
+/// 
+/// struct MyPilot { . . .}
+/// 
+/// impl Pilot for MyPilot { . . . }
+/// 
+/// #[tokio::main]
+/// async fn main() -> Result<(), Box<dyn std::error:Error>> {
+/// 	let pilot = MyPilot { . . .};
+/// 	pilot_lib::pilot_base::pilot_main(pilot).await
+/// }
+/// ```
 pub async fn pilot_main<P>(pilot: P) -> Result<(), Box<dyn std::error::Error>>
 where
 	P: Pilot,
