@@ -45,7 +45,7 @@ impl PilotState {
                     let num_frames = rng.next_u32() % 100 + 100;
                     *activity = Activity::Accelerate(num_frames as usize);
                 } else {
-                    cmd = pilot_lib::stop(ship);
+                    cmd = pilot_lib::steering::stop(ship);
                 }
             }
         }
