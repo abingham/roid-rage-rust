@@ -2375,6 +2375,9 @@ dependencies = [
  "float-cmp 0.6.0",
  "roid-rage-grpc",
  "sted",
+ "structopt",
+ "tokio",
+ "tonic",
 ]
 
 [[package]]
@@ -2898,7 +2901,6 @@ dependencies = [
  "roid-rage-grpc",
  "specs",
  "sted",
- "structopt",
  "tokio",
  "tonic",
 ]
@@ -3133,6 +3135,7 @@ version = "0.1.0"
 dependencies = [
  "glam",
  "nalgebra",
+ "pilot-lib",
  "roid-rage",
  "roid-rage-grpc",
  "sted",

@@ -29,5 +29,5 @@ impl Pilot for SimplePilot {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pilot = SimplePilot::default();
-    roid_rage::pilot_base::pilot_main(pilot).await
+    pilot_lib::pilot_base::pilot_main(pilot).await
 }

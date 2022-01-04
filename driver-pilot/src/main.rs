@@ -78,5 +78,5 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         activity: Arc::new(Mutex::new(Activity::Stop)),
     };
 
-    roid_rage::pilot_base::pilot_main(pilot).await
+    pilot_lib::pilot_base::pilot_main(pilot).await
 }
