@@ -47,6 +47,13 @@ impl Pilot for PilotState {
                         Some(ship) => pilot_lib::steering::stop(ship)
                     }
                 },
+                Keycode::E => {
+                    let game_state = request.get_ref();
+                    match &game_state.ship {
+                        None => cmd,
+                        Some(ship) => pilot_lib::steering::evade(ship, &game_state.roids)
+                    }
+                }
                 _ => cmd,
             }
         }

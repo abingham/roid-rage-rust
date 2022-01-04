@@ -2373,6 +2373,8 @@ name = "pilot-lib"
 version = "0.1.0"
 dependencies = [
  "float-cmp 0.6.0",
+ "glam",
+ "roid-rage",
  "roid-rage-grpc",
  "sted",
  "structopt",
@@ -2909,6 +2911,7 @@ dependencies = [
 name = "roid-rage-grpc"
 version = "0.1.0"
 dependencies = [
+ "glam",
  "prost",
  "prost-types",
  "sted",

@@ -7,6 +7,8 @@ version = "0.1.0"
 
 [dependencies]
 float-cmp = "0.6.0"
+glam = "*"
+roid-rage = {path = "../roid-rage"}
 roid-rage-grpc = {path = "../roid-rage-grpc"}
 sted = {path = "../sted"}
 structopt = "0.3"

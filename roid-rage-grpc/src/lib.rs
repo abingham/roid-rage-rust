@@ -12,12 +12,36 @@ pub mod roid_rage {
         }
     }
 
+    impl Roid {
+        /// Get a velocity from a roid, producing a default velocity if necessary.
+        pub fn velocity(&self) -> &Velocity {
+            match &self.velocity {
+                None => &Velocity { x: 0.0, y: 0.0 },
+                Some(v) => v,
+            }
+        }
+
+        pub fn position(&self) -> &Position {
+            match &self.position {
+                None => &Position { x: 0.0, y: 0.0 },
+                Some(p) => p,
+            }
+        }
+    }
+
     impl Ship {
         /// Get a velocity from a ship, producing a default velocity if necessary.
         pub fn velocity(&self) -> &Velocity {
             match &self.velocity {
                 None => &Velocity { x: 0.0, y: 0.0 },
                 Some(v) => v,
+            }
+        }
+
+        pub fn position(&self) -> &Position {
+            match &self.position {
+                None => &Position { x: 0.0, y: 0.0 },
+                Some(p) => p,
             }
         }
     }
@@ -30,6 +54,12 @@ pub mod roid_rage {
                 rotation: Rotation::None as i32,
                 thrusters: false,
             }
+        }
+    }
+
+    impl From<&Position> for glam::Vec2 {
+        fn from(p: &Position) -> glam::Vec2 {
+            glam::Vec2::new(p.x, p.y)
         }
     }
 }
