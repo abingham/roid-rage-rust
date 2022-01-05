@@ -10,7 +10,6 @@ use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
 use rand::prelude::*;
 use specs::{Component, VecStorage};
-use sted::Bearing;
 
 pub struct Roid {
     pub radius: f32,
@@ -58,7 +57,7 @@ pub fn make_roid<B>(
     B: specs::world::Builder,
 {
     let position = Position(Vec2::new(x, y));
-    let rotation = Rotation(Bearing::new(0.0f32));
+    let rotation = Rotation(Vec2::ZERO);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);

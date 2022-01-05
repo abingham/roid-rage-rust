@@ -18,8 +18,8 @@ pub struct RegisterPilotsSystem {
 
 impl RegisterPilotsSystem {
     pub fn new(url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
-        // TODO: Should this be a resource in the world?
-        let rt = tokio::runtime::Builder::new_multi_thread()
+        // TODO: Should the runtime be a resource in the world?
+        let rt = tokio::runtime::Builder::new_current_thread()
             .enable_all()
             .build()?;
 

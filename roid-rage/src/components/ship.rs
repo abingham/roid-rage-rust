@@ -1,8 +1,6 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, Wrapping};
-use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use specs::{Component, HashMapStorage};
-use sted::Bearing;
 
 pub struct Cannon {
     pub bullet_speed: f32,
@@ -44,7 +42,7 @@ impl Component for Ship {
 
 pub fn make_ship<B>(
     builder: B,
-    heading: Bearing<f32>,
+    heading: Vec2,
     length: f32,
     width: f32,
     mass: f32,
@@ -53,8 +51,7 @@ pub fn make_ship<B>(
     cannon: Cannon,
     x: f32,
     y: f32,
-    speed: f32,
-    course: Bearing<f32>,
+    velocity: Vec2,
 ) -> B
 where
     B: specs::world::Builder,
@@ -64,10 +61,7 @@ where
 
     // Create the entity
     builder
-        .with(LinearVelocity(from_quantity_and_bearing(
-            speed,
-            course.radians(),
-        )))
+        .with(LinearVelocity(velocity))
         .with(AngularVelocity(0.0))
         .with(position)
         .with(rotation)

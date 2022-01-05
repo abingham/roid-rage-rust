@@ -1,13 +1,6 @@
-mod bearing;
 mod velocity;
+mod direction;
 
-pub use bearing::Bearing;
 pub use velocity::Velocity;
+pub use direction::Direction;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

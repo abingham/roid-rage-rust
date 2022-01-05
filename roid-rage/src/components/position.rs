@@ -1,10 +1,6 @@
-use glam::Vec2;
-use specs::Component;
-use specs::VecStorage;
-
 #[derive(Clone)]
-pub struct Position(pub Vec2);
+pub struct Position(pub glam::Vec2);
 
-impl Component for Position {
-    type Storage = VecStorage<Self>;
+impl specs::Component for Position {
+    type Storage = specs::VecStorage<Self>;
 }

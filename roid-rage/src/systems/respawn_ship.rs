@@ -2,7 +2,6 @@
 use crate::components::{make_ship, Cannon, Pilot, Ship};
 use crate::settings::Settings;
 use specs::{Builder, Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System};
-use sted::Bearing;
 
 /// Respawn the ship if needed
 pub struct RespawnShipSystem;
@@ -21,9 +20,7 @@ impl<'s> System<'s> for RespawnShipSystem {
         for (_pilot, entity, ()) in (&pilots, &entities, !&ships).join() {
             let position_x = settings.screen_width / 2.0;
             let position_y = settings.screen_height / 2.0;
-            let speed = 0.0;
-            let course = Bearing::new(0.0);
-            let heading = Bearing::new(0.0);
+            let heading = glam::Vec2::ZERO;
 
             // Arrange for a ship to be created.
             make_ship(
@@ -43,8 +40,7 @@ impl<'s> System<'s> for RespawnShipSystem {
                 },
                 position_x,
                 position_y,
-                speed,
-                course,
+                glam::Vec2::ZERO,
             )
             .build();
         }

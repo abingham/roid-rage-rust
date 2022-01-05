@@ -160,7 +160,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            roid.render(position.0, rotation.0.radians(), ctx)?;
+            roid.render(position.0, rotation.0, ctx)?;
         }
 
         for (position, bullet) in (
@@ -169,7 +169,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            bullet.render(position.0, 0.0, ctx)?;
+            bullet.render(position.0, glam::Vec2::ZERO, ctx)?;
         }
 
         for (position, rotation, ship) in (
@@ -179,7 +179,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            ship.render(position.0, rotation.0.radians(), ctx)?;
+            ship.render(position.0, rotation.0, ctx)?;
         }
 
         for (rotation, linear_velocity, _ship) in (
@@ -195,7 +195,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
             let hud_y = settings.maximum_roid_radius + 10.0;
 
             let heading_text = graphics::Text::new((
-                format!("heading: {}", rotation.0.radians()),
+                format!("heading: {}", rotation.0.bearing()),
                 self.assets.font,
                 hud_font_size,
             ));
@@ -236,7 +236,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            fragment.render(position.0, 0.0, ctx)?;
+            fragment.render(position.0, glam::Vec2::ZERO, ctx)?;
         }
 
         graphics::present(ctx)?;

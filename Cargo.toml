@@ -1,2 +1,10 @@
 [workspace]
-members = ["driver-pilot", "manual-pilot", "roid-rage", "roid-rage-grpc", "simple-pilot", "sted", "pilot-lib"]
+members = [
+	#"driver-pilot", 
+	#"manual-pilot", 
+	"roid-rage", 
+	"roid-rage-grpc", 
+	#"simple-pilot", 
+	"sted", 
+	#"pilot-lib"
+	]

@@ -1,10 +1,6 @@
-use sted::Bearing;
-use specs::Component;
-use specs::VecStorage;
-
 #[derive(Clone)]
-pub struct Rotation(pub Bearing<f32>);
+pub struct Rotation(pub glam::Vec2);
 
-impl Component for Rotation {
-    type Storage = VecStorage<Self>;
+impl specs::Component for Rotation {
+    type Storage = specs::VecStorage<Self>;
 }
