@@ -19,9 +19,16 @@ pub trait Direction<T: Float + FromPrimitive> {
     }
 
     fn rotate(&self, amount: T) -> Self where Self: Sized {
-        let new_brg = self.bearing() + amount; 
-        let dx = new_brg.tan();
-        Self::create(dx, T::from(-1.0_f32).unwrap()) 
+        // TODO: This is nuts. Should we just hardcode things to f32?
+
+        let theta = self.bearing() + amount;
+        let two = T::from(2.0_f32).unwrap();
+        let neg_one = T::from(-1.0_f32).unwrap();
+
+        let len = (self.dx().powf(two) + self.dy().powf(two)).sqrt();
+        let new_x = theta.cos() * len;
+        let new_y = theta.sin() * len;
+        Self::create(new_x, neg_one * new_y)
     }
 }
 
@@ -49,22 +56,24 @@ mod tests {
         #[test]
         fn east_to_north() {
             let east = glam::Vec2::new(1.0, 0.0);
-            let north = east.rotate(PI);
+            let north = east.rotate(PI / 2.0);
             let expected = glam::Vec2::new(0.0, -1.0);
-            assert!((north.x - expected.x).abs() < 0.0000001);
+            assert_eq!(north.bearing(), expected.bearing());
         }
-    }
-
-    mod sub {
-        use super::super::Direction;
-        use std::f32::consts::PI;
 
         #[test]
         fn north_to_east() {
             let north = glam::Vec2::new(0.0, -1.0);
-            let actual = north.rotate(-1.0 * PI).normalize();
+            let east = north.rotate(-1.0 * PI / 2.0);
             let expected = glam::Vec2::new(1.0, 0.0);
-            assert!((actual.x - expected.x).abs() < 0.00000001);
+            assert_eq!(east.bearing(), expected.bearing());
+        }
+
+        #[test]
+        fn add_zero() {
+            let original = glam::Vec2::new(-1.509958e-7, 1.0);
+            let actual = original.rotate(0.0);
+            assert_eq!(actual.bearing(), original.bearing());
         }
     }
 
