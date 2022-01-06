@@ -1,5 +1,6 @@
 use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, TimeDelta};
 use specs::{Join, Read, ReadStorage, System, WriteStorage};
+use sted::Direction;
 
 pub struct MoveObjectsSystem;
 
@@ -23,7 +24,9 @@ impl<'s> System<'s> for MoveObjectsSystem {
 
         // Rotate all of the rotating objects
         for (angular_velocity, rotation) in (&angular_velocities, &mut rotations).join() {
-            rotation.0 = rotation.0 + angular_velocity.0 * time_delta.0.as_secs_f32();
+            println!("{:?} {:?}", angular_velocity.0, rotation.0);
+            rotation.0 = rotation.0.rotate(angular_velocity.0 * time_delta.0.as_secs_f32());
+            println!("{:?} {:?}", rotation.0, time_delta.0);
         }
     }
 }

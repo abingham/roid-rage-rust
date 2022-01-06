@@ -1,34 +1,34 @@
 use num::{Float, FromPrimitive};
 
 /// Vector representing a direction.
-pub trait Direction<T: Float + FromPrimitive> {
-    fn dx(&self) -> T;
-    fn dy(&self) -> T;
+pub trait Direction {
+    fn dx(&self) -> f32;
+    fn dy(&self) -> f32;
 
-    fn create(x: T, y: T) -> Self;
+    fn create(x: f32, y: f32) -> Self;
 
     /// Get the bearing of the direction in radians.
     /// 
     /// CCW azimuthal direction.
-    fn bearing(&self) -> T {
+    fn bearing(&self) -> f32 {
         let x = self.dx();
         // NB: We flip the y axis because our coord. system is
         // different from the math one. I.e. for us -y is "up".
-        let y = T::from(-1.0_f32).unwrap() * self.dy();
-        T::atan2(y, x)
+        let y = -1.0 * self.dy();
+        f32::atan2(y, x)
     }
 
-    fn rotate(&self, amount: T) -> Self where Self: Sized {
+    fn rotate(&self, amount: f32) -> Self where Self: Sized {
         // TODO: This is nuts. Should we just hardcode things to f32?
 
         let theta = self.bearing() + amount;
-        let two = T::from(2.0_f32).unwrap();
-        let neg_one = T::from(-1.0_f32).unwrap();
 
-        let len = (self.dx().powf(two) + self.dy().powf(two)).sqrt();
+        let len = (self.dx().powf(2.0) + self.dy().powf(2.0)).sqrt();
         let new_x = theta.cos() * len;
         let new_y = theta.sin() * len;
-        Self::create(new_x, neg_one * new_y)
+        let new = Self::create(new_x, 1.0 * new_y);
+        println!("{:?} {:?}", new_x, new_y);
+        new
     }
 }
 

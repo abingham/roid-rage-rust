@@ -69,7 +69,7 @@ impl RoidRage {
                 "cleanup_collisions",
                 &[],
             )
-            .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
+            // .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
             .with(
                 RespawnShipSystem,
                 "respawn",
@@ -79,7 +79,8 @@ impl RoidRage {
             .with(
                 MoveObjectsSystem,
                 "move_objects",
-                &["repopulate", "respawn"],
+                &[// "repopulate", 
+                "respawn"],
             )
             .with(
                 DetectCollisionsSystem,
