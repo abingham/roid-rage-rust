@@ -155,8 +155,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                                 lazy: &*lazy,
                             },
                             firing_position,
-                            settings.bullet_speed * rotation.0.vector(),
-                            &mut collision_world,
+                            rotation.0.vector().normalize() * settings.bullet_speed,
+                            &mut collision_world
                         );
                     }
 
@@ -170,7 +170,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                     angular_velocity.0 = rotation_direction * ship.rotational_speed;
 
                     if command.thrusters {
-                        let steering_force = ship.thrust * rotation.0;
+                        let steering_force = ship.thrust * rotation.0.vector();
                         let accel = steering_force / ship.mass;
                         linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }

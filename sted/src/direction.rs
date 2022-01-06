@@ -7,7 +7,7 @@ pub trait Direction {
     fn vector(&self) -> glam::Vec2 {
         let x = self.radians().cos();
         let y = self.radians().sin();
-        glam::Vec2::new(x, -1.0 * y)
+        glam::Vec2::new(x, y)
     }
 
     // Get the bearing of the direction in radians.

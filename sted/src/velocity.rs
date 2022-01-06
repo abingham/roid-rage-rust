@@ -11,7 +11,6 @@ pub trait Velocity<T: Float + FromPrimitive> {
         (self.dx().powf(two) + self.dy().powf(two)).sqrt()
     }
 
-    // TODO: Shouldn't this return a Bearing instance?
     fn bearing(&self) -> T {
         self.dy().atan2(self.dx())
     }
