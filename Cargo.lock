@@ -839,6 +839,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "driver-pilot"
+version = "0.1.0"
+dependencies = [
+ "nalgebra",
+ "pilot-lib",
+ "rand 0.6.5",
+ "roid-rage",
+ "roid-rage-grpc",
+ "sted",
+ "tokio",
+ "tonic",
+]
+
+[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3073,6 +3087,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bd5ac56c121948b4879bba9e519852c211bcdd8f014efff766441deff0b91bdb"
 dependencies = [
  "num-traits 0.2.14",
+]
+
+[[package]]
+name = "simple-pilot"
+version = "0.1.0"
+dependencies = [
+ "glam",
+ "nalgebra",
+ "pilot-lib",
+ "roid-rage",
+ "roid-rage-grpc",
+ "sted",
+ "tokio",
+ "tonic",
 ]
 
 [[package]]
