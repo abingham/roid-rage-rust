@@ -839,6 +839,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "driver-pilot"
+version = "0.1.0"
+dependencies = [
+ "nalgebra",
+ "pilot-lib",
+ "rand 0.6.5",
+ "roid-rage",
+ "roid-rage-grpc",
+ "sted",
+ "tokio",
+ "tonic",
+]
+
+[[package]]
 name = "either"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3382,6 +3396,7 @@ dependencies = [
  "libc",
  "memchr",
  "mio",
+ "num_cpus",
  "pin-project-lite",
  "tokio-macros",
  "winapi",

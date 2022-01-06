@@ -72,6 +72,8 @@ pub mod roid_rage {
         }
     }
 
+    // Conversions from RPC types to glam
+
     impl From<&Position> for glam::Vec2 {
         fn from(p: &Position) -> glam::Vec2 {
             glam::Vec2::new(p.x, p.y)

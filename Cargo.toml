@@ -1,6 +1,6 @@
 [workspace]
 members = [
-	# "driver-pilot", 
+	"driver-pilot", 
 	#"manual-pilot", 
 	"roid-rage", 
 	"roid-rage-grpc", 
