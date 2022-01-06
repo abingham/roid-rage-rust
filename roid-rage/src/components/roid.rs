@@ -57,7 +57,7 @@ pub fn make_roid<B>(
     B: specs::world::Builder,
 {
     let position = Position(Vec2::new(x, y));
-    let rotation = Rotation(Vec2::ZERO);
+    let rotation = Rotation(0.0);
 
     let mut collision_groups = CollisionGroups::new();
     collision_groups.set_membership(&[ROID_GROUP]);

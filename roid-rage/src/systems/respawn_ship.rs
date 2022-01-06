@@ -20,7 +20,7 @@ impl<'s> System<'s> for RespawnShipSystem {
         for (_pilot, entity, ()) in (&pilots, &entities, !&ships).join() {
             let position_x = settings.screen_width / 2.0;
             let position_y = settings.screen_height / 2.0;
-            let heading = glam::Vec2::X;
+            let heading = 0.0;
 
             // Arrange for a ship to be created.
             make_ship(

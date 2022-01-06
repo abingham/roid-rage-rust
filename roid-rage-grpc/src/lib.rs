@@ -51,14 +51,6 @@ pub mod roid_rage {
                 Some(p) => glam::Vec2::from(p),
             }
         }
-
-        pub fn heading(&self) -> glam::Vec2 {
-            match &self.heading {
-                None => glam::Vec2::ZERO,
-                Some(h) => glam::Vec2::from(h),
-            }
-        }
-
     }
 
     impl Command {
@@ -82,12 +74,6 @@ pub mod roid_rage {
 
     impl From<&Velocity> for glam::Vec2 {
         fn from(p: &Velocity) -> glam::Vec2 {
-            glam::Vec2::new(p.x, p.y)
-        }
-    }
-
-    impl From<&Direction> for glam::Vec2 {
-        fn from(p: &Direction) -> glam::Vec2 {
             glam::Vec2::new(p.x, p.y)
         }
     }

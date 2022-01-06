@@ -1,7 +1,7 @@
 use float_cmp::ApproxEqRatio;
 use roid_rage_grpc::roid_rage as rpc;
 use std::f32::consts::PI;
-use sted::Velocity;
+use sted::{Direction, Velocity};
 
 /// Bring the ship to a stop
 ///
@@ -9,7 +9,7 @@ use sted::Velocity;
 /// ship's heading, and then fire thrusters until speed
 /// is zero.
 pub fn stop(ship: &rpc::Ship) -> rpc::Command {
-    let diff = ship.heading().dot(ship.velocity());
+    let diff = ship.heading.vector().dot(ship.velocity());
 
     let mut cmd = rpc::Command {
         fire: false,
@@ -48,7 +48,7 @@ mod tests {
         fn test_rotate_ccw() {
             let ship = rpc::Ship {
                 // facing 'east'
-                heading: Some(rpc::Direction { x: 1.0, y: 0.0 }),
+                heading: 0.0,
                 mass: 1.0,
                 position: None,
                 thrust: 1.0,
@@ -67,7 +67,7 @@ mod tests {
         fn test_rotate_cw() {
             let ship = rpc::Ship {
                 // facing 'east'
-                heading: Some(rpc::Direction { x: 1.0, y: 0.0 }),
+                heading: 0.0,
                 mass: 1.0,
                 position: None,
                 thrust: 1.0,
@@ -86,7 +86,7 @@ mod tests {
         fn test_fire_thrusters_when_facing_correct_direction() {
             let ship = rpc::Ship {
                 // facing 'east'
-                heading: Some(rpc::Direction { x: 1.0, y: 0.0 }),
+                heading: 0.0,
                 mass: 1.0,
                 position: None,
                 thrust: 1.0,
@@ -105,7 +105,7 @@ mod tests {
         fn test_do_nothing_when_already_stopped() {
             let ship = rpc::Ship {
                 // facing 'east'
-                heading: Some(rpc::Direction { x: 1.0, y: 0.0 }),
+                heading: 0.0,
                 mass: 1.0,
                 position: None,
                 thrust: 1.0,

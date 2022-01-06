@@ -26,11 +26,6 @@ message Velocity {
   float y = 2;
 }
 
-message Direction {
-  float x = 1;
-  float y = 2;
-}
-
 message Roid {
   float radius = 1;
   Position position = 2;
@@ -47,7 +42,7 @@ message Ship {
   float thrust = 2;
   Position position = 3;
   Velocity velocity = 4;
-  Direction heading = 5;
+  float heading = 5;
   Cannon cannon = 6;
 }
 

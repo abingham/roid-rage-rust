@@ -42,7 +42,7 @@ impl Component for Ship {
 
 pub fn make_ship<B>(
     builder: B,
-    heading: Vec2,
+    heading: f32,
     length: f32,
     width: f32,
     mass: f32,

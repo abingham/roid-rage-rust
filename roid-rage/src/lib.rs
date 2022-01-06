@@ -69,7 +69,7 @@ impl RoidRage {
                 "cleanup_collisions",
                 &[],
             )
-            // .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
+            .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
             .with(
                 RespawnShipSystem,
                 "respawn",
@@ -79,8 +79,7 @@ impl RoidRage {
             .with(
                 MoveObjectsSystem,
                 "move_objects",
-                &[// "repopulate", 
-                "respawn"],
+                &["repopulate", "respawn"],
             )
             .with(
                 DetectCollisionsSystem,
@@ -170,7 +169,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            bullet.render(position.0, glam::Vec2::ZERO, ctx)?;
+            bullet.render(position.0, 0.0, ctx)?;
         }
 
         for (position, rotation, ship) in (
@@ -196,7 +195,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
             let hud_y = settings.maximum_roid_radius + 10.0;
 
             let heading_text = graphics::Text::new((
-                format!("heading: {}", rotation.0.bearing()),
+                format!("heading: {}", rotation.0),
                 self.assets.font,
                 hud_font_size,
             ));
@@ -237,7 +236,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            fragment.render(position.0, glam::Vec2::ZERO, ctx)?;
+            fragment.render(position.0, 0.0, ctx)?;
         }
 
         graphics::present(ctx)?;

@@ -102,8 +102,8 @@ impl<'s> System<'s> for QueryPilotSystem {
 
             let firing_position = Vec2::new(
                 // TODO: Would it be better to use rotation.0.normalized() instead of doing trig here?
-                ship_center.x + rotation.0.bearing().cos() * ship.length / 2.0,
-                ship_center.y + rotation.0.bearing().sin() * ship.length / 2.0,
+                ship_center.x + rotation.0.cos() * ship.length / 2.0,
+                ship_center.y + rotation.0.sin() * ship.length / 2.0,
             );
 
             let game_state = rpc::GameState {
@@ -128,10 +128,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                         x: linear_velocity.0.x,
                         y: linear_velocity.0.y,
                     }),
-                    heading: Some(rpc::Direction {
-                        x: rotation.0.x,
-                        y: rotation.0.y,
-                    }),
+                    heading: rotation.0,
                     cannon: Some(rpc::Cannon {
                         bullet_speed: ship.cannon.bullet_speed,
                         rate_of_fire: ship.cannon.rate_of_fire,
@@ -158,7 +155,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                                 lazy: &*lazy,
                             },
                             firing_position,
-                            settings.bullet_speed * rotation.0.normalize(),
+                            settings.bullet_speed * rotation.0.vector(),
                             &mut collision_world,
                         );
                     }

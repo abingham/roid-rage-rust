@@ -1,6 +1,5 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
 use crate::components::{CollisionHandle, LinearVelocity, Position};
-use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
 use nalgebra::{Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
