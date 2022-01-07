@@ -9,7 +9,7 @@ use sted::{Direction, Velocity};
 /// ship's heading, and then fire thrusters until speed
 /// is zero.
 pub fn stop(ship: &rpc::Ship) -> rpc::Command {
-    let diff = ship.heading.vector().dot(ship.velocity());
+    let diff = ship.heading.vector().angle_between(ship.velocity());
 
     let mut cmd = rpc::Command {
         fire: false,
