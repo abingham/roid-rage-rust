@@ -15,6 +15,8 @@ use specs::{
 use sted::Direction;
 
 pub struct QueryPilotSystem {
+    // TODO: I think this should be a per-pilot component. This will allow use to
+    // a) have one per pilot (important!) and b) zero it when there's a bullet collision.
     fire_timer: f32,
 }
 
