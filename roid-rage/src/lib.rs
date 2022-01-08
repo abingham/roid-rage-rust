@@ -93,7 +93,7 @@ impl RoidRage {
             .with(
                 RemoveOutOfBoundsSystem,
                 "remove_out_of_bounds",
-                &["wrap_objects"],
+                &["detect_collisions"],
             )
             .with(
                 ExplodeRoidsSystem,
@@ -105,12 +105,11 @@ impl RoidRage {
                 "explode_bullets",
                 &["remove_out_of_bounds"],
             )
-            // .with(
-            //     FireOnTargetsSystem::new(),
-            //     "fire_on_targets",
-            //     &["remove_out_of_bounds"],
-            // )
-            .with(query_pilot_system, "query_pilot", &["remove_out_of_bounds"])
+            .with(
+                query_pilot_system,
+                "query_pilot",
+                &["wrap_objects", "remove_out_of_bounds"],
+            )
             // .with(LoggingSystem, "logging", &["out_of_bounds"])
             .build();
 
