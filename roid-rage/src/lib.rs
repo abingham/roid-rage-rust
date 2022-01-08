@@ -182,7 +182,8 @@ impl EventHandler<ggez::GameError> for RoidRage {
             ship.render(position.0, rotation.0, ctx)?;
         }
 
-        for (rotation, linear_velocity, _ship) in (
+        for (position, rotation, linear_velocity, _ship) in (
+            &self.world.read_storage::<Position>(),
             &self.world.read_storage::<Rotation>(),
             &self.world.read_storage::<LinearVelocity>(),
             &self.world.read_storage::<Ship>(),
@@ -194,6 +195,18 @@ impl EventHandler<ggez::GameError> for RoidRage {
             let hud_x = settings.maximum_roid_radius + 10.0;
             let hud_y = settings.maximum_roid_radius + 10.0;
 
+            let position_text = graphics::Text::new((
+                format!("position: {} {}", position.0.x, position.0.y),
+                self.assets.font,
+                hud_font_size,
+            ));
+            graphics::draw(
+                ctx,
+                &position_text,
+                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
+            )?;
+
+            let hud_y = hud_y + hud_font_size;
             let heading_text = graphics::Text::new((
                 format!("heading: {}", rotation.0),
                 self.assets.font,
