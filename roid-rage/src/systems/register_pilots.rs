@@ -1,7 +1,9 @@
 use crate::components::Pilot;
+use crate::settings::Settings;
 use roid_rage_grpc::roid_rage::pilot_registrar_server::{PilotRegistrar, PilotRegistrarServer};
 use roid_rage_grpc::roid_rage::{RegistrationRequest, RegistrationResponse};
-use specs::{Entities, System, WriteStorage};
+use specs::prelude::*;
+use specs::{Entities, System, World, WriteStorage};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
 use tonic::{transport::Server, Code, Request, Response, Status};
@@ -12,27 +14,31 @@ use tonic::{transport::Server, Code, Request, Response, Status};
 // TODO: Consider renaming to PilotRegistration or something like that.
 pub struct RegisterPilotsSystem {
     rx: Receiver<String>,
+    tx: Sender<String>,
 }
 
 impl RegisterPilotsSystem {
-    pub fn new(runtime: &tokio::runtime::Runtime, url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
+    pub fn new() -> RegisterPilotsSystem {
         let (tx, rx) = channel();
 
-        let system = RegisterPilotsSystem { rx: rx };
-
-        // Launch the registrar listener.
-        println!("new pilot reg system");
-        runtime.spawn(listen(String::from(url), tx));
-
-        Ok(system)
+        RegisterPilotsSystem { rx: rx, tx: tx }
     }
 }
 
 impl<'s> System<'s> for RegisterPilotsSystem {
-    type SystemData = (
-        WriteStorage<'s, Pilot>,
-        Entities<'s>,
-    );
+    type SystemData = (WriteStorage<'s, Pilot>, Entities<'s>);
+    fn setup(&mut self, world: &mut World) {
+        let runtime = world.read_resource::<tokio::runtime::Runtime>();
+        let settings = world.read_resource::<Settings>();
+        runtime.spawn(listen(
+            String::from(&settings.pilot_registration_url),
+            self.tx.clone(),
+        ));
+    }
+
+    fn dispose(self, _world: &mut World) {
+        // TODO: Kill the listener?
+    }
 
     fn run(&mut self, (mut pilots, entities): Self::SystemData) {
         // TODO: What if the URL is already registered? Ignore it.

@@ -48,7 +48,6 @@ pub struct RoidRage {
 impl RoidRage {
     pub fn new(ctx: &mut Context, settings: settings::Settings) -> GameResult<RoidRage> {
         let mut world = World::new();
-        let pilot_registration_url = settings.pilot_registration_url.clone();
 
         world.insert(Field::new(
             settings.screen_width as usize,
@@ -64,14 +63,10 @@ impl RoidRage {
         world.insert(runtime);
 
         let query_pilot_system = QueryPilotSystem::new()?;
-        let pilot_registration_system = RegisterPilotsSystem::new(
-            &world.read_resource::<tokio::runtime::Runtime>(),
-            &pilot_registration_url,
-        )?;
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something
-            .with(pilot_registration_system, "pilot-registration", &[])
+            .with(RegisterPilotsSystem::new(), "pilot-registration", &[])
             .with(
                 CleanupCollisionsSystem::default(),
                 "cleanup_collisions",
