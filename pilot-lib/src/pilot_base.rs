@@ -22,12 +22,19 @@ struct Opt {
 /// 
 /// # Example
 /// 
-/// ```
+/// ```ignore
 /// use roid_rage_grpc::roid_rage::pilot_server::Pilot;
 /// 
-/// struct MyPilot { . . .}
+/// struct MyPilot {}
 /// 
-/// impl Pilot for MyPilot { . . . }
+/// impl Pilot for MyPilot {
+/// 	async fn get_command(
+/// 		&self,
+/// 		request: Request<rpc::GameState>,
+/// 	) -> Result<Response<rpc::Command>, Status> {
+/// 		rpc::Command::null()
+/// 	}
+/// }
 /// 
 /// #[tokio::main]
 /// async fn main() -> Result<(), Box<dyn std::error:Error>> {
