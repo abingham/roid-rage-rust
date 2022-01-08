@@ -58,8 +58,16 @@ impl RoidRage {
         world.insert(TimeDelta(Duration::from_secs(0)));
         world.insert(settings);
 
+        let runtime = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()?;
+        world.insert(runtime);
+
         let query_pilot_system = QueryPilotSystem::new()?;
-        let pilot_registration_system = RegisterPilotsSystem::new(&pilot_registration_url)?;
+        let pilot_registration_system = RegisterPilotsSystem::new(
+            &world.read_resource::<tokio::runtime::Runtime>(),
+            &pilot_registration_url,
+        )?;
 
         let mut dispatcher = DispatcherBuilder::new()
             // TODO: Rename this to collision-system-maintenance or something

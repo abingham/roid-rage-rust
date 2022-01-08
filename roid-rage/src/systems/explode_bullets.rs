@@ -5,7 +5,7 @@ use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 
 pub struct ExplodeBulletsSystem;
 
-/// Explode roids that have collided with something.
+/// Explode bullets that have collided with something.
 impl<'s> System<'s> for ExplodeBulletsSystem {
     type SystemData = (
         ReadStorage<'s, Collision>,

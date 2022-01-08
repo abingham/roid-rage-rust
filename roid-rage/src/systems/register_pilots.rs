@@ -4,7 +4,6 @@ use roid_rage_grpc::roid_rage::{RegistrationRequest, RegistrationResponse};
 use specs::{Entities, System, WriteStorage};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
-use tokio::runtime::Runtime;
 use tonic::{transport::Server, Code, Request, Response, Status};
 
 // What needs to happen here?
@@ -12,24 +11,18 @@ use tonic::{transport::Server, Code, Request, Response, Status};
 
 // TODO: Consider renaming to PilotRegistration or something like that.
 pub struct RegisterPilotsSystem {
-    rt: Runtime,
     rx: Receiver<String>,
 }
 
 impl RegisterPilotsSystem {
-    pub fn new(url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
-        // TODO: Should the runtime be a resource in the world?
-        let rt = tokio::runtime::Builder::new_multi_thread()
-            .enable_all()
-            .build()?;
-
+    pub fn new(runtime: &tokio::runtime::Runtime, url: &str) -> Result<RegisterPilotsSystem, std::io::Error> {
         let (tx, rx) = channel();
 
-        let system = RegisterPilotsSystem { rt: rt, rx: rx };
+        let system = RegisterPilotsSystem { rx: rx };
 
         // Launch the registrar listener.
         println!("new pilot reg system");
-        system.rt.spawn(listen(String::from(url), tx));
+        runtime.spawn(listen(String::from(url), tx));
 
         Ok(system)
     }

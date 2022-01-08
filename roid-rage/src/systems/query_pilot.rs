@@ -12,24 +12,15 @@ use roid_rage_grpc::roid_rage as rpc;
 use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
-use tokio::runtime::Runtime;
 use sted::Direction;
 
 pub struct QueryPilotSystem {
     fire_timer: f32,
-    rt: Runtime,
 }
 
 impl QueryPilotSystem {
     pub fn new() -> Result<QueryPilotSystem, std::io::Error> {
-        let rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()?;
-
-        Ok(QueryPilotSystem {
-            fire_timer: 0.0,
-            rt: rt,
-        })
+        Ok(QueryPilotSystem { fire_timer: 0.0 })
     }
 }
 
@@ -46,6 +37,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         WriteStorage<'s, Bullet>,
         ReadExpect<'s, Field>,
         Read<'s, TimeDelta>,
+        ReadExpect<'s, tokio::runtime::Runtime>,
         Entities<'s>,
         WriteExpect<'s, CollisionWorld<f32, specs::world::Index>>,
         ReadExpect<'s, Settings>,
@@ -65,6 +57,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             _bullets,
             field,
             time_delta,
+            runtime,
             entities,
             mut collision_world,
             settings,
@@ -137,9 +130,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             };
 
             // Pass game-state to pilot process
-            let res = self
-                .rt
-                .block_on(query_pilot(pilot.url.to_string(), game_state));
+            let res = runtime.block_on(query_pilot(pilot.url.to_string(), game_state));
 
             match res {
                 // TODO: If we fail to reach a pilot after some time, we should remove it and its ship.
@@ -156,7 +147,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                             },
                             firing_position,
                             rotation.0.vector().normalize() * settings.bullet_speed,
-                            &mut collision_world
+                            &mut collision_world,
                         );
                     }
 
