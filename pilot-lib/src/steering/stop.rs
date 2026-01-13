@@ -1,7 +1,7 @@
 use float_cmp::ApproxEqRatio;
 use roid_rage_grpc::roid_rage as rpc;
 use std::f32::consts::PI;
-use sted::{Direction, Velocity};
+use sted::{to_vector, Velocity};
 
 /// Bring the ship to a stop
 ///
@@ -9,7 +9,7 @@ use sted::{Direction, Velocity};
 /// ship's heading, and then fire thrusters until speed
 /// is zero.
 pub fn stop(ship: &rpc::Ship) -> rpc::Command {
-    let diff = ship.heading.vector().angle_to(ship.velocity());
+    let diff = to_vector(ship.heading).angle_to(ship.velocity());
 
     let mut cmd = rpc::Command {
         fire: false,

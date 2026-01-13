@@ -3,7 +3,7 @@ use glam::Vec2;
 // use roid_rage::core::collide::collision_vector;
 use roid_rage_grpc::roid_rage as rpc;
 use std::f32::consts::PI;
-use sted::{Direction};
+use sted::to_vector;
 
 // TODO: This is super half-assed right now.
 pub fn evade(ship: &rpc::Ship, roids: &Vec<rpc::Roid>) -> rpc::Command {
@@ -19,7 +19,7 @@ pub fn evade(ship: &rpc::Ship, roids: &Vec<rpc::Roid>) -> rpc::Command {
         .map(|roid| Vec2::from(roid.position()) - Vec2::from(ship.position()))
         .fold(Vec2::new(0.0, 0.0), |acc, x| acc + x);
 
-    let diff = pressure_vector.dot(ship.heading.vector());
+    let diff = pressure_vector.dot(to_vector(ship.heading));
 
     // TODO: We use this same code in 'stop()'. Perhaps it should be
     // factored into some sort of "turn_to()" function.

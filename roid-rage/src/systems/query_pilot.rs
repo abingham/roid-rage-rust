@@ -13,7 +13,7 @@ use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
 use std::convert::TryFrom;
-use sted::Direction;
+use sted::to_vector;
 
 pub struct QueryPilotSystem {
     // TODO: I think this should be a per-pilot component. This will allow use to
@@ -149,7 +149,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                                 lazy: &*lazy,
                             },
                             firing_position,
-                            rotation.0.vector().normalize() * settings.bullet_speed,
+                            to_vector(rotation.0).normalize() * settings.bullet_speed,
                             &mut collision_world,
                         );
                     }
@@ -164,7 +164,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                     angular_velocity.0 = rotation_direction * ship.rotational_speed;
 
                     if command.thrusters {
-                        let steering_force = ship.thrust * rotation.0.vector();
+                        let steering_force = ship.thrust * to_vector(rotation.0);
                         let accel = steering_force / ship.mass;
                         linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }
