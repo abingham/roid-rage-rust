@@ -1,9 +1,14 @@
-use glam::Vec2;
+use nalgebra::Vector2;
+use num::{Float, FromPrimitive};
 use std::cmp::Ordering;
-use sted::Velocity;
 
-// TODO: I'd like this to be generic on the float type, but I ran into hairy
-// issues with collision_vector. Try again sometime.
+fn speed<T: Float>(vector: &Vector2<T>) -> T {
+    (vector.x * vector.x + vector.y * vector.y).sqrt()
+}
+
+fn bearing<T: Float>(vector: &Vector2<T>) -> T {
+    vector.y.atan2(vector.x)
+}
 
 /// Find real roots for a quadratic of the form:
 ///
@@ -13,18 +18,24 @@ use sted::Velocity;
 /// :param b: The "b" in the quadratic
 /// :param c: The "c" in the quadratic
 /// :return: A list of real roots, sized 0, 1, or 2
-fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
-    let disc: f32 = b.powf(2.0) - 4.0 * a * c;
+fn solve_quadratic<T>(a: T, b: T, c: T) -> Vec<T>
+where
+    T: Float + FromPrimitive,
+{
+    let four = T::from_u8(4).unwrap();
+    let disc: T = b.powi(2) - four * a * c;
 
-    if disc < 0.0 {
+    if disc < T::zero() {
         vec![]
-    } else if disc == 0.0 {
-        vec![(-1.0 * b) / (2.0 * a)]
+    } else if disc == T::zero() {
+        let two = T::from_u8(2).unwrap();
+        vec![(-T::one() * b) / (two * a)]
     } else {
         let sqrt_disc = disc.sqrt();
+        let two = T::from_u8(2).unwrap();
         vec![
-            (-1.0 * b + sqrt_disc) / (2.0 * a),
-            (-1.0 * b - sqrt_disc) / (2.0 * a),
+            (-T::one() * b + sqrt_disc) / (two * a),
+            (-T::one() * b - sqrt_disc) / (two * a),
         ]
     }
 }
@@ -39,34 +50,38 @@ fn solve_quadratic(a: f32, b: f32, c: f32) -> Vec<f32> {
 /// same. This results in a quadratic equation which we solve. If this gives results, we choose the closest time, figure
 /// out where the target will be at that time, and return that.
 pub fn collision_point(
-    launch_position: &Vec2,
-    projectile_speed: f32,
-    target_position: &Vec2,
-    target_velocity: &Vec2,
-) -> Option<Vec2> {
+    launch_position: &Vector2<T>,
+    projectile_speed: T,
+    target_position: &Vector2<T>,
+    target_velocity: &Vector2<T>,
+) -> Option<Vector2<T>>
+where
+    T: Float + FromPrimitive,
+{
     let delta_x = launch_position.x - target_position.x;
     let delta_y = launch_position.y - target_position.y;
 
-    let cos_target_bearing = f32::cos(target_velocity.bearing());
-    let sin_target_bearing = f32::sin(target_velocity.bearing());
-    let a = target_velocity.speed().powf(2.0) * cos_target_bearing.powf(2.0)
-        + target_velocity.speed().powf(2.0) * sin_target_bearing.powf(2.0)
-        - projectile_speed.powf(2.0);
-    let b = -1.0
-        * (2.0 * delta_x * target_velocity.speed() * cos_target_bearing
-            + 2.0 * delta_y * target_velocity.speed() * sin_target_bearing);
-    let c = delta_x.powf(2.0) + delta_y.powf(2.0);
+    let target_speed = speed(target_velocity);
+    let target_bearing = bearing(target_velocity);
+    let cos_target_bearing = target_bearing.cos();
+    let sin_target_bearing = target_bearing.sin();
+    let two = T::from_u8(2).unwrap();
+    let a = target_speed.powi(2) * cos_target_bearing.powi(2)
+        + target_speed.powi(2) * sin_target_bearing.powi(2)
+        - projectile_speed.powi(2);
+    let b = -T::one()
+        * (two * delta_x * target_speed * cos_target_bearing
+            + two * delta_y * target_speed * sin_target_bearing);
+    let c = delta_x.powi(2) + delta_y.powi(2);
 
     solve_quadratic(a, b, c)
         .iter()
-        .filter(|r| **r >= 0.0)
+        .filter(|r| **r >= T::zero())
         .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less))
         .map(|dt| {
-            let coll_x = *dt * target_velocity.speed() * f32::cos(target_velocity.bearing())
-                + target_position.x;
-            let coll_y = *dt * target_velocity.speed() * f32::sin(target_velocity.bearing())
-                + target_position.y;
-            Vec2::new(coll_x, coll_y)
+            let coll_x = *dt * target_speed * target_bearing.cos() + target_position.x;
+            let coll_y = *dt * target_speed * target_bearing.sin() + target_position.y;
+            Vector2::new(coll_x, coll_y)
         })
 }
 
@@ -81,11 +96,14 @@ pub fn collision_point(
 ///
 /// Returns a tuple (collision-position, collision-vector) if one.
 pub fn collision_vector(
-    position: &Vec2,
-    speed: f32,
-    target_position: &Vec2,
-    target_velocity: &Vec2,
-) -> Option<(Vec2, Vec2)> {
+    position: &Vector2<T>,
+    speed: T,
+    target_position: &Vector2<T>,
+    target_velocity: &Vector2<T>,
+) -> Option<(Vector2<T>, Vector2<T>)>
+where
+    T: Float + FromPrimitive,
+{
     collision_point(position, speed, target_position, target_velocity)
         .map(|p| (p, p - *position))
 }
