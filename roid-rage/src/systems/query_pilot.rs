@@ -152,19 +152,21 @@ impl<'s> System<'s> for QueryPilotSystem {
                     }
 
                     let rotation_direction = match rpc::Rotation::try_from(command.rotation) {
-                        Ok(rpc::Rotation::Clockwise) => 1.0,
-                        Ok(rpc::Rotation::Counterclockwise) => -1.0,
-                        Ok(rpc::Rotation::None) => 0.0,
+                        Ok(rpc::Rotation::Clockwise) => Some(1.0),
+                        Ok(rpc::Rotation::Counterclockwise) => Some(-1.0),
+                        Ok(rpc::Rotation::None) => Some(0.0),
                         Err(_) => {
                             println!(
                                 "Invalid rotation value {} from pilot {}",
                                 command.rotation, pilot.url
                             );
-                            0.0
+                            None
                         }
                     };
 
-                    angular_velocity.0 = rotation_direction * ship.rotational_speed;
+                    if let Some(rotation_direction) = rotation_direction {
+                        angular_velocity.0 = rotation_direction * ship.rotational_speed;
+                    }
 
                     if command.thrusters {
                         let steering_force = ship.thrust * to_vector(rotation.0);
