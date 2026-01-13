@@ -1,8 +1,6 @@
-#![feature(proc_macro_hygiene, decl_macro)]
-
 extern crate nalgebra;
 
-use rand::prelude::*;
+use rand::Rng;
 use std::sync::Arc;
 use std::sync::Mutex;
 use sted::Velocity;
@@ -41,8 +39,8 @@ impl PilotState {
                 let speed = ship.velocity().speed();
 
                 if speed < 0.5 {
-                    let mut rng = rand::thread_rng();
-                    let num_frames = rng.next_u32() % 100 + 100;
+                    let mut rng = rand::rng();
+                    let num_frames = rng.random::<u32>() % 100 + 100;
                     *activity = Activity::Accelerate(num_frames as usize);
                 } else {
                     cmd = pilot_lib::steering::stop(ship);

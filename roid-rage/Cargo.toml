@@ -5,24 +5,24 @@ name = "roid-rage"
 version = "0.1.0"
 
 [dependencies]
-config = "0.9"
-ggez = "0.7"
-ncollide2d = "0.21"
-num = "0.2.1"
-rand = "0.6.5"
+config = "0.15.19"
+ggez = "0.9.3"
+ncollide2d = "0.33"
+num = "0.4.3"
+rand = "0.9.2"
 roid-rage-grpc = {path = "../roid-rage-grpc"}
-specs = "0.16"
-tokio = {version = "1.15.0", features = ["rt-multi-thread"]}
-tonic = "0.6.2"
+specs = "0.20"
+tokio = {version = "1.49.0", features = ["rt-multi-thread"]}
+tonic = "0.14.2"
 
 [dependencies.glam]
-version = "*"
+version = "0.30.10"
 
 [dependencies.nalgebra]
-version = "0.19"
+version = "0.34.1"
 
 [dev-dependencies]
-float-cmp = "0.6.0"
+float-cmp = "0.10.0"
 
 [dependencies.sted]
 path = "../sted"

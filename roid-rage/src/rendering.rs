@@ -1,18 +1,31 @@
-use ggez::graphics::{Color, DrawMode, DrawParam, StrokeOptions};
-use ggez::{graphics, Context, GameResult};
-use glam::Vec2;
+use ggez::glam::Vec2 as GgezVec2;
+use ggez::graphics::{self, Canvas, Color, DrawMode, DrawParam, StrokeOptions};
+use ggez::{Context, GameResult};
+use glam::Vec2 as GameVec2;
 use std::f32::consts::PI;
 
-type Point2 = Vec2;
+type Point2 = GgezVec2;
 
 use crate::components::{Bullet, Fragment, Roid, Ship};
 
 pub trait Render {
-    fn render(&self, position: Point2, direction: f32, ctx: &mut Context) -> GameResult<()>;
+    fn render(
+        &self,
+        position: GameVec2,
+        direction: f32,
+        ctx: &mut Context,
+        canvas: &mut Canvas,
+    ) -> GameResult<()>;
 }
 
 impl Render for Roid {
-    fn render(&self, position: Vec2, direction: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(
+        &self,
+        position: GameVec2,
+        direction: f32,
+        ctx: &mut Context,
+        canvas: &mut Canvas,
+    ) -> GameResult<()> {
         let angle_step = (PI * 2.0) / self.points.len() as f32;
         let line_points: Vec<Point2> = self
             .points
@@ -31,46 +44,67 @@ impl Render for Roid {
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
 
-        let mesh = mb.build(ctx)?;
+        let mesh = graphics::Mesh::from_data(ctx, mb.build());
         let param = DrawParam::new()
             .rotation(direction)
-            .dest(Point2::new(position.x, position.y));
-        graphics::draw(ctx, &mesh, param)
+            .dest(to_ggez_vec2(position));
+        canvas.draw(&mesh, param);
+        Ok(())
     }
 }
 
 impl Render for Bullet {
-    fn render(&self, position: Vec2, _direction: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(
+        &self,
+        position: GameVec2,
+        _direction: f32,
+        ctx: &mut Context,
+        canvas: &mut Canvas,
+    ) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            Point2::new(position.x, position.y),
+            to_ggez_vec2(position),
             Bullet::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
-        let mesh = mb.build(ctx)?;
-        graphics::draw(ctx, &mesh, DrawParam::new())
+        let mesh = graphics::Mesh::from_data(ctx, mb.build());
+        canvas.draw(&mesh, DrawParam::new());
+        Ok(())
     }
 }
 
 impl Render for Fragment {
-    fn render(&self, position: Vec2, _direction: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(
+        &self,
+        position: GameVec2,
+        _direction: f32,
+        ctx: &mut Context,
+        canvas: &mut Canvas,
+    ) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         mb.circle(
             DrawMode::fill(),
-            Point2::new(position.x, position.y),
+            to_ggez_vec2(position),
             Fragment::radius(),
             0.1,
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
-        let mesh = mb.build(ctx)?;
-        graphics::draw(ctx, &mesh, DrawParam::new())
+        let mesh = graphics::Mesh::from_data(ctx, mb.build());
+        canvas.draw(&mesh, DrawParam::new());
+        Ok(())
     }
 }
 
 impl Render for Ship {
-    fn render(&self, position: Vec2, direction: f32, ctx: &mut Context) -> GameResult<()> {
+    fn render(
+        &self,
+        position: GameVec2,
+        direction: f32,
+        ctx: &mut Context,
+        canvas: &mut Canvas,
+    ) -> GameResult<()> {
         let mb = &mut graphics::MeshBuilder::new();
         // let center = Point2::new(0.0, 0.0);
         let points = vec![
@@ -84,10 +118,15 @@ impl Render for Ship {
             &points,
             Color::new(1.0, 1.0, 1.0, 1.0),
         )?;
-        let mesh = mb.build(ctx)?;
+        let mesh = graphics::Mesh::from_data(ctx, mb.build());
         let param = DrawParam::new()
             .rotation(direction)
-            .dest(Point2::new(position.x, position.y));
-        graphics::draw(ctx, &mesh, param)
+            .dest(to_ggez_vec2(position));
+        canvas.draw(&mesh, param);
+        Ok(())
     }
+}
+
+fn to_ggez_vec2(value: GameVec2) -> GgezVec2 {
+    GgezVec2::new(value.x, value.y)
 }

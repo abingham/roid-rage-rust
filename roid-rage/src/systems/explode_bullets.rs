@@ -1,6 +1,6 @@
 use crate::components::{make_fragment, Bullet, Collision, Position};
 use crate::core::util::random_bearing;
-use rand::prelude::*;
+use rand::Rng;
 use specs::{Entities, Join, LazyUpdate, Read, ReadStorage, System};
 
 pub struct ExplodeBulletsSystem;
@@ -16,7 +16,7 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
     );
 
     fn run(&mut self, (collisions, bullets, positions, entities, lazy): Self::SystemData) {
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
 
         for (_collision, _bullet, position, entity) in
             (&collisions, &bullets, &positions, &entities).join()
@@ -26,7 +26,7 @@ impl<'s> System<'s> for ExplodeBulletsSystem {
                 _ => {}
             }
 
-            for _ in 0..(rng.next_u32() % 5 + 5) {
+            for _ in 0..(rng.random::<u32>() % 5 + 5) {
                 let new_entity = entities.create();
 
                 make_fragment(

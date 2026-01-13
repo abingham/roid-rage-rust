@@ -6,11 +6,11 @@ version = "0.1.0"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-float-cmp = "0.6.0"
-glam = "*"
+float-cmp = "0.10.0"
+glam = "0.30.10"
 roid-rage = {path = "../roid-rage"}
 roid-rage-grpc = {path = "../roid-rage-grpc"}
 sted = {path = "../sted"}
-structopt = "0.3"
-tokio = "1.15.0"
-tonic = "0.6.2"
+structopt = "0.3.26"
+tokio = "1.49.0"
+tonic = "0.14.2"

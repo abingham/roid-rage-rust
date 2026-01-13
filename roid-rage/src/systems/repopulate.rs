@@ -21,17 +21,18 @@ impl<'s> System<'s> for RepopulateSystem {
             return;
         }
 
-        use rand::prelude::*;
-        let mut rng = thread_rng();
+        use rand::Rng;
+        let mut rng = rand::rng();
         for _ in 0..settings.initial_roid_count {
-            let x = rng.gen::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
-            let y = rng.gen::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
-            let speed = rng.gen::<f32>()
+            let x = rng.random::<f32>() * (settings.screen_width + settings.maximum_roid_radius);
+            let y = rng.random::<f32>() * (settings.screen_height + settings.maximum_roid_radius);
+            let speed = rng.random::<f32>()
                 * (settings.max_initial_roid_speed - settings.min_initial_roid_speed)
                 + settings.min_initial_roid_speed;
             let course = random_bearing();
-            let radius = rng.gen::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
-            let angular_velocity = rng.gen::<f32>() * 0.5;
+            let radius =
+                rng.random::<f32>() * 5.0 + (settings.maximum_roid_radius - 5.0);
+            let angular_velocity = rng.random::<f32>() * 0.5;
             let new_entity = entities.create();
             make_roid(
                 specs::world::LazyBuilder {

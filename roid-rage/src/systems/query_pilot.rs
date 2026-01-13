@@ -12,6 +12,7 @@ use roid_rage_grpc::roid_rage as rpc;
 use specs::{
     Entities, Join, LazyUpdate, Read, ReadExpect, ReadStorage, System, WriteExpect, WriteStorage,
 };
+use std::convert::TryFrom;
 use sted::Direction;
 
 pub struct QueryPilotSystem {
@@ -153,11 +154,11 @@ impl<'s> System<'s> for QueryPilotSystem {
                         );
                     }
 
-                    let rotation_direction = match rpc::Rotation::from_i32(command.rotation) {
-                        Some(rpc::Rotation::Clockwise) => 1.0,
-                        Some(rpc::Rotation::Counterclockwise) => -1.0,
-                        Some(rpc::Rotation::None) => 0.0,
-                        None => 0.0, // TODO: Should raise an error? Assert?
+                    let rotation_direction = match rpc::Rotation::try_from(command.rotation) {
+                        Ok(rpc::Rotation::Clockwise) => 1.0,
+                        Ok(rpc::Rotation::Counterclockwise) => -1.0,
+                        Ok(rpc::Rotation::None) => 0.0,
+                        Err(_) => 0.0, // TODO: Should raise an error? Assert?
                     };
 
                     angular_velocity.0 = rotation_direction * ship.rotational_speed;

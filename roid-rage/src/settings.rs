@@ -21,16 +21,15 @@ macro_rules! initialize_settings {
 
                 pub fn load() -> Result<Settings, ()> {
                     // Load the settings file
-                    let mut cfg = config::Config::default();
-                    // Add in `./Settings.toml`
-                    cfg
+                    let cfg = config::Config::builder()
+                        // Add in `./Settings.toml`
                         // .merge(fig::File::with_name("Settings"))
-                        .merge(config::File::with_name("Settings").required(false))
-                        .unwrap()
-                    // Add in settings from the environment (with a prefix of APP)
-                    // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
-                        .merge(config::Environment::with_prefix("ROID_RAGE"))
-                        .unwrap();
+                        .add_source(config::File::with_name("Settings").required(false))
+                        // Add in settings from the environment (with a prefix of APP)
+                        // Eg.. `APP_DEBUG=1 ./target/app` would set the `debug` key
+                        .add_source(config::Environment::with_prefix("ROID_RAGE"))
+                        .build()
+                        .map_err(|_| ())?;
 
                     let mut default = Settings::default();
                     $(

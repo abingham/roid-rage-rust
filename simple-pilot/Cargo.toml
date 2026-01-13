@@ -5,11 +5,11 @@ name = "simple-pilot"
 version = "0.1.0"
 
 [dependencies]
-glam = "*"
-nalgebra = "0.19"
+glam = "0.30.10"
+nalgebra = "0.34.1"
 pilot-lib = {path = "../pilot-lib"}
 roid-rage = {path = "../roid-rage"}
 roid-rage-grpc = {path = "../roid-rage-grpc"}
 sted = {path = "../sted"}
-tokio = {version = "1.15.0", features = ["rt-multi-thread", "macros"]}
-tonic = "0.6.2"
+tokio = {version = "1.49.0", features = ["rt-multi-thread", "macros"]}
+tonic = "0.14.2"

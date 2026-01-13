@@ -1,7 +1,7 @@
 use crate::components::{LinearVelocity, Position};
 use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
-use rand::prelude::*;
+use rand::Rng;
 use specs::{Component, HashMapStorage};
 use std::time::Duration;
 
@@ -31,7 +31,7 @@ pub fn make_fragment<B>(builder: B, x: f32, y: f32, course: f32)
 where
     B: specs::world::Builder,
 {
-    let speed = thread_rng().gen::<f32>() * 250.0 + 250.0;
+    let speed = rand::rng().random::<f32>() * 250.0 + 250.0;
 
     builder
         .with(LinearVelocity(from_quantity_and_bearing(speed, course)))

@@ -4,11 +4,11 @@ use crate::components::{
 };
 use crate::core::util::from_quantity_and_bearing;
 use glam::Vec2;
-use nalgebra::{zero, Isometry2, Vector2};
+use ncollide2d::na::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;
-use rand::prelude::*;
+use rand::Rng;
 use specs::{Component, VecStorage};
 
 pub struct Roid {
@@ -18,15 +18,15 @@ pub struct Roid {
 
 impl Roid {
     pub fn new(radius: f32, bumpiness: f32) -> Self {
-        let mut rng = rand::thread_rng();
-        let num_points = rng.next_u32() % 5 + 5;
+        let mut rng = rand::rng();
+        let num_points = rng.random::<u32>() % 5 + 5;
         let point_variance = radius * bumpiness;
 
         let points: Vec<f32> = (0..num_points)
             .map(|_| {
                 vec![
-                    radius + rng.gen::<f32>() * point_variance,
-                    radius - rng.gen::<f32>() * point_variance,
+                    radius + rng.random::<f32>() * point_variance,
+                    radius - rng.random::<f32>() * point_variance,
                 ]
             })
             .flatten()

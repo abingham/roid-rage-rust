@@ -19,7 +19,7 @@ use crate::rendering::Render;
 use ggez::event::EventHandler;
 use ggez::timer;
 use ggez::{graphics, Context, GameResult};
-use glam;
+use ggez::glam;
 use ncollide2d::world::CollisionWorld;
 use specs::prelude::*;
 use specs::Join;
@@ -28,13 +28,17 @@ use std::time::Duration;
 type Point2 = glam::Vec2;
 
 struct Assets {
-    font: graphics::Font,
+    font: String,
 }
 
 impl Assets {
     pub fn new(ctx: &mut Context) -> GameResult<Assets> {
+        let font_name = "DejaVuSansMono";
+        let font_data = graphics::FontData::from_path(ctx, "/DejaVuSansMono.ttf")?;
+        ctx.gfx.add_font(font_name, font_data);
+
         Ok(Assets {
-            font: graphics::Font::new(ctx, "/DejaVuSansMono.ttf")?,
+            font: font_name.to_string(),
         })
     }
 }
@@ -129,10 +133,10 @@ impl EventHandler<ggez::GameError> for RoidRage {
     fn update(&mut self, ctx: &mut Context) -> GameResult {
         const DESIRED_FPS: u32 = 60;
 
-        while timer::check_update_time(ctx, DESIRED_FPS as u32) {
+        while ctx.time.check_update_time(DESIRED_FPS) {
             {
                 let mut delta = self.world.write_resource::<TimeDelta>();
-                *delta = TimeDelta(timer::delta(ctx));
+                *delta = TimeDelta(ctx.time.delta());
             }
             self.dispatcher.dispatch(&mut self.world);
             self.world.maintain();
@@ -143,17 +147,15 @@ impl EventHandler<ggez::GameError> for RoidRage {
     fn draw(&mut self, ctx: &mut Context) -> GameResult {
         // This adds a buffer around the edge of the screen so that roids don't teleport from one side to the next.
         let settings = self.world.read_resource::<settings::Settings>();
-        graphics::set_screen_coordinates(
-            ctx,
+        let mut canvas = graphics::Canvas::from_frame(ctx, graphics::Color::BLACK);
+        canvas.set_screen_coordinates(
             graphics::Rect::new(
                 settings.maximum_roid_radius,
                 settings.maximum_roid_radius,
                 settings.screen_width - settings.maximum_roid_radius * 2.0,
                 settings.screen_height - settings.maximum_roid_radius * 2.0,
             ),
-        )?;
-
-        graphics::clear(ctx, graphics::Color::BLACK);
+        );
 
         for (position, rotation, roid) in (
             &self.world.read_storage::<Position>(),
@@ -162,7 +164,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            roid.render(position.0, rotation.0, ctx)?;
+            roid.render(position.0, rotation.0, ctx, &mut canvas)?;
         }
 
         for (position, bullet) in (
@@ -171,7 +173,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            bullet.render(position.0, 0.0, ctx)?;
+            bullet.render(position.0, 0.0, ctx, &mut canvas)?;
         }
 
         for (position, rotation, ship) in (
@@ -181,7 +183,7 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            ship.render(position.0, rotation.0, ctx)?;
+            ship.render(position.0, rotation.0, ctx, &mut canvas)?;
         }
 
         for (position, rotation, linear_velocity, _ship) in (
@@ -197,52 +199,57 @@ impl EventHandler<ggez::GameError> for RoidRage {
             let hud_x = settings.maximum_roid_radius + 10.0;
             let hud_y = settings.maximum_roid_radius + 10.0;
 
-            let position_text = graphics::Text::new((
-                format!("position: {} {}", position.0.x, position.0.y),
-                self.assets.font,
-                hud_font_size,
+            let mut position_text = graphics::Text::new(format!(
+                "position: {} {}",
+                position.0.x, position.0.y
             ));
-            graphics::draw(
-                ctx,
+            position_text
+                .set_font(self.assets.font.clone())
+                .set_scale(hud_font_size);
+            canvas.draw(
                 &position_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
-            )?;
+                graphics::DrawParam::new()
+                    .dest(Point2::new(hud_x, hud_y))
+                    .color(graphics::Color::WHITE),
+            );
 
             let hud_y = hud_y + hud_font_size;
-            let heading_text = graphics::Text::new((
-                format!("heading: {}", rotation.0),
-                self.assets.font,
-                hud_font_size,
-            ));
-            graphics::draw(
-                ctx,
+            let mut heading_text = graphics::Text::new(format!("heading: {}", rotation.0));
+            heading_text
+                .set_font(self.assets.font.clone())
+                .set_scale(hud_font_size);
+            canvas.draw(
                 &heading_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
-            )?;
+                graphics::DrawParam::new()
+                    .dest(Point2::new(hud_x, hud_y))
+                    .color(graphics::Color::WHITE),
+            );
 
             let hud_y = hud_y + hud_font_size;
-            let bearing_text = graphics::Text::new((
-                format!("bearing: {}", linear_velocity.0.bearing()),
-                self.assets.font,
-                hud_font_size,
-            ));
-            graphics::draw(
-                ctx,
+            let mut bearing_text =
+                graphics::Text::new(format!("bearing: {}", linear_velocity.0.bearing()));
+            bearing_text
+                .set_font(self.assets.font.clone())
+                .set_scale(hud_font_size);
+            canvas.draw(
                 &bearing_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
-            )?;
+                graphics::DrawParam::new()
+                    .dest(Point2::new(hud_x, hud_y))
+                    .color(graphics::Color::WHITE),
+            );
 
             let hud_y = hud_y + hud_font_size;
-            let speed_text = graphics::Text::new((
-                format!("speed: {}", linear_velocity.0.speed()),
-                self.assets.font,
-                hud_font_size,
-            ));
-            graphics::draw(
-                ctx,
+            let mut speed_text =
+                graphics::Text::new(format!("speed: {}", linear_velocity.0.speed()));
+            speed_text
+                .set_font(self.assets.font.clone())
+                .set_scale(hud_font_size);
+            canvas.draw(
                 &speed_text,
-                (Point2::new(hud_x, hud_y), 0.0, graphics::Color::WHITE),
-            )?;
+                graphics::DrawParam::new()
+                    .dest(Point2::new(hud_x, hud_y))
+                    .color(graphics::Color::WHITE),
+            );
         }
 
         for (position, fragment) in (
@@ -251,10 +258,10 @@ impl EventHandler<ggez::GameError> for RoidRage {
         )
             .join()
         {
-            fragment.render(position.0, 0.0, ctx)?;
+            fragment.render(position.0, 0.0, ctx, &mut canvas)?;
         }
 
-        graphics::present(ctx)?;
+        canvas.finish(ctx)?;
 
         timer::yield_now();
 

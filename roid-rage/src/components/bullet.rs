@@ -1,7 +1,7 @@
 use super::collision_groups::{ROID_GROUP, WEAPON_GROUP};
 use crate::components::{CollisionHandle, LinearVelocity, Position};
 use glam::Vec2;
-use nalgebra::{Isometry2, Vector2};
+use ncollide2d::na::{Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionGroups, GeometricQueryType};
 use ncollide2d::shape::{Ball, ShapeHandle};
 use ncollide2d::world::CollisionWorld;

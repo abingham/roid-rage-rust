@@ -1,6 +1,6 @@
 use crate::components::CollisionHandle;
 use crate::components::{Collision, Position};
-use nalgebra::{zero, Isometry2, Vector2};
+use ncollide2d::na::{zero, Isometry2, Vector2};
 use ncollide2d::pipeline::{CollisionObjectSlabHandle, ContactEvent};
 use ncollide2d::world::CollisionWorld;
 use specs::{Entities, Join, ReadStorage, System, WriteExpect, WriteStorage};
