@@ -80,7 +80,19 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (pilot, ship, fire_timer, position, rotation, linear_velocity, angular_velocity) in (
+        let mut disconnected = Vec::new();
+
+        for (
+            entity,
+            pilot,
+            ship,
+            fire_timer,
+            position,
+            rotation,
+            linear_velocity,
+            angular_velocity,
+        ) in (
+            &entities,
             &pilots,
             &ships,
             &mut fire_timers,
@@ -133,8 +145,10 @@ impl<'s> System<'s> for QueryPilotSystem {
             let res = runtime.block_on(query_pilot(pilot.url.to_string(), game_state));
 
             match res {
-                // TODO: If we fail to reach a pilot after some time, we should remove it and its ship.
-                Err(msg) => println!("Error communicating with pilot: {:?}", msg),
+                Err(msg) => {
+                    println!("Error communicating with pilot {}: {:?}", pilot.url, msg);
+                    disconnected.push(entity);
+                }
                 Ok(command) => {
                     if command.fire && fire_timer.0 >= settings.rate_of_fire {
                         fire_timer.0 = 0.0;
@@ -146,7 +160,7 @@ impl<'s> System<'s> for QueryPilotSystem {
                                 lazy: &*lazy,
                             },
                             firing_position,
-                            to_vector(rotation.0).normalize() * settings.bullet_speed,
+                            heading * settings.bullet_speed,
                             &mut collision_world,
                         );
                     }
@@ -169,11 +183,17 @@ impl<'s> System<'s> for QueryPilotSystem {
                     }
 
                     if command.thrusters {
-                        let steering_force = ship.thrust * to_vector(rotation.0);
+                        let steering_force = ship.thrust * heading;
                         let accel = steering_force / ship.mass;
                         linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }
                 }
+            }
+        }
+
+        for entity in disconnected {
+            if let Err(err) = entities.delete(entity) {
+                println!("Failed to remove unresponsive pilot entity: {:?}", err);
             }
         }
     }
