@@ -4,7 +4,7 @@ pub use self::detect_collisions::DetectCollisionsSystem;
 pub use self::explode_bullets::ExplodeBulletsSystem;
 pub use self::explode_roids::ExplodeRoidsSystem;
 pub use self::move_objects::MoveObjectsSystem;
-pub use self::register_pilots::RegisterPilotsSystem;
+pub use self::register_pilots::PilotRegistrationSystem;
 pub use self::query_pilot::QueryPilotSystem;
 pub use self::remove_out_of_bounds::RemoveOutOfBoundsSystem;
 pub use self::repopulate::RepopulateSystem;

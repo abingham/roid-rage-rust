@@ -7,31 +7,33 @@ use specs::{Entities, System, World, WriteStorage};
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
 use tokio::sync::oneshot;
+use tokio::task::JoinHandle;
 use tonic::{transport::Server, Code, Request, Response, Status};
 
 // What needs to happen here?
 // 1. A task/thread for listening for pilot registrations
 
-// TODO: Consider renaming to PilotRegistration or something like that.
-pub struct RegisterPilotsSystem {
+pub struct PilotRegistrationSystem {
     rx: Receiver<String>,
     tx: Sender<String>,
     shutdown_tx: Option<oneshot::Sender<()>>,
+    listener_task: Option<JoinHandle<Result<(), tonic::transport::Error>>>,
 }
 
-impl RegisterPilotsSystem {
-    pub fn new() -> RegisterPilotsSystem {
+impl PilotRegistrationSystem {
+    pub fn new() -> PilotRegistrationSystem {
         let (tx, rx) = channel();
 
-        RegisterPilotsSystem {
+        PilotRegistrationSystem {
             rx: rx,
             tx: tx,
             shutdown_tx: None,
+            listener_task: None,
         }
     }
 }
 
-impl<'s> System<'s> for RegisterPilotsSystem {
+impl<'s> System<'s> for PilotRegistrationSystem {
     type SystemData = (WriteStorage<'s, Pilot>, WriteStorage<'s, FireTimer>, Entities<'s>);
     fn setup(&mut self, world: &mut World) {
         let runtime = world.read_resource::<tokio::runtime::Runtime>();
@@ -39,12 +41,15 @@ impl<'s> System<'s> for RegisterPilotsSystem {
         let addr = settings.pilot_registration_url;
         let (shutdown_tx, shutdown_rx) = oneshot::channel();
         self.shutdown_tx = Some(shutdown_tx);
-        runtime.spawn(listen(addr, self.tx.clone(), shutdown_rx));
+        self.listener_task = Some(runtime.spawn(listen(addr, self.tx.clone(), shutdown_rx)));
     }
 
     fn dispose(self, _world: &mut World) {
         if let Some(shutdown_tx) = self.shutdown_tx {
             let _ = shutdown_tx.send(());
+        }
+        if let Some(listener_task) = self.listener_task {
+            listener_task.abort();
         }
     }
 
@@ -54,7 +59,7 @@ impl<'s> System<'s> for RegisterPilotsSystem {
                 Err(_) => break,
                 Ok(pilot_url) => {
                     if (&pilots).join().any(|pilot| pilot.url == pilot_url) {
-                        println!("pilot already registered: {}", pilot_url);
+                        println!("duplicate pilot registration ignored: {}", pilot_url);
                         continue;
                     }
                     let new_entity = entities.create();
