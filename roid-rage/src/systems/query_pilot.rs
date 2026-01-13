@@ -95,11 +95,8 @@ impl<'s> System<'s> for QueryPilotSystem {
 
             let ship_center = position.0;
 
-            let firing_position = Vec2::new(
-                // TODO: Would it be better to use rotation.0.normalized() instead of doing trig here?
-                ship_center.x + rotation.0.cos() * ship.length / 2.0,
-                ship_center.y + rotation.0.sin() * ship.length / 2.0,
-            );
+            let heading = to_vector(rotation.0);
+            let firing_position = ship_center + heading * (ship.length / 2.0);
 
             let game_state = rpc::GameState {
                 field: Some(rpc::Field {
@@ -158,7 +155,13 @@ impl<'s> System<'s> for QueryPilotSystem {
                         Ok(rpc::Rotation::Clockwise) => 1.0,
                         Ok(rpc::Rotation::Counterclockwise) => -1.0,
                         Ok(rpc::Rotation::None) => 0.0,
-                        Err(_) => 0.0, // TODO: Should raise an error? Assert?
+                        Err(_) => {
+                            println!(
+                                "Invalid rotation value {} from pilot {}",
+                                command.rotation, pilot.url
+                            );
+                            0.0
+                        }
                     };
 
                     angular_velocity.0 = rotation_direction * ship.rotational_speed;
