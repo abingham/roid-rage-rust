@@ -2776,6 +2776,7 @@ version = "0.1.0"
 dependencies = [
  "float-cmp",
  "glam 0.30.10",
+ "nalgebra 0.34.1",
  "roid-rage",
  "roid-rage-grpc",
  "sted",
