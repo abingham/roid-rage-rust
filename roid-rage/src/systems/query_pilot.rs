@@ -35,7 +35,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Position>,
         ReadStorage<'s, Rotation>,
         WriteStorage<'s, Bullet>,
-        ReadExpect<'s, Field>,
+        ReadExpect<'s, Field<f32>>,
         Read<'s, TimeDelta>,
         ReadExpect<'s, tokio::runtime::Runtime>,
         Entities<'s>,

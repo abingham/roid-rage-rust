@@ -10,7 +10,7 @@ impl<'s> System<'s> for RemoveOutOfBoundsSystem {
         ReadStorage<'s, Position>,
         ReadStorage<'s, Wrapping>,
         Entities<'s>,
-        ReadExpect<'s, Field>,
+        ReadExpect<'s, Field<f32>>,
     );
 
     fn run(&mut self, (positions, wrapping, entities, field): Self::SystemData) {

@@ -10,7 +10,7 @@ impl<'s> System<'s> for WrapObjectsSystem {
     type SystemData = (
         WriteStorage<'s, Position>,
         ReadStorage<'s, Wrapping>,
-        ReadExpect<'s, Field>,
+        ReadExpect<'s, Field<f32>>,
     );
 
     fn run(&mut self, (mut positions, wrapping, field): Self::SystemData) {
