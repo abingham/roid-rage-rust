@@ -4,6 +4,7 @@ use roid_rage_grpc::roid_rage::pilot_registrar_server::{PilotRegistrar, PilotReg
 use roid_rage_grpc::roid_rage::{RegistrationRequest, RegistrationResponse};
 use specs::prelude::*;
 use specs::{Entities, System, World, WriteStorage};
+use std::net::SocketAddr;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
 use tonic::{transport::Server, Code, Request, Response, Status};
@@ -30,10 +31,17 @@ impl<'s> System<'s> for RegisterPilotsSystem {
     fn setup(&mut self, world: &mut World) {
         let runtime = world.read_resource::<tokio::runtime::Runtime>();
         let settings = world.read_resource::<Settings>();
-        runtime.spawn(listen(
-            String::from(&settings.pilot_registration_url),
-            self.tx.clone(),
-        ));
+        let addr = match settings.pilot_registration_url.parse::<SocketAddr>() {
+            Ok(addr) => addr,
+            Err(err) => {
+                println!(
+                    "Invalid pilot registration address {}: {}",
+                    settings.pilot_registration_url, err
+                );
+                return;
+            }
+        };
+        runtime.spawn(listen(addr, self.tx.clone()));
     }
 
     fn dispose(self, _world: &mut World) {
@@ -41,11 +49,14 @@ impl<'s> System<'s> for RegisterPilotsSystem {
     }
 
     fn run(&mut self, (mut pilots, mut fire_timers, entities): Self::SystemData) {
-        // TODO: What if the URL is already registered? Ignore it.
         loop {
             match self.rx.try_recv() {
                 Err(_) => break,
                 Ok(pilot_url) => {
+                    if (&pilots).join().any(|pilot| pilot.url == pilot_url) {
+                        println!("pilot already registered: {}", pilot_url);
+                        continue;
+                    }
                     let new_entity = entities.create();
                     match pilots.insert(new_entity, Pilot::new(&pilot_url)) {
                         Err(_) => println!("oops! Trouble creating pilot"),
@@ -61,14 +72,13 @@ impl<'s> System<'s> for RegisterPilotsSystem {
 }
 
 // Listen for registrations on a URL, publishing them to a channel.
-async fn listen(url: String, tx: Sender<String>) -> Result<(), tonic::transport::Error> {
+async fn listen(addr: SocketAddr, tx: Sender<String>) -> Result<(), tonic::transport::Error> {
     let registrar = Registrar { tx: Mutex::new(tx) };
     let svc = PilotRegistrarServer::new(registrar);
-    // TODO: This parse().unwrap() call is bad. Callers should pass in a SocketAddr.
-    println!("Listening for pilot registration on {:?}", url);
+    println!("Listening for pilot registration on {:?}", addr);
     let result = Server::builder()
         .add_service(svc)
-        .serve(url.parse().unwrap())
+        .serve(addr)
         .await?;
     println!("Registration listener closing");
     Ok(result)
