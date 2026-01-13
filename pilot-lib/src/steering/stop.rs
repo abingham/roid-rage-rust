@@ -1,7 +1,7 @@
-use float_cmp::ApproxEqRatio;
 use roid_rage_grpc::roid_rage as rpc;
-use std::f32::consts::PI;
-use sted::{to_vector, Velocity};
+use sted::Velocity;
+
+use super::turn_or_thrust;
 
 /// Bring the ship to a stop
 ///
@@ -9,32 +9,14 @@ use sted::{to_vector, Velocity};
 /// ship's heading, and then fire thrusters until speed
 /// is zero.
 pub fn stop(ship: &rpc::Ship) -> rpc::Command {
-    let diff = to_vector(ship.heading).angle_to(ship.velocity());
-
-    let mut cmd = rpc::Command {
-        fire: false,
-        rotation: rpc::Rotation::None as i32,
-        thrusters: false,
-    };
+    let velocity = ship.velocity();
 
     // If already stopped, do nothing
-    if ship.velocity().speed() == 0.0 {
-        ();
-    }
-    // If we're not facing opposite to our motion, keep rotating to get there.
-    else if !diff.approx_eq_ratio(&PI, 0.01) {
-        cmd.rotation = if diff.signum() as i8 > 0 {
-            rpc::Rotation::Counterclockwise as i32
-        } else {
-            rpc::Rotation::Clockwise as i32
-        };
-    }
-    // If we're still moving, fire thrusters
-    else {
-        cmd.thrusters = true;
+    if velocity.speed() == 0.0 {
+        return rpc::Command::null();
     }
 
-    cmd
+    turn_or_thrust(ship.heading, -velocity)
 }
 
 #[cfg(test)]

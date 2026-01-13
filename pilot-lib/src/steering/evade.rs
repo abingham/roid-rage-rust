@@ -1,41 +1,44 @@
-use float_cmp::ApproxEqRatio;
 use glam::Vec2;
-// use roid_rage::core::collide::collision_vector;
 use roid_rage_grpc::roid_rage as rpc;
-use std::f32::consts::PI;
-use sted::to_vector;
 
-// TODO: This is super half-assed right now.
-pub fn evade(ship: &rpc::Ship, roids: &Vec<rpc::Roid>) -> rpc::Command {
-    let mut cmd = rpc::Command {
-        fire: false,
-        rotation: rpc::Rotation::None as i32,
-        thrusters: false,
+use super::turn_or_thrust;
+
+pub fn evade(ship: &rpc::Ship, roids: &[rpc::Roid]) -> rpc::Command {
+    if roids.is_empty() {
+        return rpc::Command::null();
+    }
+
+    let ship_pos = ship.position();
+    let mut away_vector = Vec2::ZERO;
+    let mut closest_delta = None;
+    let mut closest_distance_sq = f32::INFINITY;
+
+    for roid in roids {
+        let delta = ship_pos - roid.position();
+        let distance_sq = delta.length_squared();
+        if distance_sq == 0.0 {
+            continue;
+        }
+
+        if distance_sq < closest_distance_sq {
+            closest_distance_sq = distance_sq;
+            closest_delta = Some(delta);
+        }
+
+        away_vector += delta / distance_sq;
+    }
+
+    let target = if away_vector.length_squared() > 0.0 {
+        away_vector
+    } else {
+        closest_delta.unwrap_or(Vec2::ZERO)
     };
 
-    // Turn away from all roids
-    let pressure_vector = roids
-        .iter()
-        .map(|roid| Vec2::from(roid.position()) - Vec2::from(ship.position()))
-        .fold(Vec2::new(0.0, 0.0), |acc, x| acc + x);
-
-    let diff = pressure_vector.dot(to_vector(ship.heading));
-
-    // TODO: We use this same code in 'stop()'. Perhaps it should be
-    // factored into some sort of "turn_to()" function.
-    if !diff.approx_eq_ratio(&PI, 0.01) {
-        cmd.rotation = if diff.signum() as i8 > 0 {
-            rpc::Rotation::Counterclockwise as i32
-        } else {
-            rpc::Rotation::Clockwise as i32
-        };
-    }
-    // If we're still moving, fire thrusters
-    else {
-        cmd.thrusters = true;
+    if target.length_squared() == 0.0 {
+        return rpc::Command::null();
     }
 
-    cmd
+    turn_or_thrust(ship.heading, target)
 }
 
 // #[cfg(test)] mod tests { use super::*;
