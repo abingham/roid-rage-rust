@@ -1,4 +1,4 @@
-use specs::{Component, HashMapStorage};
+use specs::{Component, VecStorage};
 
 pub struct Pilot {
     /// Address for communicating with pilot process with grpc.
@@ -14,6 +14,5 @@ impl Pilot {
 }
 
 impl Component for Pilot {
-    // TODO: Is this the right storage type?
-    type Storage = HashMapStorage<Self>;
+    type Storage = VecStorage<Self>;
 }
