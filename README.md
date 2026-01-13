@@ -70,4 +70,39 @@ this as a rough guide of how to write a pilot.
 
 Roid Rage has a number of setting you can modify. These can be controlled via environment variables or a settings file.
 
-TODO: Document these and how to set them.
+Settings are loaded from an optional `Settings.toml` in the working directory and then
+overridden by environment variables prefixed with `ROID_RAGE_`. Environment variables use
+the exact setting name in uppercase, for example `screen_width` becomes `ROID_RAGE_SCREEN_WIDTH`.
+
+Example `Settings.toml`:
+```toml
+screen_width = 1024.0
+screen_height = 768.0
+pilot_registration_url = "[::1]:50051"
+```
+
+Example environment overrides:
+```bash
+ROID_RAGE_SCREEN_WIDTH=1024 ROID_RAGE_SCREEN_HEIGHT=768 cargo run --bin roid-rage
+```
+
+Available settings and defaults (see `roid-rage/src/settings.rs`):
+
+| Setting | Type | Default | Purpose |
+| --- | --- | --- | --- |
+| screen_width | f32 | 800.0 | Window width. |
+| screen_height | f32 | 600.0 | Window height. |
+| minimum_roid_radius | f32 | 15.0 | Smallest roid radius. |
+| maximum_roid_radius | f32 | 42.5 | Largest roid radius. |
+| roid_bumpiness | f32 | 0.1 | Irregularity factor for roid shape. |
+| rate_of_fire | f32 | 0.5 | Seconds between ship shots. |
+| bullet_speed | f32 | 1000.0 | Bullet speed. |
+| min_initial_roid_speed | f32 | 50.0 | Minimum initial roid speed. |
+| max_initial_roid_speed | f32 | 100.0 | Maximum initial roid speed. |
+| initial_roid_count | u32 | 10 | Roids spawned at startup. |
+| ship_length | f32 | 10.0 | Ship length. |
+| ship_width | f32 | 5.0 | Ship width. |
+| ship_mass | f32 | 1.0 | Ship mass. |
+| ship_thrust | f32 | 300.0 | Ship thrust force. |
+| ship_rotational_speed | f32 | 6.0 | Ship rotational speed (radians/sec). |
+| pilot_registration_url | String | "[::1]:50051" | gRPC registration listener address. |
