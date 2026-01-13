@@ -1,8 +1,8 @@
 /// This queries the pilot process using grpc to figure out
 /// what it wants to do, e.g. shoot, turn, etc.
 use crate::components::{
-    make_bullet, AngularVelocity, Bullet, LinearVelocity, Pilot, Position, Roid, Rotation, Ship,
-    TimeDelta,
+    make_bullet, AngularVelocity, Bullet, FireTimer, LinearVelocity, Pilot, Position, Roid,
+    Rotation, Ship, TimeDelta,
 };
 use crate::core::field::Field;
 use crate::settings::Settings;
@@ -15,15 +15,11 @@ use specs::{
 use std::convert::TryFrom;
 use sted::to_vector;
 
-pub struct QueryPilotSystem {
-    // TODO: I think this should be a per-pilot component. This will allow use to
-    // a) have one per pilot (important!) and b) zero it when there's a bullet collision.
-    fire_timer: f32,
-}
+pub struct QueryPilotSystem;
 
 impl QueryPilotSystem {
     pub fn new() -> Result<QueryPilotSystem, std::io::Error> {
-        Ok(QueryPilotSystem { fire_timer: 0.0 })
+        Ok(QueryPilotSystem)
     }
 }
 
@@ -35,6 +31,7 @@ impl<'s> System<'s> for QueryPilotSystem {
         ReadStorage<'s, Ship>,
         WriteStorage<'s, LinearVelocity>,
         WriteStorage<'s, AngularVelocity>,
+        WriteStorage<'s, FireTimer>,
         ReadStorage<'s, Position>,
         ReadStorage<'s, Rotation>,
         WriteStorage<'s, Bullet>,
@@ -55,6 +52,7 @@ impl<'s> System<'s> for QueryPilotSystem {
             ships,
             mut linear_velocities,
             mut angular_velocities,
+            mut fire_timers,
             positions,
             rotations,
             _bullets,
@@ -67,8 +65,6 @@ impl<'s> System<'s> for QueryPilotSystem {
             lazy,
         ): Self::SystemData,
     ) {
-        self.fire_timer += time_delta.0.as_secs_f32();
-
         let roids: Vec<rpc::Roid> = (&roids, &linear_velocities, &positions)
             .join()
             .map(|(roid, linear_velocity, position)| rpc::Roid {
@@ -84,9 +80,10 @@ impl<'s> System<'s> for QueryPilotSystem {
             })
             .collect();
 
-        for (pilot, ship, position, rotation, linear_velocity, angular_velocity) in (
+        for (pilot, ship, fire_timer, position, rotation, linear_velocity, angular_velocity) in (
             &pilots,
             &ships,
+            &mut fire_timers,
             &positions,
             &rotations,
             &mut linear_velocities,
@@ -94,6 +91,8 @@ impl<'s> System<'s> for QueryPilotSystem {
         )
             .join()
         {
+            fire_timer.0 += time_delta.0.as_secs_f32();
+
             let ship_center = position.0;
 
             let firing_position = Vec2::new(
@@ -111,7 +110,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                     x: firing_position.x,
                     y: firing_position.y,
                 }),
-                time_to_fire: settings.rate_of_fire - self.fire_timer,
+                // TODO: Is time_to_fire actually used?
+                time_to_fire: settings.rate_of_fire - fire_timer.0,
                 roids: roids.clone(),
                 ship: Some(rpc::Ship {
                     mass: ship.mass,
@@ -139,8 +139,8 @@ impl<'s> System<'s> for QueryPilotSystem {
                 // TODO: If we fail to reach a pilot after some time, we should remove it and its ship.
                 Err(msg) => println!("Error communicating with pilot: {:?}", msg),
                 Ok(command) => {
-                    if command.fire && self.fire_timer >= settings.rate_of_fire {
-                        self.fire_timer = 0.0;
+                    if command.fire && fire_timer.0 >= settings.rate_of_fire {
+                        fire_timer.0 = 0.0;
 
                         let new_entity = entities.create();
                         make_bullet(

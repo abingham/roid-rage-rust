@@ -1,4 +1,4 @@
-use crate::components::Pilot;
+use crate::components::{FireTimer, Pilot};
 use crate::settings::Settings;
 use roid_rage_grpc::roid_rage::pilot_registrar_server::{PilotRegistrar, PilotRegistrarServer};
 use roid_rage_grpc::roid_rage::{RegistrationRequest, RegistrationResponse};
@@ -26,7 +26,7 @@ impl RegisterPilotsSystem {
 }
 
 impl<'s> System<'s> for RegisterPilotsSystem {
-    type SystemData = (WriteStorage<'s, Pilot>, Entities<'s>);
+    type SystemData = (WriteStorage<'s, Pilot>, WriteStorage<'s, FireTimer>, Entities<'s>);
     fn setup(&mut self, world: &mut World) {
         let runtime = world.read_resource::<tokio::runtime::Runtime>();
         let settings = world.read_resource::<Settings>();
@@ -40,7 +40,7 @@ impl<'s> System<'s> for RegisterPilotsSystem {
         // TODO: Kill the listener?
     }
 
-    fn run(&mut self, (mut pilots, entities): Self::SystemData) {
+    fn run(&mut self, (mut pilots, mut fire_timers, entities): Self::SystemData) {
         // TODO: What if the URL is already registered? Ignore it.
         loop {
             match self.rx.try_recv() {
@@ -49,7 +49,10 @@ impl<'s> System<'s> for RegisterPilotsSystem {
                     let new_entity = entities.create();
                     match pilots.insert(new_entity, Pilot::new(&pilot_url)) {
                         Err(_) => println!("oops! Trouble creating pilot"),
-                        Ok(_) => println!("new pilot"),
+                        Ok(_) => match fire_timers.insert(new_entity, FireTimer(0.0)) {
+                            Err(_) => println!("oops! Trouble creating fire timer"),
+                            Ok(_) => println!("new pilot"),
+                        },
                     }
                 }
             }
