@@ -69,18 +69,17 @@ impl RoidRage {
         let query_pilot_system = QueryPilotSystem::new()?;
 
         let mut dispatcher = DispatcherBuilder::new()
-            // TODO: Rename this to collision-system-maintenance or something
             .with(RegisterPilotsSystem::new(), "pilot-registration", &[])
             .with(
                 CleanupCollisionsSystem::default(),
-                "cleanup_collisions",
+                "collision-system-maintenance",
                 &[],
             )
-            .with(RepopulateSystem, "repopulate", &["cleanup_collisions"])
+            .with(RepopulateSystem, "repopulate", &["collision-system-maintenance"])
             .with(
                 RespawnShipSystem,
                 "respawn",
-                &["pilot-registration", "cleanup_collisions"],
+                &["pilot-registration", "collision-system-maintenance"],
             )
             .with(AgeFragmentsSystem, "age_fragments", &[])
             .with(

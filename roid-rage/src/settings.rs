@@ -1,6 +1,8 @@
 /// Create a Settings struct that holds all of our application settings.
 ///
 /// The struct has static `load()` method which returns a fully configured Settings object.
+use std::net::{IpAddr, Ipv6Addr, SocketAddr};
+
 macro_rules! initialize_settings {
     ( $( ($setting:ident, $type:ident, $default_value:expr) ),* ) => {
             #[derive(Clone)]
@@ -59,5 +61,9 @@ initialize_settings!(
     (ship_mass, f32, 1.0),
     (ship_thrust, f32, 300.0),
     (ship_rotational_speed, f32, 6.0),
-    (pilot_registration_url, String, String::from("[::1]:50051"))
+    (
+        pilot_registration_url,
+        SocketAddr,
+        SocketAddr::new(IpAddr::V6(Ipv6Addr::LOCALHOST), 50051)
+    )
 );

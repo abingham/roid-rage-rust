@@ -105,4 +105,4 @@ Available settings and defaults (see `roid-rage/src/settings.rs`):
 | ship_mass | f32 | 1.0 | Ship mass. |
 | ship_thrust | f32 | 300.0 | Ship thrust force. |
 | ship_rotational_speed | f32 | 6.0 | Ship rotational speed (radians/sec). |
-| pilot_registration_url | String | "[::1]:50051" | gRPC registration listener address. |
+| pilot_registration_url | SocketAddr | "[::1]:50051" | gRPC registration listener address. |

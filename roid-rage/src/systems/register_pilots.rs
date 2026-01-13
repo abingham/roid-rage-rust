@@ -4,9 +4,9 @@ use roid_rage_grpc::roid_rage::pilot_registrar_server::{PilotRegistrar, PilotReg
 use roid_rage_grpc::roid_rage::{RegistrationRequest, RegistrationResponse};
 use specs::prelude::*;
 use specs::{Entities, System, World, WriteStorage};
-use std::net::SocketAddr;
 use std::sync::mpsc::{channel, Receiver, Sender};
 use std::sync::Mutex;
+use tokio::sync::oneshot;
 use tonic::{transport::Server, Code, Request, Response, Status};
 
 // What needs to happen here?
@@ -16,13 +16,18 @@ use tonic::{transport::Server, Code, Request, Response, Status};
 pub struct RegisterPilotsSystem {
     rx: Receiver<String>,
     tx: Sender<String>,
+    shutdown_tx: Option<oneshot::Sender<()>>,
 }
 
 impl RegisterPilotsSystem {
     pub fn new() -> RegisterPilotsSystem {
         let (tx, rx) = channel();
 
-        RegisterPilotsSystem { rx: rx, tx: tx }
+        RegisterPilotsSystem {
+            rx: rx,
+            tx: tx,
+            shutdown_tx: None,
+        }
     }
 }
 
@@ -31,21 +36,16 @@ impl<'s> System<'s> for RegisterPilotsSystem {
     fn setup(&mut self, world: &mut World) {
         let runtime = world.read_resource::<tokio::runtime::Runtime>();
         let settings = world.read_resource::<Settings>();
-        let addr = match settings.pilot_registration_url.parse::<SocketAddr>() {
-            Ok(addr) => addr,
-            Err(err) => {
-                println!(
-                    "Invalid pilot registration address {}: {}",
-                    settings.pilot_registration_url, err
-                );
-                return;
-            }
-        };
-        runtime.spawn(listen(addr, self.tx.clone()));
+        let addr = settings.pilot_registration_url;
+        let (shutdown_tx, shutdown_rx) = oneshot::channel();
+        self.shutdown_tx = Some(shutdown_tx);
+        runtime.spawn(listen(addr, self.tx.clone(), shutdown_rx));
     }
 
     fn dispose(self, _world: &mut World) {
-        // TODO: Kill the listener?
+        if let Some(shutdown_tx) = self.shutdown_tx {
+            let _ = shutdown_tx.send(());
+        }
     }
 
     fn run(&mut self, (mut pilots, mut fire_timers, entities): Self::SystemData) {
@@ -72,13 +72,20 @@ impl<'s> System<'s> for RegisterPilotsSystem {
 }
 
 // Listen for registrations on a URL, publishing them to a channel.
-async fn listen(addr: SocketAddr, tx: Sender<String>) -> Result<(), tonic::transport::Error> {
+async fn listen(
+    addr: SocketAddr,
+    tx: Sender<String>,
+    shutdown_rx: oneshot::Receiver<()>,
+) -> Result<(), tonic::transport::Error> {
     let registrar = Registrar { tx: Mutex::new(tx) };
     let svc = PilotRegistrarServer::new(registrar);
     println!("Listening for pilot registration on {:?}", addr);
+    let shutdown = async {
+        let _ = shutdown_rx.await;
+    };
     let result = Server::builder()
         .add_service(svc)
-        .serve(addr)
+        .serve_with_shutdown(addr, shutdown)
         .await?;
     println!("Registration listener closing");
     Ok(result)
