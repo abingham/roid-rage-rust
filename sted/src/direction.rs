@@ -7,7 +7,7 @@ pub fn to_vector(radians: f32) -> glam::Vec2 {
 #[cfg(test)]
 mod tests {
     use super::super::to_vector;
-    use float_cmp::ApproxEqRatio;
+    use float_cmp::approx_eq;
     use std::f32::consts::PI;
 
     #[test]
@@ -22,11 +22,8 @@ mod tests {
         let west = PI;
         let actual = to_vector(west);
         let expected = glam::Vec2::new(-1.0, 0.0);
-        assert!(actual.x.approx_eq_ratio(&expected.x, 0.0001));
-        assert!((actual.y - expected.y).abs() < 0.00001);
-
-        // TODO: Why doesn't this work? And the others?
-        // assert!(actual.y.approx_eq_ratio(&expected.y, 0.01));
+        assert!(approx_eq!(f32, actual.x, expected.x, epsilon = 0.0001));
+        assert!(approx_eq!(f32, actual.y, expected.y, epsilon = 0.0001));
     }
 
     #[test]
@@ -34,9 +31,8 @@ mod tests {
         let north = PI / 2.0;
         let actual = to_vector(north);
         let expected = glam::Vec2::new(0.0, 1.0);
-        // assert_eq!(actual, expected);
-        assert!((actual.x - expected.x).abs() < 0.0001);
-        assert!((actual.y - expected.y).abs() < 0.0001);
+        assert!(approx_eq!(f32, actual.x, expected.x, epsilon = 0.0001));
+        assert!(approx_eq!(f32, actual.y, expected.y, epsilon = 0.0001));
     }
 
     #[test]
@@ -44,7 +40,7 @@ mod tests {
         let south = 3.0 * PI / 2.0;
         let actual = to_vector(south);
         let expected = glam::Vec2::new(0.0, -1.0);
-        assert!((actual.x - expected.x).abs() < 0.0001);
-        assert!((actual.y - expected.y).abs() < 0.0001);
+        assert!(approx_eq!(f32, actual.x, expected.x, epsilon = 0.0001));
+        assert!(approx_eq!(f32, actual.y, expected.y, epsilon = 0.0001));
     }
 }
