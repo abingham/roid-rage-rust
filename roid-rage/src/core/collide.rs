@@ -114,6 +114,8 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use float_cmp::approx_eq;
+    use nalgebra::Vector2;
 
     mod quadratic {
         use super::*;
@@ -133,6 +135,42 @@ mod tests {
             for ((a, b, c), expected) in cases {
                 assert_eq!(solve_quadratic(a, b, c), expected);
             }
+        }
+    }
+
+    mod collision {
+        use super::*;
+
+        #[test]
+        fn stationary_target_returns_target_position() {
+            let launch = Vector2::new(0.0_f32, 0.0);
+            let target_pos = Vector2::new(10.0_f32, 0.0);
+            let target_vel = Vector2::new(0.0_f32, 0.0);
+            let point = collision_point(&launch, 5.0, &target_pos, &target_vel).unwrap();
+            assert!(approx_eq!(f32, point[0], 10.0, epsilon = 0.0001));
+            assert!(approx_eq!(f32, point[1], 0.0, epsilon = 0.0001));
+        }
+
+        #[test]
+        fn moving_target_intercept() {
+            let launch = Vector2::new(0.0_f32, 0.0);
+            let target_pos = Vector2::new(10.0_f32, 0.0);
+            let target_vel = Vector2::new(1.0_f32, 0.0);
+            let point = collision_point(&launch, 5.0, &target_pos, &target_vel).unwrap();
+            assert!(approx_eq!(f32, point[0], 12.5, epsilon = 0.0001));
+            assert!(approx_eq!(f32, point[1], 0.0, epsilon = 0.0001));
+        }
+
+        #[test]
+        fn collision_vector_points_to_intercept() {
+            let launch = Vector2::new(0.0_f32, 0.0);
+            let target_pos = Vector2::new(10.0_f32, 0.0);
+            let target_vel = Vector2::new(0.0_f32, 0.0);
+            let (point, vector) =
+                collision_vector(&launch, 5.0, &target_pos, &target_vel).unwrap();
+            assert!(approx_eq!(f32, point[0], 10.0, epsilon = 0.0001));
+            assert!(approx_eq!(f32, vector[0], 10.0, epsilon = 0.0001));
+            assert!(approx_eq!(f32, vector[1], 0.0, epsilon = 0.0001));
         }
     }
 }

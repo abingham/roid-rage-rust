@@ -24,3 +24,57 @@ impl<'s> System<'s> for RemoveOutOfBoundsSystem {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::components::{Position, Wrapping};
+    use crate::core::field::Field;
+    use specs::{Builder, World, WorldExt};
+
+    #[test]
+    fn removes_entities_outside_field() {
+        let mut world = World::new();
+        world.register::<Position>();
+        world.register::<Wrapping>();
+        world.insert(Field::new(10.0_f32, 10.0_f32));
+
+        let outside = world
+            .create_entity()
+            .with(Position(glam::Vec2::new(11.0, 5.0)))
+            .build();
+        let inside = world
+            .create_entity()
+            .with(Position(glam::Vec2::new(1.0, 2.0)))
+            .build();
+
+        let mut system = RemoveOutOfBoundsSystem;
+        system.run_now(&world);
+        world.maintain();
+
+        let entities = world.entities();
+        assert!(!entities.is_alive(outside));
+        assert!(entities.is_alive(inside));
+    }
+
+    #[test]
+    fn ignores_wrapping_entities() {
+        let mut world = World::new();
+        world.register::<Position>();
+        world.register::<Wrapping>();
+        world.insert(Field::new(10.0_f32, 10.0_f32));
+
+        let wrapped = world
+            .create_entity()
+            .with(Position(glam::Vec2::new(11.0, 5.0)))
+            .with(Wrapping)
+            .build();
+
+        let mut system = RemoveOutOfBoundsSystem;
+        system.run_now(&world);
+        world.maintain();
+
+        let entities = world.entities();
+        assert!(entities.is_alive(wrapped));
+    }
+}

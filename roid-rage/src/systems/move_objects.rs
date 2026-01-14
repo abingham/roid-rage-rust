@@ -27,3 +27,40 @@ impl<'s> System<'s> for MoveObjectsSystem {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, TimeDelta};
+    use specs::{Builder, World, WorldExt};
+    use std::time::Duration;
+
+    #[test]
+    fn integrates_position_and_rotation() {
+        let mut world = World::new();
+        world.register::<Position>();
+        world.register::<Rotation>();
+        world.register::<LinearVelocity>();
+        world.register::<AngularVelocity>();
+        world.insert(TimeDelta(Duration::from_secs_f32(0.5)));
+
+        world
+            .create_entity()
+            .with(Position(glam::Vec2::new(1.0, 2.0)))
+            .with(Rotation(0.0))
+            .with(LinearVelocity(glam::Vec2::new(4.0, -2.0)))
+            .with(AngularVelocity(2.0))
+            .build();
+
+        let mut system = MoveObjectsSystem;
+        system.run_now(&world);
+        world.maintain();
+
+        let positions = world.read_storage::<Position>();
+        let rotations = world.read_storage::<Rotation>();
+        let (position, rotation) = (&positions, &rotations).join().next().unwrap();
+
+        assert_eq!(position.0, glam::Vec2::new(3.0, 1.0));
+        assert!((rotation.0 - 1.0).abs() < 0.0001);
+    }
+}

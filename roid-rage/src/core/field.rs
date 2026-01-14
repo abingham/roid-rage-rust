@@ -47,3 +47,26 @@ where
         (x, y)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Field;
+
+    #[test]
+    fn contains_includes_bounds() {
+        let field = Field::new(10.0_f32, 5.0_f32);
+        assert!(field.contains(0.0, 0.0));
+        assert!(field.contains(10.0, 5.0));
+        assert!(!field.contains(-0.1, 1.0));
+        assert!(!field.contains(1.0, 5.1));
+    }
+
+    #[test]
+    fn wrap_resets_outside_edges() {
+        let field = Field::new(10.0_f32, 5.0_f32);
+        assert_eq!(field.wrap(-1.0, 2.0), (10.0, 2.0));
+        assert_eq!(field.wrap(11.0, 2.0), (0.0, 2.0));
+        assert_eq!(field.wrap(3.0, -1.0), (3.0, 5.0));
+        assert_eq!(field.wrap(3.0, 6.0), (3.0, 0.0));
+    }
+}
