@@ -39,3 +39,23 @@ where
         self.1
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Velocity;
+
+    #[test]
+    fn tuple_speed_and_bearing() {
+        let v = (3.0_f32, 4.0_f32);
+        assert!((v.speed() - 5.0).abs() < 0.0001);
+        assert!((v.bearing() - 0.9272952).abs() < 0.0001);
+    }
+
+    #[test]
+    fn vec2_speed_and_bearing() {
+        let v = glam::Vec2::new(-1.0, 0.0);
+        assert!((v.speed() - 1.0).abs() < 0.0001);
+        let bearing = v.bearing();
+        assert!((bearing - std::f32::consts::PI).abs() < 0.0001);
+    }
+}
