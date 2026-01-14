@@ -78,3 +78,50 @@ pub mod roid_rage {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::roid_rage::{Command, Position, Roid, Ship, Velocity};
+
+    #[test]
+    fn ship_velocity_defaults_to_zero() {
+        let ship = Ship {
+            velocity: None,
+            ..Default::default()
+        };
+        let v = ship.velocity();
+        assert_eq!(v.x, 0.0);
+        assert_eq!(v.y, 0.0);
+    }
+
+    #[test]
+    fn roid_position_defaults_to_zero() {
+        let roid = Roid {
+            position: None,
+            ..Default::default()
+        };
+        let p = roid.position();
+        assert_eq!(p.x, 0.0);
+        assert_eq!(p.y, 0.0);
+    }
+
+    #[test]
+    fn command_null_is_noop() {
+        let cmd = Command::null();
+        assert!(!cmd.fire);
+        assert!(!cmd.thrusters);
+        assert_eq!(cmd.rotation, super::roid_rage::Rotation::None as i32);
+    }
+
+    #[test]
+    fn from_position_and_velocity() {
+        let p = Position { x: 3.0, y: -2.0 };
+        let v = Velocity { x: -1.0, y: 4.0 };
+        let gp: glam::Vec2 = (&p).into();
+        let gv: glam::Vec2 = (&v).into();
+        assert_eq!(gp.x, 3.0);
+        assert_eq!(gp.y, -2.0);
+        assert_eq!(gv.x, -1.0);
+        assert_eq!(gv.y, 4.0);
+    }
+}
