@@ -32,7 +32,7 @@ impl<'s> System<'s> for MoveObjectsSystem {
 mod tests {
     use super::*;
     use crate::components::{AngularVelocity, LinearVelocity, Position, Rotation, TimeDelta};
-    use specs::{Builder, World, WorldExt};
+    use specs::{Builder, RunNow, World, WorldExt};
     use std::time::Duration;
 
     #[test]

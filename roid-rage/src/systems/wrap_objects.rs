@@ -27,7 +27,7 @@ mod tests {
     use super::*;
     use crate::components::{Position, Wrapping};
     use crate::core::field::Field;
-    use specs::{Builder, World, WorldExt};
+    use specs::{Builder, RunNow, World, WorldExt};
 
     #[test]
     fn wraps_only_wrapping_entities() {

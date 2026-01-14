@@ -27,9 +27,11 @@ mod wrap_objects;
 #[cfg(test)]
 mod tests {
     use super::{MoveObjectsSystem, WrapObjectsSystem};
-    use crate::components::{LinearVelocity, Position, TimeDelta, Wrapping};
+    use crate::components::{
+        AngularVelocity, LinearVelocity, Position, Rotation, TimeDelta, Wrapping,
+    };
     use crate::core::field::Field;
-    use specs::{Builder, DispatcherBuilder, World, WorldExt};
+    use specs::{Builder, DispatcherBuilder, Join, World, WorldExt};
     use std::time::Duration;
 
     #[test]
@@ -38,6 +40,8 @@ mod tests {
         world.register::<Position>();
         world.register::<LinearVelocity>();
         world.register::<Wrapping>();
+        world.register::<Rotation>();
+        world.register::<AngularVelocity>();
         world.insert(TimeDelta(Duration::from_secs_f32(1.0)));
         world.insert(Field::new(10.0_f32, 10.0_f32));
 
