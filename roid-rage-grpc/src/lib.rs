@@ -95,6 +95,17 @@ mod tests {
     }
 
     #[test]
+    fn ship_position_defaults_to_zero() {
+        let ship = Ship {
+            position: None,
+            ..Default::default()
+        };
+        let p = ship.position();
+        assert_eq!(p.x, 0.0);
+        assert_eq!(p.y, 0.0);
+    }
+
+    #[test]
     fn roid_position_defaults_to_zero() {
         let roid = Roid {
             position: None,
@@ -103,6 +114,17 @@ mod tests {
         let p = roid.position();
         assert_eq!(p.x, 0.0);
         assert_eq!(p.y, 0.0);
+    }
+
+    #[test]
+    fn roid_velocity_defaults_to_zero() {
+        let roid = Roid {
+            velocity: None,
+            ..Default::default()
+        };
+        let v = roid.velocity();
+        assert_eq!(v.x, 0.0);
+        assert_eq!(v.y, 0.0);
     }
 
     #[test]
