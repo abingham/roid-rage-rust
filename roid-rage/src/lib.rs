@@ -53,10 +53,7 @@ impl RoidRage {
     pub fn new(ctx: &mut Context, settings: settings::Settings) -> GameResult<RoidRage> {
         let mut world = World::new();
 
-        world.insert(Field::new(
-            settings.screen_width as usize,
-            settings.screen_height as usize,
-        ));
+        world.insert(Field::new(settings.screen_width, settings.screen_height));
         world.insert(CollisionWorld::<f32, specs::world::Index>::new(0.02f32));
         world.insert(TimeDelta(Duration::from_secs(0)));
         world.insert(settings);

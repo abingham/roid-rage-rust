@@ -3,11 +3,11 @@ use num::{Float, FromPrimitive};
 use std::cmp::Ordering;
 
 fn speed<T: Float>(vector: &Vector2<T>) -> T {
-    (vector.x * vector.x + vector.y * vector.y).sqrt()
+    (vector[0] * vector[0] + vector[1] * vector[1]).sqrt()
 }
 
 fn bearing<T: Float>(vector: &Vector2<T>) -> T {
-    vector.y.atan2(vector.x)
+    vector[1].atan2(vector[0])
 }
 
 /// Find real roots for a quadratic of the form:
@@ -49,7 +49,7 @@ where
 /// The basic calculation is to find a time in the future when the distance of the projectile and the target is the
 /// same. This results in a quadratic equation which we solve. If this gives results, we choose the closest time, figure
 /// out where the target will be at that time, and return that.
-pub fn collision_point(
+pub fn collision_point<T>(
     launch_position: &Vector2<T>,
     projectile_speed: T,
     target_position: &Vector2<T>,
@@ -58,8 +58,8 @@ pub fn collision_point(
 where
     T: Float + FromPrimitive,
 {
-    let delta_x = launch_position.x - target_position.x;
-    let delta_y = launch_position.y - target_position.y;
+    let delta_x = launch_position[0] - target_position[0];
+    let delta_y = launch_position[1] - target_position[1];
 
     let target_speed = speed(target_velocity);
     let target_bearing = bearing(target_velocity);
@@ -79,8 +79,8 @@ where
         .filter(|r| **r >= T::zero())
         .min_by(|a, b| a.partial_cmp(b).unwrap_or(Ordering::Less))
         .map(|dt| {
-            let coll_x = *dt * target_speed * target_bearing.cos() + target_position.x;
-            let coll_y = *dt * target_speed * target_bearing.sin() + target_position.y;
+            let coll_x = *dt * target_speed * target_bearing.cos() + target_position[0];
+            let coll_y = *dt * target_speed * target_bearing.sin() + target_position[1];
             Vector2::new(coll_x, coll_y)
         })
 }
@@ -95,7 +95,7 @@ where
 /// * target_dir - Direction (of movement) of target
 ///
 /// Returns a tuple (collision-position, collision-vector) if one.
-pub fn collision_vector(
+pub fn collision_vector<T>(
     position: &Vector2<T>,
     speed: T,
     target_position: &Vector2<T>,
@@ -105,7 +105,10 @@ where
     T: Float + FromPrimitive,
 {
     collision_point(position, speed, target_position, target_velocity)
-        .map(|p| (p, p - *position))
+        .map(|p| {
+            let vector = Vector2::new(p[0] - position[0], p[1] - position[1]);
+            (p, vector)
+        })
 }
 
 #[cfg(test)]

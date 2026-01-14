@@ -6,7 +6,6 @@ use crate::components::{
 };
 use crate::core::field::Field;
 use crate::settings::Settings;
-use glam::Vec2;
 use ncollide2d::world::CollisionWorld;
 use roid_rage_grpc::roid_rage as rpc;
 use specs::{

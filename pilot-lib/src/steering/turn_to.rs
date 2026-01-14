@@ -8,13 +8,18 @@ pub fn turn_to(heading: f32, target: Vec2) -> rpc::Rotation {
         return rpc::Rotation::None;
     }
 
-    let diff = to_vector(heading).angle_to(target);
+    let target_dir = target.normalize_or_zero();
+    if target_dir.length_squared() == 0.0 {
+        return rpc::Rotation::None;
+    }
+
+    let diff = to_vector(heading).angle_to(target_dir);
 
     if diff.approx_eq_ratio(&0.0, 0.01) {
         rpc::Rotation::None
     } else if diff.signum() as i8 > 0 {
-        rpc::Rotation::Counterclockwise
-    } else {
         rpc::Rotation::Clockwise
+    } else {
+        rpc::Rotation::Counterclockwise
     }
 }
