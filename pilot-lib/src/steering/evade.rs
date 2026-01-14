@@ -41,6 +41,55 @@ pub fn evade(ship: &rpc::Ship, roids: &[rpc::Roid]) -> rpc::Command {
     turn_or_thrust(ship.heading, target)
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn make_ship(heading: f32) -> rpc::Ship {
+        rpc::Ship {
+            heading,
+            mass: 1.0,
+            position: Some(rpc::Position { x: 0.0, y: 0.0 }),
+            thrust: 1.0,
+            velocity: Some(rpc::Velocity { x: 0.0, y: 0.0 }),
+            cannon: None,
+        }
+    }
+
+    fn make_roid(x: f32, y: f32) -> rpc::Roid {
+        rpc::Roid {
+            radius: 1.0,
+            position: Some(rpc::Position { x, y }),
+            velocity: None,
+        }
+    }
+
+    #[test]
+    fn no_rods_returns_null() {
+        let ship = make_ship(0.0);
+        let cmd = evade(&ship, &[]);
+        assert_eq!(cmd, rpc::Command::null());
+    }
+
+    #[test]
+    fn thrusts_when_already_facing_away() {
+        let ship = make_ship(std::f32::consts::PI);
+        let roid = make_roid(5.0, 0.0);
+        let cmd = evade(&ship, &[roid]);
+        assert_eq!(cmd.rotation, rpc::Rotation::None as i32);
+        assert!(cmd.thrusters);
+    }
+
+    #[test]
+    fn ignores_zero_distance_roid() {
+        let ship = make_ship(0.0);
+        let roid = make_roid(0.0, 0.0);
+        let other = make_roid(5.0, 0.0);
+        let cmd = evade(&ship, &[roid, other]);
+        assert_ne!(cmd, rpc::Command::null());
+    }
+}
+
 // #[cfg(test)] mod tests { use super::*;
 
 //     mod stop {
