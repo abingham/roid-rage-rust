@@ -149,9 +149,17 @@ impl<'s> System<'s> for QueryPilotSystem {
                     disconnected.push(entity);
                 }
                 Ok(command) => {
-                    if command.fire && fire_timer.0 >= settings.rate_of_fire {
-                        fire_timer.0 = 0.0;
-
+                    if apply_command(
+                        &command,
+                        ship,
+                        &rotation,
+                        linear_velocity,
+                        angular_velocity,
+                        fire_timer,
+                        &time_delta,
+                        &settings,
+                        &pilot.url,
+                    ) {
                         let new_entity = entities.create();
                         make_bullet(
                             specs::world::LazyBuilder {
@@ -162,29 +170,6 @@ impl<'s> System<'s> for QueryPilotSystem {
                             heading * settings.bullet_speed,
                             &mut collision_world,
                         );
-                    }
-
-                    let rotation_direction = match rpc::Rotation::try_from(command.rotation) {
-                        Ok(rpc::Rotation::Clockwise) => Some(1.0),
-                        Ok(rpc::Rotation::Counterclockwise) => Some(-1.0),
-                        Ok(rpc::Rotation::None) => Some(0.0),
-                        Err(_) => {
-                            println!(
-                                "Invalid rotation value {} from pilot {}",
-                                command.rotation, pilot.url
-                            );
-                            None
-                        }
-                    };
-
-                    if let Some(rotation_direction) = rotation_direction {
-                        angular_velocity.0 = rotation_direction * ship.rotational_speed;
-                    }
-
-                    if command.thrusters {
-                        let steering_force = ship.thrust * heading;
-                        let accel = steering_force / ship.mass;
-                        linear_velocity.0 += accel * time_delta.0.as_secs_f32();
                     }
                 }
             }
@@ -209,4 +194,186 @@ async fn query_pilot(
     let response = client.get_command(request).await?;
 
     Ok(response.get_ref().clone())
+}
+
+fn apply_command(
+    command: &rpc::Command,
+    ship: &Ship,
+    rotation: &Rotation,
+    linear_velocity: &mut LinearVelocity,
+    angular_velocity: &mut AngularVelocity,
+    fire_timer: &mut FireTimer,
+    time_delta: &TimeDelta,
+    settings: &Settings,
+    pilot_url: &str,
+) -> bool {
+    let heading = to_vector(rotation.0);
+    let mut fired = false;
+
+    if command.fire && fire_timer.0 >= settings.rate_of_fire {
+        fire_timer.0 = 0.0;
+        fired = true;
+    }
+
+    let rotation_direction = match rpc::Rotation::try_from(command.rotation) {
+        Ok(rpc::Rotation::Clockwise) => Some(1.0),
+        Ok(rpc::Rotation::Counterclockwise) => Some(-1.0),
+        Ok(rpc::Rotation::None) => Some(0.0),
+        Err(_) => {
+            println!(
+                "Invalid rotation value {} from pilot {}",
+                command.rotation, pilot_url
+            );
+            None
+        }
+    };
+
+    if let Some(rotation_direction) = rotation_direction {
+        angular_velocity.0 = rotation_direction * ship.rotational_speed;
+    }
+
+    if command.thrusters {
+        let steering_force = ship.thrust * heading;
+        let accel = steering_force / ship.mass;
+        linear_velocity.0 += accel * time_delta.0.as_secs_f32();
+    }
+
+    fired
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn settings() -> Settings {
+        Settings::load().expect("settings")
+    }
+
+    fn ship() -> Ship {
+        Ship {
+            mass: 2.0,
+            thrust: 4.0,
+            length: 1.0,
+            width: 1.0,
+            rotational_speed: 3.0,
+            cannon: crate::components::Cannon {
+                bullet_speed: 10.0,
+                rate_of_fire: 0.5,
+            },
+        }
+    }
+
+    #[test]
+    fn apply_command_sets_rotation() {
+        let mut linear_velocity = LinearVelocity(glam::Vec2::ZERO);
+        let mut angular_velocity = AngularVelocity(0.0);
+        let mut fire_timer = FireTimer(0.0);
+        let rotation = Rotation(0.0);
+        let time_delta = TimeDelta(std::time::Duration::from_secs_f32(0.5));
+        let command = rpc::Command {
+            fire: false,
+            rotation: rpc::Rotation::Clockwise as i32,
+            thrusters: false,
+        };
+
+        apply_command(
+            &command,
+            &ship(),
+            &rotation,
+            &mut linear_velocity,
+            &mut angular_velocity,
+            &mut fire_timer,
+            &time_delta,
+            &settings(),
+            "pilot",
+        );
+
+        assert!((angular_velocity.0 - 3.0).abs() < 0.0001);
+    }
+
+    #[test]
+    fn apply_command_ignores_invalid_rotation() {
+        let mut linear_velocity = LinearVelocity(glam::Vec2::ZERO);
+        let mut angular_velocity = AngularVelocity(0.5);
+        let mut fire_timer = FireTimer(0.0);
+        let rotation = Rotation(0.0);
+        let time_delta = TimeDelta(std::time::Duration::from_secs_f32(0.5));
+        let command = rpc::Command {
+            fire: false,
+            rotation: 99,
+            thrusters: false,
+        };
+
+        apply_command(
+            &command,
+            &ship(),
+            &rotation,
+            &mut linear_velocity,
+            &mut angular_velocity,
+            &mut fire_timer,
+            &time_delta,
+            &settings(),
+            "pilot",
+        );
+
+        assert!((angular_velocity.0 - 0.5).abs() < 0.0001);
+    }
+
+    #[test]
+    fn apply_command_thrusters_accelerate_along_heading() {
+        let mut linear_velocity = LinearVelocity(glam::Vec2::ZERO);
+        let mut angular_velocity = AngularVelocity(0.0);
+        let mut fire_timer = FireTimer(0.0);
+        let rotation = Rotation(0.0);
+        let time_delta = TimeDelta(std::time::Duration::from_secs_f32(0.5));
+        let command = rpc::Command {
+            fire: false,
+            rotation: rpc::Rotation::None as i32,
+            thrusters: true,
+        };
+
+        apply_command(
+            &command,
+            &ship(),
+            &rotation,
+            &mut linear_velocity,
+            &mut angular_velocity,
+            &mut fire_timer,
+            &time_delta,
+            &settings(),
+            "pilot",
+        );
+
+        assert!((linear_velocity.0.x - 1.0).abs() < 0.0001);
+        assert!((linear_velocity.0.y - 0.0).abs() < 0.0001);
+    }
+
+    #[test]
+    fn apply_command_fires_when_ready() {
+        let mut linear_velocity = LinearVelocity(glam::Vec2::ZERO);
+        let mut angular_velocity = AngularVelocity(0.0);
+        let mut fire_timer = FireTimer(1.0);
+        let rotation = Rotation(0.0);
+        let time_delta = TimeDelta(std::time::Duration::from_secs_f32(0.5));
+        let command = rpc::Command {
+            fire: true,
+            rotation: rpc::Rotation::None as i32,
+            thrusters: false,
+        };
+
+        let fired = apply_command(
+            &command,
+            &ship(),
+            &rotation,
+            &mut linear_velocity,
+            &mut angular_velocity,
+            &mut fire_timer,
+            &time_delta,
+            &settings(),
+            "pilot",
+        );
+
+        assert!(fired);
+        assert!((fire_timer.0 - 0.0).abs() < 0.0001);
+    }
 }
